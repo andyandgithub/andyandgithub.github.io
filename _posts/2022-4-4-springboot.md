@@ -403,6 +403,7 @@ public class Demo1Application {
         </dependency>
 </dependencies>
 ```
+
 2. 定义表和实体类
 3. 添加yml配置
 ```yaml
@@ -414,6 +415,7 @@ spring:
       driver-class-name: com.mysql.jdbc.Driver
 #server:
 ```
+
 两种使用方式，注解方式、xml方式
 ### 注解方式
 User.java 类
@@ -514,4 +516,156 @@ public interface UserXmlMapper {
     }
 ```
 ## redis
+启动redis,进入到安装目录之下
+```shell
+redis-server.exe redis.windows.conf
+# 新建一个cmd
+redis-cli.exe -h 127.0.0.1 -p 6379 
+```
+xml导入依赖
+```xml
+<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+```
+yml配置
+```yaml
+spring:
+    redis:
+        host: localhost
+        port: 6376
+#server:
+```
+```java
+
+package com.demo.demo1;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.data.redis.core.RedisTemplate;
+
+@SpringBootTest(classes=Demo1Application.class)
+@RunWith(SpringRunner.class)
+public class redisTest {
+    @Autowired
+    RedisTemplate redisTemplate;
+    @Test
+    public void test(){
+        redisTemplate.opsForValue().set("a","b");
+        redisTemplate.boundValueOps("c").set("d");
+
+    }
+    @Test
+    public void testRedis2(){
+        Object b=redisTemplate.opsForValue().get("a");
+        System.out.println(b);
+        Object c=redisTemplate.boundValueOps("c").get();
+        System.out.println(c);
+    }
+}
+
+```
+# 自动配置
+## condition
+SpringBoot 提供的常用条件注解：
+
+- ConditionalOnProperty：判断配置文件中是否有对应属性和值才初始化Bean
+
+- ConditionalOnClass：判断环境中是否有对应字节码文件才初始化Bean
+
+- ConditionalOnMissingBean：判断环境中没有对应Bean才初始化Bean
+## 切换内置服务器
+tomcat(默认),jetty,netty
+pom文件中的排除依赖效果
+```xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+    <!--排除tomcat依赖-->
+    <exclusions>
+        <exclusion>
+            <artifactId>spring-boot-starter-tomcat</artifactId>
+            <groupId>org.springframework.boot</groupId>
+        </exclusion>
+    </exclusions>
+</dependency>
+
+<!--引入jetty的依赖-->
+<dependency>
+    <artifactId>spring-boot-starter-jetty</artifactId>
+    <groupId>org.springframework.boot</groupId>
+</dependency>
+```
+> 问你：为什么引入了starter-data-redis，我们就能项目中，直接拿redistemplate?
+
+> springboot中的autoconfig工程里把常用的对象的配置类都有了，只要工程中，引入了相关起步依赖，这些对象在我们本项目的容器中就有了。
+
+## 引入第三方jar包
+
+三种解决方案：
+
+1. 使用@ComponentScan扫描com.ydlclass.config包
+
+2. 可以使用@Import注解，加载类。这些类都会被Spring创建，并放入IOC容器
+
+3. 可以对Import注解进行封装。
+
+重点：Enable注解底层原理是使用@Import注解实现Bean的动态加载
+
+重要：springbootapplication 由三个注解组成
+
+@SpringBootConfiguration 自动配置相关
+@EnableAutoConfiguration
+@ComponentScan 扫本包及子包
+
+
+pom中引入springboot-enable-other
+```xml
+
+ 	<dependency>
+          <groupId>com.ydlclass</groupId>
+          <artifactId>springboot-enable-other</artifactId>
+          <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+```
+## import用法
+@Enable底层依赖于@Import注解导入一些类，使用@Import导入的类会被Spring加载到IOC容器中。而@Import提供4中用法：
+
+①导入Bean。注意bean名字是全限定名
+```java
+@Import(User.class)
+
+```
+②导入配置类
+
+③导入 ImportSelector 实现类。一般用于加载配置文件中的类
+
+④导入 ImportBeanDefinitionRegistrar 实现类。
+
+导入Bean @Import(User.class)
+
+导入配置类 @Import(UserConfig.class)
+
+导入 ImportSelector 实现类 @Import(MyImportSelector.class)
+
+MyImportSelector
+
+# 打包上线
+maven -package打包
+在target里面的jar包
+```shell
+java -jar xxxx.jar
+```
+更改最终的名字
+pom.xml中的
+```xml
+<build>
+    <finalName>name</finalName>
+</build>
+```
 
