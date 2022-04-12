@@ -274,7 +274,65 @@ java -jar xxxx.jar --spring.profiles.active=dev
 java -jar myproject.jar --spring.config.location=d://application.properties
 java -jar app.jar --name="Spring“ --server.port=9000
 ```
+## 前后端交互
+### 返回Json数据
 
+在 Controller 类上面用 @RestController 定义或者在方法上面用 @ResponseBody 定义，表明是在 Body 区域输出数据。
+
+
+```java
+public Users getUser(){
+    user=...
+    return user;
+}
+```
+### 获取传递的参数
+```java
+@PostMapping("/login")
+    public String login(@RequestParam("username") String username,
+                        @RequestParam("password") String password){
+
+
+//        Query query=new Query(Criteria.where("username").is("admin"));
+        System.out.println(username+password);
+        return "login"+username+password;
+}
+```
+@PathVaribale 获取url中的数据
+@RequestParam 获取请求参数的值
+@GetMapping 组合注解，是 @RequestMapping(method = RequestMethod.GET) 的缩写
+@RequestBody 利用一个对象去获取前端传过来的数
+### 插入
+```java
+mongoTemplate.save(user);
+mongoTemplate.insert(user);
+//  根据集合名称保存对象到mongodb
+mongoTemplate.save(user,"mongodb_user");
+mongoTemplate.insert(user,"mongodb_user");
+//  根据集合名称保存list到mongodb
+mongoTemplate.save(list,"mongodb_user");
+mongoTemplate.insert(list,"mongodb_user");
+mongoTemplate.insert(list,User.class);
+```
+### 更新
+```java
+Query query = Query.query(Criteria.where("_id").is("5d1312aeb1829c279c6c256b"));
+Update update = Update.update("name","zs");
+        update.set("age", 12);
+
+//  更新一条数据
+mongoTemplate.updateFirst(query,update, User.class);
+mongoTemplate.updateFirst(query,update, "mongodb_user");
+mongoTemplate.updateFirst(query,update, User.class,"mongodb_user");
+//  更新多条数据
+mongoTemplate.updateMulti(query,update, User.class);
+mongoTemplate.updateMulti(query,update,"mongodb_user");
+mongoTemplate.updateMulti(query,update, User.class,"mongodb_user");
+//  更新数据，如果数据不存在就新增
+mongoTemplate.upsert(query,update, User.class);
+mongoTemplate.upsert(query,update,"mongodb_user");
+mongoTemplate.upsert(query,update, User.class,"mongodb_user")
+```
 # 整合junit
 JUnit 是一个Java 编程语言的单元测试框架。
 ```xml
@@ -569,6 +627,120 @@ public class redisTest {
     }
 }
 
+```
+## mongoDb
+```xml
+<dependency>
+    <groupId>org.springframework.data</groupId>
+    <artifactId>spring-data-mongodb</artifactId>
+    <version>2.1.3.RELEASE</version>
+</dependency>
+```
+### 查询
+#### 条件查询
+```java
+    @PostMapping("test1")
+    public ResultData<Users> test2(){
+        Query query=new Query(Criteria.where("username").is("admin"));
+
+        Users a=mongoTemplate.findOne(query, Users.class);
+        List<Users> ba=mongoTemplate.findAll(Users.class);
+        return ResultData.success(a);
+    }
+```
+####  多条件查询
+```java
+
+Query query = new Query(Criteria.where("user").is("admin").and("age").is(18));
+Usrrs result = mongoTemplate.findOne(query, Users.class, COLLECTION_NAME);
+System.out.println("query: " + query + " | andQuery: " + result);
+```
+
+```java
+ @PostMapping("/login")
+
+    public ResultData<Users> login(
+            @RequestBody Users user
+    ){
+    
+        System.out.println("login");
+        Query query=new Query();
+        query.addCriteria(Criteria.where("username").is(user.getUsername()));
+        query.addCriteria(Criteria.where("password").is(user.getPassword()));
+        System.out.println(user);
+        Users u=mongoTemplate.findOne(query,Users.class);
+        if(u!=null){
+            u.setRole(mongoTemplate.findOne(new Query(Criteria.where("_id").is(u.getRole_id())), Roles.class));
+            System.out.println(ResultData.success(u));
+            return ResultData.success(u);
+        }else{
+            System.out.println(ResultData.fail(u));
+            return ResultData.fail(u);
+        }
+    }
+```
+####分页查询
+
+```java
+/**
+ * 分页查询
+ */
+public void pageQuery() {
+    // limit限定查询2条
+    Query query = Query.query(Criteria.where("user").is("一灰灰blog")).with(Sort.by("age")).limit(2);
+    List<Map> result = mongoTemplate.find(query, Map.class, COLLECTION_NAME);
+    System.out.println("query: " + query + " | limitPageQuery " + result);
+
+
+    // skip()方法来跳过指定数量的数据
+    query = Query.query(Criteria.where("user").is("一灰灰blog")).with(Sort.by("age")).skip(2);
+    result = mongoTemplate.find(query, Map.class, COLLECTION_NAME);
+    Syste
+```
+#### or或查询
+```java
+Query query = new Query(Criteria.where("user").is("admin")
+            .orOperator(Criteria.where("age").is(18), Criteria.where("sign").exists(true)));
+List<Map> result = mongoTemplate.find(query, Map.class, COLLECTION_NAME);
+```
+#### in 查询
+```java
+Query query = new Query(Criteria.where("age").in(Arrays.asList(18, 20, 30)));
+
+```
+
+#### 数字比较
+```java
+// age > 18
+Query query = new Query(Criteria.where("age").gt(18));
+// age >= 18
+query = new Query(Criteria.where("age").gte(18));
+// age < 20
+Query query = new Query(Criteria.where("age").lt(20));
+// age <= 20
+query = new Query(Criteria.where("age").lte(20));
+```
+
+#### 正则查询
+```java
+ // age <= 20
+query = new Query(Criteria.where("age").lte(20));
+```
+#### 查询总数
+```java
+Query query = new Query(Criteria.where("user").is("admin"));
+long cnt = mongoTemplate.count(query, COLLECTION_NAME);
+```
+#### 分组查询
+```java
+Aggregation aggregation = Aggregation.newAggregation(Aggregation.group("user").count().as("userCount"));
+AggregationResults<Map> ans = mongoTemplate.aggregate(aggregation, COLLECTION_NAME, Map.class);
+System.out.println("query: " + aggregation + " | groupQuery " + ans.getMappedResults());
+```
+
+#### 排序
+```java
+Query query = Query.query(Criteria.where("user").is("一灰灰blog")).with(Sort.by("age"));
 ```
 # 自动配置
 ## condition
