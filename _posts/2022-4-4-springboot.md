@@ -504,7 +504,17 @@ public UserRepository extends JpaRepository<User,int>{
 使用
 ```java
 private UserRepository userRepository;
-userRepository.findAll();
+userRepository.findAll();//查询全部数据
+```
+按照页数页码查询
+```java
+@GetMapping("/findall/{page}/{size}")
+[public Page<User>finadAll(@PathVariable("page") Integer page,@PathVariable("size") Integer size){
+    Pageable pageable =PageRequest.of(page-1,size)
+    return userRepository.findAll(pageable);
+}
+
+
 ```
 ## mybatis
 1. 引入依赖
