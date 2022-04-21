@@ -2,7 +2,7 @@
 layout: post
 title: SpringBoot入门
 categories: study
-tags : Java
+tags : java
 toc: true
 ---
 
@@ -85,7 +85,7 @@ public class demoController {
 
 至于这三层结构的划分，则是基于后续体量大的一种考虑方案，并不是最优解，但是最常见的分层。
 
-## SptringBoot配置解析
+# SptringBoot配置解析
 SpringBoot是基于约定的，所以很多配置都有默认值，但如果想使用自己的配置替换默认配置的话，就可以使用application.properties或者application.yml（application.yaml）进行配置
 同一目录之下，优先级`.properties>.yml>.yaml`
 .properties
@@ -100,15 +100,15 @@ server:
   port: 5000
   address: /test
 ```
-### yml
-#### yml语法
+## yml
+### yml语法
 - 大小写敏感
 - 数据值前边必须有空格，作为分隔符
 - 使用缩进表示层级关系
 - 缩进时不允许使用Tab键，只允许使用空格（各个系统 Tab对应的空格数目可能不同，导致层次混乱）。
 - 缩进的空格数目不重要，只要相同层级的元素左侧对齐即可
 - ''#" 表示注释，从这个字符一直到行尾，都会被解析器忽略
-#### yml数据
+### yml数据
 对象(map)：键值对的集合。
 ```yml
 person:
@@ -274,8 +274,8 @@ java -jar xxxx.jar --spring.profiles.active=dev
 java -jar myproject.jar --spring.config.location=d://application.properties
 java -jar app.jar --name="Spring“ --server.port=9000
 ```
-## 前后端交互
-### 返回Json数据
+# 前后端交互
+## 返回Json数据
 
 在 Controller 类上面用 @RestController 定义或者在方法上面用 @ResponseBody 定义，表明是在 Body 区域输出数据。
 
@@ -286,7 +286,7 @@ public Users getUser(){
     return user;
 }
 ```
-### 获取传递的参数
+## 获取传递的参数
 ```java
 @PostMapping("/login")
     public String login(@RequestParam("username") String username,
@@ -302,36 +302,64 @@ public Users getUser(){
 @RequestParam 获取请求参数的值
 @GetMapping 组合注解，是 @RequestMapping(method = RequestMethod.GET) 的缩写
 @RequestBody 利用一个对象去获取前端传过来的数
-### 插入
-```java
-mongoTemplate.save(user);
-mongoTemplate.insert(user);
-//  根据集合名称保存对象到mongodb
-mongoTemplate.save(user,"mongodb_user");
-mongoTemplate.insert(user,"mongodb_user");
-//  根据集合名称保存list到mongodb
-mongoTemplate.save(list,"mongodb_user");
-mongoTemplate.insert(list,"mongodb_user");
-mongoTemplate.insert(list,User.class);
-```
-### 更新
-```java
-Query query = Query.query(Criteria.where("_id").is("5d1312aeb1829c279c6c256b"));
-Update update = Update.update("name","zs");
-        update.set("age", 12);
 
-//  更新一条数据
-mongoTemplate.updateFirst(query,update, User.class);
-mongoTemplate.updateFirst(query,update, "mongodb_user");
-mongoTemplate.updateFirst(query,update, User.class,"mongodb_user");
-//  更新多条数据
-mongoTemplate.updateMulti(query,update, User.class);
-mongoTemplate.updateMulti(query,update,"mongodb_user");
-mongoTemplate.updateMulti(query,update, User.class,"mongodb_user");
-//  更新数据，如果数据不存在就新增
-mongoTemplate.upsert(query,update, User.class);
-mongoTemplate.upsert(query,update,"mongodb_user");
-mongoTemplate.upsert(query,update, User.class,"mongodb_user")
+## 文件传递和展示
+### 后端路由直接展示图片
+需要一个photoConfig.java
+```java
+package com.admin.react.config;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class PhotoConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        //和页面有关的静态目录都放在项目的static目录下
+//        registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
+        //上传的图片在D盘下的OTA目录下，访问路径如：http://localhost:8081/OTA/d3cf0281-bb7f-40e0-ab77-406db95ccf2c.jpg
+        //其中OTA表示访问的前缀。"file:D:/OTA/"是文件真实的存储路径
+        registry.addResourceHandler("/manage/photo/**").addResourceLocations("file:"+System.getProperty("user.dir")+"\\src\\main\\resources\\static\\");
+//        registry.addResourceHandler("/manage/photo/**").addResourceLocations("file:D:\\Files\\Project\\JavaProject\\RASBoot\\src\\main\\resources\\static\\");
+    }
+}
+```
+
+### 运行文件的当前目录
+```java
+System.getProperty("user.dir");
+```
+### 文件存在、删除
+```java
+if(file.exists()&&file.delete())
+        ...
+```
+### 上传图片
+```java
+ @PostMapping("/upload")
+    public ResultData<ImageUpload>uploadImage(
+             @RequestParam MultipartFile image
+    ) throws IOException {
+
+        String fileName=image.getOriginalFilename();
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+
+        ImageUpload imageUpload=new ImageUpload();
+        try{
+        String fileType = fileName.substring(fileName.lastIndexOf("."));
+        String imageFilePath = System.getProperty("user.dir")+"\\src\\main\\resources\\static\\" + uuid + fileType;
+        image.transferTo(new File(imageFilePath));
+        imageUpload.setName(uuid+fileType);
+        imageUpload.setUrl("http://localhost:5000/manage/photo/"+imageUpload.getName());
+        return ResultData.success(imageUpload);
+        }catch(Exception e){
+            return ResultData.fail(imageUpload);
+        }
+
+    }
 ```
 # 整合junit
 JUnit 是一个Java 编程语言的单元测试框架。
@@ -437,8 +465,47 @@ public class Demo1Application {
 
 
 ```
+## jpa
+### 配置
+```yml
+spring:
+    datasource:
+      url: jdbc:mysql://127.0.0.1:3306/test?serverTimezone=UTC
+      username: boss
+      password: 123456
+      driver-class-name: com.mysql.jdbc.Driver
+#server:
+  jpa:
+    show-sql: true  #s输出时候输出sql语句
+    properties: 
+      hibernate:
+        format_sql: true  # 输出多个对象时候换行‘
+```
+### 基本使用
+entity/user.java
+字段与数据库保持一致
+```java
+@Entity
+@Data //lombook的注解
+public class User{
+    @Id
+    private int id;
+    private String name;
+    private String author;
+}
+```
+repository/UserrePository.class之下
+```java
+public UserRepository extends JpaRepository<User,int>{
 
+}
+```
 
+使用
+```java
+private UserRepository userRepository;
+userRepository.findAll();
+```
 ## mybatis
 1. 引入依赖
 ```xml
@@ -741,6 +808,76 @@ System.out.println("query: " + aggregation + " | groupQuery " + ans.getMappedRes
 #### 排序
 ```java
 Query query = Query.query(Criteria.where("user").is("一灰灰blog")).with(Sort.by("age"));
+```
+### 插入
+```java
+mongoTemplate.insert(product);
+Person insert = mongoTemplate.insert(person);
+```
+
+```java
+mongoTemplate.save(user);
+mongoTemplate.insert(user);
+//  根据集合名称保存对象到mongodb
+mongoTemplate.save(user,"mongodb_user");
+mongoTemplate.insert(user,"mongodb_user");
+//  根据集合名称保存list到mongodb
+mongoTemplate.save(list,"mongodb_user");
+mongoTemplate.insert(list,"mongodb_user");
+mongoTemplate.insert(list,User.class);
+```
+### 更新
+```java
+Query query = Query.query(Criteria.where("_id").is("5d1312aeb1829c279c6c256b"));
+Update update = Update.update("name","zs");
+        update.set("age", 12);
+
+//  更新一条数据
+mongoTemplate.updateFirst(query,update, User.class);
+mongoTemplate.updateFirst(query,update, "mongodb_user");
+mongoTemplate.updateFirst(query,update, User.class,"mongodb_user");
+//  更新多条数据
+mongoTemplate.updateMulti(query,update, User.class);
+mongoTemplate.updateMulti(query,update,"mongodb_user");
+mongoTemplate.updateMulti(query,update, User.class,"mongodb_user");
+//  更新数据，如果数据不存在就新增
+mongoTemplate.upsert(query,update, User.class);
+mongoTemplate.upsert(query,update,"mongodb_user");
+mongoTemplate.upsert(query,update, User.class,"mongodb_user")
+```
+
+```java
+Query query = Query.query(Criteria.where("_id").is(productId));
+Update update = Update.update("status",productStatus);
+update.set("imgs",product.getImgs());
+update.set("name",product.getName());
+mongoTemplate.updateFirst(query,update,Products.class);
+UpdateResult updateResult = mongoTemplate.updateFirst(Query.query(Criteria.where("name").is(name)),Update.update("age", age), Person.class);
+long modifiedCount = updateResult.getModifiedCount();
+        
+```
+### 删除
+```java
+Query query = Query.query(Criteria.where("_id").in("5d1312aeb1829c279c6c256b","5d13133ab1829c29d02ce29c"));
+//  根据条件删除
+mongoTemplate.remove(query,Users.class);
+mongoTemplate.remove(user);
+```
+# 解决跨域问题
+config/CrosConfig.class
+```java
+@Configruation
+public class CrosConfig  implements WebMvcConfig{
+    @Override
+    ! public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("*")
+                .allowedMethods("GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowCredentials(true)
+                .maxAge(3600)
+                .allowedHeaders("*");
+    }
+}
 ```
 # 自动配置
 ## condition
