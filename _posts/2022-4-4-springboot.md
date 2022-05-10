@@ -5,8 +5,15 @@ categories: study
 tags : java
 toc: true
 ---
+# 文件结构
+一、dao（mapper）层
+DAO层叫数据访问层，全称为data access object，持久层直接和数据库打交道，具体到对于某个表的增删改查，封装了增删改查基本操作。
 
+二、Service层
+Service层叫业务层，被称为服务，对多Dao的数据库操作进行需要事物控制、业务逻辑。
 
+三、Spring中的关联
+spring采用注入DI和IOC控制反转，直接将dao注入service层，省的业务中不断创建dao对象造成的内存消耗。
 # 创建SpringBoot项目
 选择maven或者Springboot项目
 Spring 项目会自动引入
@@ -274,6 +281,22 @@ java -jar xxxx.jar --spring.profiles.active=dev
 java -jar myproject.jar --spring.config.location=d://application.properties
 java -jar app.jar --name="Spring“ --server.port=9000
 ```
+
+# 常用注解
+
+```java
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonAppend;
+import org.apache.ibatis.annotations.Mapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Autowired//从springboot管理的容器中取值
+@Component//表示被springboot管理,把类注入到spring容器中
+@Mapper//将mapper放到容器当中,@Mapper注解是识别他为mybatis的mapper接口，会自动的把 加@Mapper 注解的接口生成动态代理类。
+
+@JsonIgnore //在entity类中使用该字段例如password使得前端接收不到
+```
 # 前后端交互
 ## 返回Json数据
 
@@ -282,10 +305,24 @@ java -jar app.jar --name="Spring“ --server.port=9000
 
 ```java
 public Users getUser(){
-    user=...
+    user=...;
     return user;
 }
 ```
+### 使用map返回数据
+```java
+Map<String,Object> getpages(){
+    int total=userMapper.selectTotal();
+    List<User> data=userMapper.selectPages();
+    Map<String,Object> res=new HasxhMap();
+    res.put("totel",total);
+    res.put("data",data);
+    return res;
+
+}
+
+```
+
 ## 获取传递的参数
 ```java
 @PostMapping("/login")
@@ -582,6 +619,11 @@ import java.util.List;
 public interface  UserMapperr{
     @Select("select * from user")
     public List<User> findAll();
+
+
+    @Select("select * from sys_user where username like concat('%',  #{username}, '%') limit  #{pagenum}, #{pagesize};")
+    List<User> selectpage(Integer pagenum,Integer pagesize,String username,String email,String address);
+
 }
 ```
 调用test.java 或者
@@ -609,8 +651,68 @@ public class UserTest {
 }
 
 ```
+### 增加
+controller
+```java
+@PostMapping("/save")
+    public Integer save(
+            @RequestBody User user
+    )
+    {
+        return userMapper.insert(user);
+    }
+```
+mapper
+```java
+@Insert("insert into sys_user(username,password,nickname,email,phone," +
+        "address,role,avatar_url)values(#{username},#{password},#{nickname},#{email},#{phone}, #{address},#{role},#{avatar_url});")
 
+int insert(User user);
+```
+### 更新
 
+注解方式
+```java
+@Update({"update sys_user set username=#{username},password=#{password},nickname=#{nickname}," +
+            "email=#{email},phone=#{phone}," +
+            "address=#{address},role=#{role},avatar_url =#{avatar_url} " +
+            "where id=#{id};"})
+)
+    int  update(User user);
+```
+xml 方式可以实行按字段动态的更新
+在resource/mapper/User.xml
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.UserMapper">
+    <update id ="update">
+        update sys_user
+        <set>
+            <if test="username!=null">
+                username=#{username},
+            </if>
+            <if test="nickname!=null">
+                nickname=#{nickname},
+            </if>
+        </set>
+        password=#{password},email=#{email},phone=#{phone},address=#{address},role=#{role},avatar_url =#{avatar_url}
+        <where>
+            id=#{id}
+        </where>
+    </update>
+</mapper>
+```
+在applicaiton.yml中
+
+```yml
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#s
+```
 ### xml配置方式
 在resource.mapper.xxxx.xml
 ```xml
@@ -650,6 +752,18 @@ public interface UserXmlMapper {
         System.out.println(userlist);
     }
 ```
+
+
+## mybatis-plus
+依赖
+```xml
+ <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>3.5.1</version>
+</dependency>
+```
+
 ## redis
 启动redis,进入到安装目录之下
 ```shell
@@ -876,19 +990,53 @@ mongoTemplate.remove(user);
 # 解决跨域问题
 config/CrosConfig.class
 ```java
-@Configruation
-public class CrosConfig  implements WebMvcConfig{
-    @Override
-    ! public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("*")
-                .allowedMethods("GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowCredentials(true)
-                .maxAge(3600)
-                .allowedHeaders("*");
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
+@Configuration
+public class CorsConfig {
+    private static final long MAX_AGE = 24 * 60 * 60;
+
+    @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.addAllowedOrigin("*");//设置访问源地址
+//        corsConfiguration.addAllowedOrigin("http://localhost:8080");//设置访问源地址
+        corsConfiguration.addAllowedHeader("*");//设置访问请求头
+        corsConfiguration.addAllowedMethod("*");//设置访问源请求方法
+        corsConfiguration.setAllowCredentials(true);
+        corsConfiguration.setMaxAge(MAX_AGE);
+
+        UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
+        urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
+        return new CorsFilter(urlBasedCorsConfigurationSource);
     }
 }
+
 ```
+# lombok
+## @Data
+```java
+import lombok.Data;
+
+@Data//相当于为每个字段写了setter和getter方法
+public class User {
+    private Integer id;
+    private String username;
+    private String password;
+    private String nickname;
+    private String email;
+    private String address;
+    private String phone;
+}
+```
+@NoArgsConstructor
+@AllArgsConstructor
+
+
 # 自动配置
 ## condition
 SpringBoot 提供的常用条件注解：
