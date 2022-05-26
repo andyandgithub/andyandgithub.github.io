@@ -434,6 +434,82 @@ public class UserServiceTest {
     }
 }
 ```
+# 数据接口swagge
+依赖
+```xml
+<dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId> 
+            <version>2.9.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>2.8.0</version>
+        </dependency>
+```
+SaggerConfig。java
+```java
+package com.config
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+@Configuration
+@EnableSwagger2
+public class SwaggerConfig {
+
+    /**
+     * 创建API应用
+     * apiInfo() 增加API相关信息
+     * 通过select()函数返回一个ApiSelectorBuilder实例,用来控制哪些接口暴露给Swagger来展现，
+     * 本例采用指定扫描的包路径来定义指定要建立API的目录。
+     *
+     * @return
+     */
+    @Bean
+    public Docket restApi() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .groupName("标准接口")
+                .apiInfo(apiInfo("Spring Boot中使用Swagger2构建RESTful APIs", "1.0"))
+                .useDefaultResponseMessages(true)
+                .forCodeGeneration(false)
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("com.controller"))
+                .paths(PathSelectors.any())
+                .build();
+    }
+
+    /**
+     * 创建该API的基本信息（这些基本信息会展现在文档页面中）
+     * 访问地址：http://ip:port/swagger-ui.html
+     *
+     * @return
+     */
+    private ApiInfo apiInfo(String title, String version) {
+        return new ApiInfoBuilder()
+                .title(title)
+                .description("更多请关注: https://blog.csdn.net/xqnode")
+                .termsOfServiceUrl("https://blog.csdn.net/xqnode")
+                .contact(new Contact("xqnode", "https://blog.csdn.net/xqnode", "xiaqingweb@163.com"))
+                .version(version)
+                .build();
+    }
+}
+```
+
+controller
+```java
+
+```
+
 # 数据库的连接
 ## jdbc
 ```xml
@@ -671,6 +747,27 @@ int insert(User user);
 ```
 ### 更新
 
+```java
+ @Update({"update sys_user set username=#{username},password=#{password},nickname=#{nickname}," +
+            "email=#{email},phone=#{phone}," +
+            "address=#{address},role=#{role},avatar_url =#{avatar_url} " +
+            "where id=#{id};"})
+
+    int  update(User user);
+```
+
+### 删除
+```java
+@Delete("delete from sys_user where id=#{id}")
+    Integer deleteById(@Param("id") Integer id);
+```
+###查询
+```java
+    @Select("select count(*) from sys_user where username like concat('%',  #{username}, '%') and " +
+        "address like concat('%',  #{address}, '%') and email like concat('%',  #{email}, '%');")
+    int selecTotal(String username,String email,String address);
+```
+
 注解方式
 ```java
 @Update({"update sys_user set username=#{username},password=#{password},nickname=#{nickname}," +
@@ -755,6 +852,7 @@ public interface UserXmlMapper {
 
 
 ## mybatis-plus
+不需要写sql了
 依赖
 ```xml
  <dependency>
@@ -763,6 +861,126 @@ public interface UserXmlMapper {
             <version>3.5.1</version>
 </dependency>
 ```
+
+配置
+config/MybatisPlusConfig.java
+
+```java
+package com.config;
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+@Configuration
+@MapperScan("com.mapper")
+public class MyBatisPlusConfig {
+    @Bean
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL);
+        return interceptor;
+    }
+}
+```
+
+
+`@Mapper`注解，目的就是为了不再写mapper映射文件，在mapper类之前加上
+或者使用`MapperScan`
+```java
+@MapperScan("scan.your.mapper.package")
+
+```
+新的打印sql 
+```yml
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+```
+
+UserMapper.java
+```java
+public interface UserMapper extends BaseMapper<User> {}
+```
+
+UserService.java
+新增或者更新
+
+```java
+package com.service;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.entity.User;
+import com.mapper.UserMapper;
+
+import org.springframework.stereotype.Service;
+@Service
+public class UserService extends ServiceImpl<UserMapper,User> {
+    //    @Autowired
+//    private UserMapper userMapper;
+//    public int save(User user){
+//        System.out.println(user);
+//        if(user.getId()==null){
+//           return  userMapper.insert(user);
+//        }else{
+//            return userMapper.update(user);
+//        }
+//    }
+    public boolean saveUser(User user){
+        if(user.getId()==null){
+            return  save(user);//mybatis-plus提供的方法
+        }else{
+            return  updateById(user);
+        }
+        //或者
+        //return saveOrUpdate(user);
+    }
+
+}
+
+
+
+```
+
+mybatis-plus需要entity和表名一致，或者在实体类之前加上
+
+```java
+import com.baomidou.mybatisplus.annotation.TableField;
+
+@TableName(value = "sys_user")
+//也可以指定id
+@TableId(value = "id")
+@TableId(type = IdType.AUTO)
+@TableField(value="")//指定一个字段与数据库列匹配，数据库字段别名
+```
+### 分页查询
+
+```java
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
+@GetMapping("/page")
+public IPage<User> findPage(@RequestParam Integer pagenum, @RequestParam Integer pagesize,
+@RequestParam(defaultValue = "") String username,
+@RequestParam(defaultValue = "") String address,
+@RequestParam (defaultValue = "") String email){
+        IPage<User> page =new Page<>(pagenum,pagesize);
+        QueryWrapper<User> queryWrapper=new QueryWrapper<>();
+        if(!"".equals(username)){
+        queryWrapper.like("username",username);
+        }
+        if(!"".equals(address)){
+        queryWrapper.like("address",address);
+        }
+        if(!"".equals(email)){
+        queryWrapper.like("email",email);
+
+        }
+        return userService.page(page,queryWrapper);
+}
+```
+
+
 
 ## redis
 启动redis,进入到安装目录之下

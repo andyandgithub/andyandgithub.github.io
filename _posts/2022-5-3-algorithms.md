@@ -131,3 +131,144 @@ public class ListNode {
 
 
 
+
+# 哈希表
+数组，集合，映射
+
+# 字符串
+## 拼接字符串
+```java
+String ss=s1+s2;
+```
+## kmp算法
+>也就是说我们要计算子串每一个位置j对应的k，所以用一个数组next来保存，next[j] = k，表示当T[i] != P[j]时，j指针的下一个位置。另一个非常有用且恒等的定义，因为下标从0开始的，k值实际是j位前的子串的最大重复子串的长度
+
+最常见的代码
+
+求 next
+```java
+
+    public static int[] getNext2(String ps) {
+
+        char[] p = ps.toCharArray();
+    
+        int[] next = new int[p.length];
+    
+        next[0] = -1;
+    
+        int j = 0;
+    
+        int k = -1;
+    
+        while (j < p.length - 1) {
+    
+           if (k == -1 || p[j] == p[k]) {
+    
+               if (p[++j] == p[++k]) { // 当两个字符相等时要跳过
+    
+                  next[j] = next[k];
+    
+               } else {
+    
+                  next[j] = k;
+    
+               }
+    
+           } else {
+    
+               k = next[k];
+    
+           }
+    
+        }
+    
+        return next;
+    
+    }
+   
+    
+```
+常见的改进过的代码
+
+```java
+ public static int[] getNext3(String ps) {
+ 
+        char[] p = ps.toCharArray();
+    
+        int[] next = new int[p.length];
+    
+        next[0] = -1;
+    
+        int j = 0;
+    
+        int k = -1;
+    
+        while (j < p.length - 1) {
+    
+           if (k == -1 || p[j] == p[k]) {
+    
+               next[++j] = ++k;
+    
+           } else {
+    
+               k = next[k];
+    
+           }
+    
+        }
+    
+        return next;
+    
+    }
+
+```
+
+自己写的
+```java
+ public void getNext(char[] s, int[] next) {
+        int k = -1;
+        int j = 0;
+        next[0] = -1;
+        while (j < s.length-1) {
+            while (k >= 0 && s[k] != s[j]) {
+                k = next[k];
+            }
+            next[++j] =++k;
+        }
+    }
+
+```
+kmp
+
+```java
+
+ public int kmpSubstr(String s1, String s2) {
+        char[] ss1 = s1.toCharArray();
+        char[] ss2 = s2.toCharArray();
+        int[] next = new int[s2.length()];
+        getNext(ss2, next);
+        System.out.println(Arrays.toString(next));
+        System.out.println(Arrays.toString(getNext2(s2)));
+        System.out.println(Arrays.toString(getNext3(s2)));
+        int i = 0, j = 0;
+        while (i < s1.length() && j < s2.length()) {
+            // int k=j;
+
+            if (j!=-1&&ss2[j] != ss1[i])
+                j = next[j];
+            else {
+                i++;
+                j++;
+            }
+
+        }
+        if(j==ss2.length){
+            return i-ss2.length;
+        }
+        else{
+            return -1;
+        }
+    }
+
+   
+```
