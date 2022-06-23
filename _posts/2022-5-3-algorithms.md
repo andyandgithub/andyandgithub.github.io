@@ -272,3 +272,299 @@ kmp
 
    
 ```
+
+# 二叉树
+```java
+public class TreeNode{
+    int val;
+    TreeNode left;
+    TreeNode right;
+    public Treenode(val){this.val=val;left=null;right=null;}
+}
+
+```
+## 遍历
+### 前序遍历
+>中左右
+#### 递归
+```java
+public void preorder(TreeNode root){
+    if(root==null)return ;
+    System.out.println(root.val);
+    preorder(root.left);
+    preorder(root.right);
+}
+```
+#### 栈
+```java
+public List<Integer> preorder(TreeNode root){
+    List<Integer> result=new ArrayList<>();
+    if(root==null)return result;
+    Stack<TreeNode> st=new Stack<TreeNode>();
+    
+    st.push(root);
+    while(!st.empty()){
+        TreeNode tn=st.pop();
+        result.add(tn.val);
+        if(tn.right!=null)st.push(tn.right);
+        if(tn.left!=null)st.push(tn.left);
+    }
+    return result;
+}
+```
+
+#### 栈，可转化
+```java
+public List<Integer> preorder(TreeNode root){
+    List<Integer> result=new ArrayList<>();
+    if(root==null)return result;
+    Stack<TeeeNode> st=new Stack<TreeNode>();
+    st.push(root);
+    while(!st.empty()){
+        TreeNode tn=st.peek();
+        if(tn!=null){
+            tn=st.pop();
+            if(tn.right!=null) st.push(tn.right);
+            if(tn.left!=null) st.push(tn.left);
+            st.push(tn);
+            st.push(null);
+        }else{
+            st.pop();
+            tn=st.pop();
+            result.add(tn.val);
+        }
+    }
+    return result;
+}   
+
+```
+#### 
+### 中序遍历
+>左中右
+#### 递归
+```java
+public void  preorder(TreeNode root){
+    if(root==null)return ;
+    
+    preorder(root.left);
+    System.out.println(root.val);
+    preorder(root.right);
+}
+```
+#### 栈
+```java
+public List<Integer>  inorder(TreeNode root){
+    List<Integer> result=new ArrayList<>();
+    if(root==null)return result;
+    Stack<TreeNode> st=new Stack<TreeNode>();
+    // st.push(root);
+    TreeNode cur=root;
+    while(cur!=null||!st.empty()){
+        if(cur!=null){
+            st.push(cur);
+             cur=cur.left;
+        }else{
+            cur=st.pop();
+            result.add(cur.val);
+            // st.push(tn.left);
+            cur=cur.right;
+        }  
+    }
+    return  result;
+}
+```
+
+
+#### 栈，可转化
+```java
+public List<Integer> preorder(TreeNode root){
+    List<Integer> result=new ArrayList<>();
+    if(root==null)return result;
+    Stack<TeeeNode> st=new Stack<TreeNode>();
+    st.push(root);
+    while(!st.empty()){
+        TreeNode tn=st.peek();
+        if(tn!=null){
+            tn=st.pop();
+            if(tn.right!=null) st.push(tn.right);
+            st.push(tn);
+            st.push(null);
+            if(tn.left!=null) st.push(tn.left);
+        }else{
+            st.pop();
+            tn=st.pop();
+            result.add(tn.val);
+        }
+    }
+    return result;
+}   
+
+```
+### 后序遍历
+>左右中
+#### 递归
+```java
+public preorder(TreeNode root){
+    if(root==null)return ;
+    
+    preorder(root.left);
+    preorder(root.right);
+    System.out.println(root.val);
+}
+```
+#### 栈
+```java
+public  List<Integer> postorder(TreeNode root){
+    List<Integer> result=new ArrayList<>();
+    if(root==null)return result;
+    Stack<TreeNode> st=new Stack<TreeNode>();
+    st.push(root);
+    while(!st.empty()){
+        TreeNode tn=st.pop();
+        result.add(tn.val);
+       
+        if(tn.left!=null)st.push(tn.left); 
+        if(tn.right!=null)st.push(tn.right);
+    }
+     
+    Collections.reverse(result);return result;
+}
+```
+#### 栈，可转化
+```java
+public List<Integer> preorder(TreeNode root){
+    List<Integer> result=new ArrayList<>();
+    if(root==null)return result;
+    Stack<TeeeNode> st=new Stack<TreeNode>();
+    st.push(root);
+    while(!st.empty()){
+        TreeNode tn=st.peek();
+        if(tn!=null){
+            tn=st.pop();
+            if(tn.right!=null) st.push(tn.right);
+            st.push(tn);
+            st.push(null);
+            if(tn.left!=null) st.push(tn.left);
+        }else{
+            st.pop();
+            tn=st.pop();
+            result.add(tn.val);
+        }
+    }
+    return result;
+}   
+
+```
+### 层次遍历
+#### queue.size()
+```java
+public List<List<Integer>> levelOrder(Node root) {
+    List<List<Integer>> result=new LinkedList<>();
+    Queue<Node>q=new LinkedList<>();
+    if(root!=null) q.offer(root);
+    while(!q.isEmpty()){
+        int k= q.size();
+        List<Integer> newl=new LinkedList<>();
+        Node node;
+        for(int i=0;i<k;i++){
+            node=q.poll();
+            newl.add(node.val);
+            for(Node n:node.children){
+                if(n!=null)
+                q.offer(n);
+            }
+        }
+        result.add(newl);
+    }
+    return result;
+}
+
+```
+#### last存储
+```java
+public List<List<Integer>> levelOrder(TreeNode root) {
+    Queue<TreeNode> q=new LinkedList<>();
+    List<List<Integer>> result=new ArrayList<>();
+    if(root==null)return result;
+    TreeNode last=null;
+    q.offer(root);
+    while(!q.isEmpty()){
+        TreeNode rear=q.poll();
+        TreeNode tail=last;
+        List<Integer> newl=new ArrayList<>();
+        while(rear!=tail){
+            if(rear==null)continue;
+            newl.add(rear.val);
+            if(rear.left!=null){q.offer(rear.left);last=rear.left}
+            if(rear.right!=null){q.offer(rear.right);last=rear.right}
+        }
+        reault.add(newl);
+    }
+}
+```
+
+## 回溯算法
+```java
+public List<List<String>> results=new ArraysList<>();
+public List<String> result=new ArraysList<>();
+public void trace(){
+    if()
+    return ;
+    for(){
+
+    }
+}
+public List<List<String>> fun(){
+    if(){
+
+    }
+    trace();
+    return results;
+}
+```
+
+## 贪心算法
+尝试寻找一个比较合适局部最优算法推广到全局最优，并且找不到反例，可以试一试。
+
+在没有目标的情况下，可以试一试解一下题目，找到对多种例子可行的方案。可以尝试分情况讨论
+
+对存在多个维度、方向的问题，不要一次综合两个维度，会顾此失彼，尝试每一次只针对一个维度。
+
+## 动态规划
+
+- 确定dp数组以及下标的含义
+- 确定递推公式
+- dp数组如何初始化
+- 确定遍历顺序
+- 举例推导dp数组
+  
+### 01背包
+
+我们知道01背包内嵌的循环是从大到小遍历，为了保证每个物品仅被添加一次。
+
+```java
+for(int i = 0; i < weight.length; i++) { // 遍历物品
+    for(int j = bagWeight; j >= weight[i]; j--) { // 遍历背包容量
+        dp[j] = dp[j]>dp[j - weight[i]] + value[i] ?dp[j]:dp[j - weight[i]] + value[i];
+    }
+}
+
+```
+
+### 完全背包
+```java
+for(int i = 0; i < weight.size(); i++) { // 遍历物品
+    for(int j = weight[i]; j <= bagWeight ; j++) { // 遍历背包容量
+        dp[j] = max(dp[j], dp[j - weight[i]] + value[i]);
+
+    }
+}
+
+```
+
+如果求组合数就是外层for循环遍历物品，内层for遍历背包。
+
+如果求排列数就是外层for遍历背包，内层for循环遍历物品。
+
+
+
