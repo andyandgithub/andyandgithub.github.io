@@ -11,9 +11,13 @@ O(1)常数阶 < O(logn)对数阶 < O(n)线性阶 < O(n^2)平方阶 < O(n^3)(立�
 ## 空间复杂度
 # 算法
 ## 数组
-- 二维数据在内存中不是 3*4 的连续地址空间，而是四条连续的地址空间组成！」
+- 二维数据在内存中不是 3*4 的连续地址空间，而是四条连续的地址空间组成！
+  
+
 ### 二分查找
+
 前提是已经有序的数组 35
+
 ```java
 public int searchInsert(int []nums,int target){}
     int head=0,tail=nums.length-1,mid=tail/2;
@@ -27,7 +31,7 @@ public int searchInsert(int []nums,int target){}
             return mid;
         if(nums[mid]<target){
             head=mid+1;
-            mid=head+(tail-head)/2;//防止溢出，等同于(tail-head)/2
+            mid=head+(tail-head)/2;//防止溢出，等同于(tail+head)/2
 
         }else{
             tail=mid-1;
@@ -59,6 +63,8 @@ public int removeElement(int[] nums, int val) {
 ### 滑动窗口
 滑动窗口在于可以动态的变化窗口的左边界
 209
+
+
 ```java
 class Solution {
     public int minSubArrayLen(int target, int[] nums) {
@@ -78,6 +84,26 @@ class Solution {
         return length==Integer.MAX_VALUE? 0:length;
     }
 }
+```
+
+基本格式
+增加窗口，根据条件缩小窗口，记录下合适的子数组
+
+```java
+int left = 0, right = 0;
+
+while (right < s.size()) {
+    // 增大窗口
+    window.add(s[right]);
+    right++;
+    
+    while (window needs shrink) {
+        // 缩小窗口
+        window.remove(s[left]);
+        left++;
+    }
+}
+
 ```
 
 ## 链表
@@ -170,8 +196,9 @@ public List<List<String>> fun(){
 #### 排列
 
 ### 剪枝
-主要目的是去除掉已经无用枝杈防止递归下去耗费时间
-主要在for循环的判断语句中剪
+
+- 主要目的是去除掉已经无用枝杈防止递归下去耗费时间
+- 主要在for循环的判断语句中剪
 
 
 `i<=n`与`i<=n-(k-result.size())+1`去除掉已经不能够达成条件的分支
@@ -330,7 +357,7 @@ for(int i = 0; i < weight.size(); i++) { // 遍历物品
 通常是一维数组，要寻找任一个元素的右边或者左边第一个比自己大或者小的元素的位置，此时我们就要想到可以用单调栈了。
 
 ## 前缀和
-
+> 前缀和主要适用的场景是原始数组不会被修改的情况下，频繁查询某个区间的累加和
 ```java
 import javax.naming.NamingEnumeration;
 
@@ -363,8 +390,50 @@ class NumArray {
 就是某个位置左右两边的和或者乘积的时候。
 - 使用`Deque`双端队列保存一个滑动窗口
 - 前缀和与哈希表一起使用
+
+
+
+
+
+## 差分数组
+> 差分数组的主要适用场景是频繁对原始数组的某个区间的元素进行增减
+
+记录下来每次在什么位置的改变情况，增减。最后结果由累加和的形式给出
+
+```java
+public class Difference {
+    int[] diff = new int[n];
+
+    public void Difference(int[] nums) {
+        for (int i = 0; i < n; i++) {
+            diff[i] = nums[i + 1] + nums[i];
+        }
+
+    }
+
+    public void increment(int i, int j, int val) {
+        diff[i] += val;
+        diff[j] -= val;
+    }
+
+    public int[] result() {
+        int[] answer = new int[n];
+        answer[0] = diff[0];
+        for (int i = 1; i < n; i++) {
+            answer[i] += answer[i - 1] + diff[i];
+        }
+        return answer;
+    }
+}
+
+
+```
+
+
+
 ## 线段树
 可用数组实现，一般大小为原数组的四倍大小。
+
 
 ```java
 
@@ -392,7 +461,9 @@ class NumArray {
 String ss=s1+s2;
 ```
 ## kmp算法
+
 >也就是说我们要计算子串每一个位置j对应的k，所以用一个数组next来保存，next[j] = k，表示当T[i] != P[j]时，j指针的下一个位置。另一个非常有用且恒等的定义，因为下标从0开始的，k值实际是j位前的子串的最大重复子串的长度
+
 
 最常见的代码
 
@@ -489,6 +560,7 @@ String ss=s1+s2;
     }
 
 ```
+
 kmp
 
 ```java
@@ -524,6 +596,72 @@ kmp
    
 ```
 
+
+## Pabin-Karp算法
+
+> 字符编码
+
+```java
+public int getint(char c) {
+        int x = 0;
+        switch (c) {
+            case 'A':
+                x = 0;
+                break;
+            case 'C':
+                x = 1;
+                break;
+            case 'G':
+                x = 2;
+                break;
+            case 'T':
+                x = 3;
+                break;
+            default:
+                break;
+        }
+        return x;
+}
+
+public pabin(String s1,String s2){
+     char[] sc1 = s1.toCharArray();
+      char[] sc1= s2.toCharArray();
+    int target=0;
+    int RE=进制;
+    for(int i=0;i<sc1.length;i++){
+        target*=RE;
+        target+=getint(sc1[i]);
+    }
+    int loop=0;
+    for(int i=0;i<sc1.length;i++){
+        loop*=RE;
+        loop+=getint(sc2[i]);
+    }
+    int right=RE+1;
+    int left=1;
+    while (right <= sc1.length) {
+            int y = getint(sc1[left - 1]);
+
+            // System.out.println(y);
+            x -= RE^(sc2.length-1) * y;
+            x *= RE;
+            x += getdna(sc[right - 1]);
+           
+            result.add(left);
+            
+            left++;
+            right++;
+        }
+}
+
+```
+
+
+
+
+
+
+
 # 二叉树
 ```java
 public class TreeNode{
@@ -538,8 +676,11 @@ public class TreeNode{
 
 ## 遍历
 ### 前序遍历
+
 >中左右
+
 #### 递归
+
 ```java
 public void preorder(TreeNode root){
     if(root==null)return ;
@@ -548,7 +689,9 @@ public void preorder(TreeNode root){
     preorder(root.right);
 }
 ```
+
 #### 栈
+
 ```java
 public List<Integer> preorder(TreeNode root){
     List<Integer> result=new ArrayList<>();
@@ -567,6 +710,7 @@ public List<Integer> preorder(TreeNode root){
 ```
 
 #### 栈，可转化
+
 ```java
 public List<Integer> preorder(TreeNode root){
     List<Integer> result=new ArrayList<>();
@@ -591,10 +735,14 @@ public List<Integer> preorder(TreeNode root){
 }   
 
 ```
-#### 
+ 
+
 ### 中序遍历
+
 >左中右
+
 #### 递归
+
 ```java
 public void  preorder(TreeNode root){
     if(root==null)return ;
@@ -604,7 +752,9 @@ public void  preorder(TreeNode root){
     preorder(root.right);
 }
 ```
+
 #### 栈
+
 ```java
 public List<Integer>  inorder(TreeNode root){
     List<Integer> result=new ArrayList<>();
@@ -629,6 +779,7 @@ public List<Integer>  inorder(TreeNode root){
 
 
 #### 栈，可转化
+
 ```java
 public List<Integer> preorder(TreeNode root){
     List<Integer> result=new ArrayList<>();
@@ -653,9 +804,13 @@ public List<Integer> preorder(TreeNode root){
 }   
 
 ```
+
 ### 后序遍历
+
 >左右中
+
 #### 递归
+
 ```java
 public preorder(TreeNode root){
     if(root==null)return ;
@@ -665,7 +820,9 @@ public preorder(TreeNode root){
     System.out.println(root.val);
 }
 ```
+
 #### 栈
+
 ```java
 public  List<Integer> postorder(TreeNode root){
     List<Integer> result=new ArrayList<>();
@@ -683,7 +840,9 @@ public  List<Integer> postorder(TreeNode root){
     Collections.reverse(result);return result;
 }
 ```
+
 #### 栈，可转化
+
 ```java
 public List<Integer> preorder(TreeNode root){
     List<Integer> result=new ArrayList<>();
@@ -708,8 +867,11 @@ public List<Integer> preorder(TreeNode root){
 }   
 
 ```
+
 ### 层次遍历
+
 #### queue.size()
+
 ```java
 public List<List<Integer>> levelOrder(Node root) {
     List<List<Integer>> result=new LinkedList<>();
@@ -733,7 +895,9 @@ public List<List<Integer>> levelOrder(Node root) {
 }
 
 ```
+
 #### last存储
+
 ```java
 public List<List<Integer>> levelOrder(TreeNode root) {
     Queue<TreeNode> q=new LinkedList<>();
@@ -758,9 +922,13 @@ public List<List<Integer>> levelOrder(TreeNode root) {
 
 
 # 图
+
 ## 遍历
-Bfs
+
+### Bfs
+
 ```java
+
 //以多个点开始遍历
 for(int i=0;graph.length;i++){
     LinkedList<Integer> path=new LinkedList<>();
@@ -879,7 +1047,9 @@ public UF(int n) {
 
 
 ```
+
 修改过后的新`union`
+
 
 ```java
 public void union(int p,int q){
@@ -899,12 +1069,15 @@ public void union(int p,int q){
     count--;
 }
 ```
+
 通过比较树的重量，就可以保证树的生长相对平衡，树的高度大致在 logN 这个数量级，极大提升执行效率。
 
 此时，find , union , connected 的时间复杂度都下降为 O(logN)，即便数据规模上亿，所需时间也非常少。
 
 
+
 #### 压缩路径
+
 
 这样每个节点的父节点就是整棵树的根节点，find 就能以 O(1) 的时间找到某一节点的根节点，相应的，connected 和 union 复杂度都下降为 O(1)。
 
@@ -1016,18 +1189,26 @@ for(int [] e:edge){
 }
 ```
 ### Kruskal算法
+
 > 贪心算法思想
+
 将所有边按照权重从小到大排序，从权重最小的边开始遍历，如果这条边和mst中的其它边不会形成环，则这条边是最小生成树的一部分，将它加入mst集合；否则，这条边不是最小生成树的一部分，不要把它加入mst集合。
+
 ### Prim算法
+
+
 > 贪心算法 切分定理
 
 Kruskal 算法是在一开始的时候就把所有的边排序，然后从权重最小的边开始挑选属于最小生成树的边，组建最小生成树。
 
 Prim 算法是从一个起点的切分（一组横切边）开始执行类似 BFS 算法的逻辑，借助切分定理和优先级队列动态排序的特性，从这个起点「生长」出一棵最小生成树。
+
 ## 求最短路径   
 
 权重为1都相同的的图可以使用bfs遍历。记录下来depth也就是深度可以
+
 ### Dijkstra 算法（一般音译成迪杰斯特拉算法）
+
 > 无非就是一个 BFS 算法的加强版
 - 标准的 Dijkstra 算法会把从起点 start 到所有其他节点的最短路径都算出来。
 
