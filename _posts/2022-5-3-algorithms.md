@@ -354,7 +354,65 @@ for(int i = 0; i < weight.size(); i++) { // 遍历物品
 
 
 ## 单调栈
-通常是一维数组，要寻找任一个元素的右边或者左边第一个比自己大或者小的元素的位置，此时我们就要想到可以用单调栈了。
+
+>通常是一维数组，要寻找任一个元素的右边或者左边第一个比自己大或者小的元素的位置，此时我们就要想到可以用单调栈了。
+
+
+>以寻找元素右边第一个大的元素为例
+
+### 自右向左 
+```java
+int[] nextGreaterElement(int[] nums) {
+    int n = nums.length;
+    // 存放答案的数组
+    int[] res = new int[n];
+    Stack<Integer> s = new Stack<>(); 
+    // 倒着往栈里放
+    for (int i = n - 1; i >= 0; i--) {
+        // 判定个子高矮
+        while (!s.isEmpty() && s.peek() <= nums[i]) {
+            // 矮个起开，反正也被挡着了。。。
+            s.pop();
+        }
+        // nums[i] 身后的更大元素
+        res[i] = s.isEmpty() ? -1 : s.peek();
+        s.push(nums[i]);
+    }
+    return res;
+}
+
+```
+
+### 自左向右
+
+```java
+int[] nextGreaterElement(int[] nums) {
+    int n = nums.length;
+    // 存放答案的数组
+    int[] res = new int[n];
+    Stack<Integer> s = new Stack<>();
+    s.push(0);// 先把第一个元素放在里面
+    for (int i = 1; i < n; i++) {
+        if (nums[s.peek()] > num[i]) {// 情况一，新元素比栈内元素小,入栈
+            s.push(i);
+        } else if (nums[s.peek()] == num[i]) {// 情况一，新元素与栈内元素一样,入栈
+            s.push(i);
+        } else { // 情况一，新元素比栈内元素大,修改栈内元素
+            while (!s.isEmpty() && s.peek() <= nums[i]) {
+                res[s.peek()] = i;
+                s.pop();
+            }
+        }
+        s.push(i);
+
+    }
+    return res;
+}
+
+```   
+
+```
+
 
 ## 前缀和
 > 前缀和主要适用的场景是原始数组不会被修改的情况下，频繁查询某个区间的累加和
@@ -447,10 +505,364 @@ public class Difference {
 
 
 
+## TrieMap 字典树，前缀树，单词查找树
+
+> val字段存储键对应的值，children数组存储指向子节点的指针。
+
+### 基本结构
+```java
+class TrieNode<Template> {
+    Template val=null;
+    TrieNode<Template>[] children=-new TrieNode[256];
+}
+```
+
+### 基本方法
+```java
+class TrieMap<Template> {
+  // 在 Map 中添加 key
+    public void put(String key, Template val);
+
+    /***** 删 *****/
+
+    // 删除键 key 以及对应的值
+    public void remove(String key);
+
+    /***** 查 *****/
+
+    // 搜索 key 对应的值，不存在则返回 null
+    // get("the") -> 4
+    // get("tha") -> null
+    public Template get(String key);
+
+    // 判断 key 是否存在在 Map 中
+    // containsKey("tea") -> false
+    // containsKey("team") -> true
+    public boolean containsKey(String key);
+
+    // 在 Map 的所有键中搜索 query 的最短前缀
+    // shortestPrefixOf("themxyz") -> "the"
+    public String shortestPrefixOf(String query);
+
+    // 在 Map 的所有键中搜索 query 的最长前缀
+    // longestPrefixOf("themxyz") -> "them"
+    public String longestPrefixOf(String query);
+
+    // 搜索所有前缀为 prefix 的键
+    // keysWithPrefix("th") -> ["that", "the", "them"]
+    public List<String> keysWithPrefix(String prefix);
+
+    // 判断是和否存在前缀为 prefix 的键
+    // hasKeyWithPrefix("tha") -> true
+    // hasKeyWithPrefix("apple") -> false
+    public boolean hasKeyWithPrefix(String prefix);
+
+    // 通配符 . 匹配任意字符，搜索所有匹配的键
+    // keysWithPattern("t.a.") -> ["team", "that"]
+    public List<String> keysWithPattern(String pattern);
+
+    // 通配符 . 匹配任意字符，判断是否存在匹配的键
+    // hasKeyWithPattern(".ip") -> true
+    // hasKeyWithPattern(".i") -> false
+    public boolean hasKeyWithPattern(String pattern);
+
+    // 返回 Map 中键值对的数量
+    public int getSize();
+}
+
+```
+
+
+
+### 方法实现
+
+```java
+class TrieMap<Template>{
+    private TrieNode<Template> root = null;
+    private static final int R = 256;
+    // 当前存在 Map 中的键值对个数
+    private int size = 0;
+    public class TrieMap<Template>(){
+        Template val=null;
+
+        TrieNode<Template>[] children = new TrieNode[R];
+    }
+    public int getSize(){
+        return size();
+    }
+    //工具函数
+    public TrieNode<Template> getNode(TrieNode<Template> node, String key){
+        TrieNode<Template> p=node;
+        for(int i=0;i<key.length();i++){
+            if(p==null) return null;
+            p=p.children[key.charAt(i)];
+        }
+        return p;
+    }
+
+    // 搜索 key 对应的值，不存在则返回 null
+    public Template get(String key) {
+        // 从 root 开始搜索 key
+        TrieNode<Template> x = getNode(root, key);
+        if (x == null || x.val == null) {
+            // x 为空或 x 的 val 字段为空都说明 key 没有对应的值
+            return null;
+        }
+        return x.val;
+    }
+
+    // 判断 key 是否存在在 Map 中
+    public boolean containsKey(String key) {
+        return get(key) != null;
+    }
+
+    // 判断是和否存在前缀为 prefix 的键
+    public boolean hasKeyWithPrefix(String prefix) {
+        // 只要能找到 prefix 对应的节点，就是存在前缀
+        return getNode(root, prefix) != null;
+    }
+
+    // 在所有键中寻找 query 的最短前缀
+    public String shortestPrefixOf(String query) {
+        TrieNode<Template> p = root;
+        // 从节点 node 开始搜索 key
+        for (int i = 0; i < query.length(); i++) {
+            if (p == null) {
+                // 无法向下搜索
+                return "";
+            }
+            if (p.val != null) {
+                // 找到一个键是 query 的前缀
+                return query.substring(0, i);
+            }
+            // 向下搜索
+            char c = query.charAt(i);
+            p = p.children[c];
+        }
+
+        if (p != null && p.val != null) {
+            // 如果 query 本身就是一个键
+            return query;
+        }
+        return "";
+    }
+
+    // 在所有键中寻找 query 的最长前缀
+    public String longestPrefixOf(String query) {
+        TrieNode<Template> p = root;
+        // 记录前缀的最大长度
+        int max_len = 0;
+
+        // 从节点 node 开始搜索 key
+        for (int i = 0; i < query.length(); i++) {
+            if (p == null) {
+                // 无法向下搜索
+                break;
+            }
+            if (p.val != null) {
+                // 找到一个键是 query 的前缀，更新前缀的最大长度
+                max_len = i;
+            }
+            // 向下搜索
+            char c = query.charAt(i);
+            p = p.children[c];
+        }
+
+        if (p != null && p.val != null) {
+            // 如果 query 本身就是一个键
+            return query;
+        }
+        return query.substring(0, max_len);
+    }
+
+    // 搜索前缀为 prefix 的所有键
+    public List<String> keysWithPrefix(String prefix) {
+        List<String> res = new LinkedList<>();
+        // 找到匹配 prefix 在 Trie 树中的那个节点
+        TrieNode<V> x = getNode(root, prefix);
+        if (x == null) {
+            return res;
+        }
+        // DFS 遍历以 x 为根的这棵 Trie 树
+        traverse(x, new StringBuilder(prefix), res);
+        return res;
+    }
+
+    // 遍历以 node 节点为根的 Trie 树，找到所有键
+    private void traverse(TrieNode<V> node, StringBuilder path, List<String> res) {
+        if (node == null) {
+            // 到达 Trie 树底部叶子结点
+            return;
+        }
+
+        if (node.val != null) {
+            // 找到一个 key，添加到结果列表中
+            res.add(path.toString());
+        }
+
+        // 回溯算法遍历框架
+        for (char c = 0; c < R; c++) {
+            // 做选择
+            path.append(c);
+            traverse(node.children[c], path, res);
+            // 撤销选择
+            path.deleteCharAt(path.length() - 1);
+        }
+    }
+
+
+
+    // 通配符 . 匹配任意字符
+    public List<String> keysWithPattern(String pattern) {
+        List<String> res = new LinkedList<>();
+        traverse(root, new StringBuilder(), pattern, 0, res);
+        return res;
+    }
+
+    // 遍历函数，尝试在「以 node 为根的 Trie 树中」匹配 pattern[i..]
+    private void traverse(TrieNode<V> node, StringBuilder path, String pattern, int i, List<String> res) {
+        if (node == null) {
+            // 树枝不存在，即匹配失败
+            return;
+        }
+        if (i == pattern.length()) {
+            // pattern 匹配完成
+            if (node.val != null) {
+                // 如果这个节点存储着 val，则找到一个匹配的键
+                res.add(path.toString());
+            }
+            return;
+        }
+        char c = pattern.charAt(i);
+        if (c == '.') {
+            // pattern[i] 是通配符，可以变化成任意字符
+            // 多叉树（回溯算法）遍历框架
+            for (char j = 0; j < R; j++) {
+                path.append(j);
+                traverse(node.children[j], path, pattern, i + 1, res);
+                path.deleteCharAt(path.length() - 1);
+            }
+        } else {
+            // pattern[i] 是普通字符 c
+            path.append(c);
+            traverse(node.children[c], path, pattern, i + 1, res);
+            path.deleteCharAt(path.length() - 1);
+        }
+    }
 
 
 
 
+
+    // 判断是和否存在前缀为 prefix 的键
+    public boolean hasKeyWithPattern(String pattern) {
+        // 从 root 节点开始匹配 pattern[0..]
+        return hasKeyWithPattern(root, pattern, 0);
+    }
+
+    // 函数定义：从 node 节点开始匹配 pattern[i..]，返回是否成功匹配
+    private boolean hasKeyWithPattern(TrieNode<Template> node, String pattern, int i) {
+        if (node == null) {
+            // 树枝不存在，即匹配失败
+            return false;
+        }
+        if (i == pattern.length()) {
+            // 模式串走到头了，看看匹配到的是否是一个键
+            return node.val != null;
+        }
+        char c = pattern.charAt(i);
+        // 没有遇到通配符
+        if (c != '.') {
+            // 从 node.children[c] 节点开始匹配 pattern[i+1..]
+            return hasKeyWithPattern(node.children[c], pattern, i + 1);
+        }
+        // 遇到通配符
+        for (int j = 0; j < R; j++) {
+            // pattern[i] 可以变化成任意字符，尝试所有可能，只要遇到一个匹配成功就返回
+            if (hasKeyWithPattern(node.children[j], pattern, i + 1)) {
+                return true;
+            }
+        } 
+        // 都没有匹配
+        return false;
+    }
+
+
+
+    // 在 map 中添加或修改键值对
+    public void put(String key, Template val) {
+        if (!containsKey(key)) {
+            // 新增键值对
+            size++;
+        }
+        // 需要一个额外的辅助函数，并接收其返回值
+        root = put(root, key, val, 0);
+    }
+
+    // 定义：向以 node 为根的 Trie 树中插入 key[i..]，返回插入完成后的根节点
+    private TrieNode<Template> put(TrieNode<Template> node, String key,Template val, int i) {
+        if (node == null) {
+            // 如果树枝不存在，新建
+            node = new TrieNode<>();
+        }
+        if (i == key.length()) {
+            // key 的路径已插入完成，将值 val 存入节点
+            node.val = val;
+            return node;
+        }
+        char c = key.charAt(i);
+        // 递归插入子节点，并接收返回值
+        node.children[c] = put(node.children[c], key, val, i + 1);
+        return node;
+    }
+
+
+
+
+    // 在 Map 中删除 key
+    public void remove(String key) {
+        if (!containsKey(key)) {
+            return;
+        }
+        // 递归修改数据结构要接收函数的返回值
+        root = remove(root, key, 0);
+        size--;
+    }
+
+    // 定义：在以 node 为根的 Trie 树中删除 key[i..]，返回删除后的根节点
+    private TrieNode<Template> remove(TrieNode<Template> node, String key, int i) {
+        if (node == null) {
+            return null;
+        }
+        if (i == key.length()) {
+            // 找到了 key 对应的 TrieNode，删除 val
+            node.val = null;
+        } else {
+            char c = key.charAt(i);
+            // 递归去子树进行删除
+            node.children[c] = remove(node.children[c], key, i + 1);
+        }
+        // 后序位置，递归路径上的节点可能需要被清理
+        if (node.val != null) {
+            // 如果该 TireNode 存储着 val，不需要被清理
+            return node;
+        }
+        // 检查该 TrieNode 是否还有后缀
+        for (int c = 0; c < R; c++) {
+            if (node.children[c] != null) {
+                // 只要存在一个子节点（后缀树枝），就不需要被清理
+                return node;
+            }
+        }
+        // 既没有存储 val，也没有后缀树枝，则该节点需要被清理
+        return null;
+    }
+
+
+}
+
+
+```
 
 # 哈希表
 数组，集合，映射
