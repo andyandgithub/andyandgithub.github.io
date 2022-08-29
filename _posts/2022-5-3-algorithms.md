@@ -1338,6 +1338,36 @@ public List<List<Integer>> levelOrder(TreeNode root) {
 ## 遍历
 
 ### Bfs
+> 广度遍历
+
+```java
+void Bfs(){
+    Queue que;
+    // 记录被遍历过的节点
+    boolean []visited;
+    for(int i=0;i<graph.length;i++){
+        if(!visited[i]){
+            visited[i]=true;
+            EnQueue(i);
+            while(!que.empty()){
+                int j=Dequeue();
+                for(int child:j.children){
+                    if(!visitd[child]){
+                        visited[child]=true;
+                        EnQueue(child);
+                    }
+                }
+            }
+        }
+    }
+
+
+}
+```
+
+### Dfs
+> 深度遍历
+
 
 ```java
 
@@ -1365,6 +1395,9 @@ void traverse(Graph graph, int s) {
     onPath[s] = false;
 }
 ```
+
+
+
 
 ##  并查集
 > Union-Find 算法，也就是常说的并查集（Disjoint Set）结构，主要是解决图论中「动态连通性」问题的
@@ -1614,6 +1647,84 @@ for(int [] e:edge){
 Kruskal 算法是在一开始的时候就把所有的边排序，然后从权重最小的边开始挑选属于最小生成树的边，组建最小生成树。
 
 Prim 算法是从一个起点的切分（一组横切边）开始执行类似 BFS 算法的逻辑，借助切分定理和优先级队列动态排序的特性，从这个起点「生长」出一棵最小生成树。
+
+```java
+class Prim {
+    // 核心数据结构，存储「横切边」的优先级队列
+    private PriorityQueue<int[]> pq;
+    // 类似 visited 数组的作用，记录哪些节点已经成为最小生成树的一部分
+    private boolean[] inMST;
+    // 记录最小生成树的权重和
+    private int weightSum = 0;
+    // graph 是用邻接表表示的一幅图，
+    // graph[s] 记录节点 s 所有相邻的边，
+    // 三元组 int[]{from, to, weight} 表示一条边
+    private List<int[]>[] graph;
+
+    public Prim(List<int[]>[] graph) {
+        this.graph = graph;
+        this.pq = new PriorityQueue<>((a, b) -> {
+            // 按照边的权重从小到大排序
+            return a[2] - b[2];
+        });
+        // 图中有 n 个节点
+        int n = graph.length;
+        this.inMST = new boolean[n];
+
+        // 随便从一个点开始切分都可以，我们不妨从节点 0 开始
+        inMST[0] = true;
+        cut(0);
+        // 不断进行切分，向最小生成树中添加边
+        while (!pq.isEmpty()) {
+            int[] edge = pq.poll();
+            int to = edge[1];
+            int weight = edge[2];
+            if (inMST[to]) {
+                // 节点 to 已经在最小生成树中，跳过
+                // 否则这条边会产生环
+                continue;
+            }
+            // 将边 edge 加入最小生成树
+            weightSum += weight;
+            inMST[to] = true;
+            // 节点 to 加入后，进行新一轮切分，会产生更多横切边
+            cut(to);
+        }
+    }
+
+    // 将 s 的横切边加入优先队列
+    private void cut(int s) {
+        // 遍历 s 的邻边
+        for (int[] edge : graph[s]) {
+            int to = edge[1];
+            if (inMST[to]) {
+                // 相邻接点 to 已经在最小生成树中，跳过
+                // 否则这条边会产生环
+                continue;
+            }
+            // 加入横切边队列
+            pq.offer(edge);
+        }
+    }
+
+    // 最小生成树的权重和
+    public int weightSum() {
+        return weightSum;
+    }
+
+    // 判断最小生成树是否包含图中的所有节点
+    public boolean allConnected() {
+        for (int i = 0; i < inMST.length; i++) {
+            if (!inMST[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+```
+
 
 ## 求最短路径   
 
