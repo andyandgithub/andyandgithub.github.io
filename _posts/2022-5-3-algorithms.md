@@ -326,8 +326,25 @@ public List<List<String>> fun(int []nums){
   
 ### 01背包
 
-我们知道01背包内嵌的循环是从大到小遍历，为了保证每个物品仅被添加一次。
+> 有n件物品和一个最多能背重量为w 的背包。第i件物品的重量是weight[i]，得到的价值是value[i] 。每件物品只能用一次，求解将哪些物品装入背包里物品价值总和最大。
 
+
+
+对于背包问题，有一种写法， 是使用二维数组，即`dp[i][j] `表示从下标为`[0-i]`的物品里任意取，放进容量为`j`的背包，价值总和最大是多少。
+```java
+ //遍历顺序：先遍历物品，再遍历背包容量
+for (int i = 1; i <= wlen; i++){
+    for (int j = 1; j <= bagsize; j++){
+        if (j < weight[i - 1]){
+            dp[i][j] = dp[i - 1][j];
+        }else{
+            dp[i][j] = Math.max(dp[i - 1][j], dp[i - 1][j - weight[i - 1]] + value[i - 1]);
+        }
+    }
+}
+
+```
+对于一维数dp，我们知道01背包内嵌的循环是从大到小遍历，为了保证每个物品仅被添加一次。
 ```java
 for(int i = 0; i < weight.length; i++) { // 遍历物品
     for(int j = bagWeight; j >= weight[i]; j--) { // 遍历背包容量
@@ -338,6 +355,9 @@ for(int i = 0; i < weight.length; i++) { // 遍历物品
 ```
 
 ### 完全背包
+>有N件物品和一个最多能背重量为W的背包。第i件物品的重量是weight[i]，得到的价值是value[i] 。每件物品都有无限个（也就是可以放入背包多次），求解将哪些物品装入背包里物品价值总和最大。
+
+> 完全背包和01背包问题唯一不同的地方就是，每种物品有无限件。
 ```java
 for(int i = 0; i < weight.size(); i++) { // 遍历物品
     for(int j = weight[i]; j <= bagWeight ; j++) { // 遍历背包容量
