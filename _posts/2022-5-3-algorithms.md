@@ -271,6 +271,27 @@ public List<List<String>> fun(){
 }
 ```
 
+在有相同元素且结果集合不能够重复的情况下，可以通过固定相同元素的相对位置去重
+```java
+
+    for (int i = 0; i < nums.length; i++) {
+        if (used[i]) {
+            continue;
+        }
+        // 新添加的剪枝逻辑，固定相同的元素在排列中的相对位置
+        if (i > 0 && nums[i] == nums[i - 1] && !used[i - 1]) {
+            continue;
+        }
+        track.add(nums[i]);
+        used[i] = true;
+        backtrack(nums);
+        track.removeLast();
+        used[i] = false;
+    }
+
+
+```
+
 #### 树层去重
 ```java
 public List<List<String>> results=new ArraysList<>();
@@ -283,7 +304,8 @@ public void trace(){
     if()
     results.add(new Linked<>(result));
 
-    boolean []usedtemp=Arrays.copyOfRange(used,0,size);//本层去重
+    // boolean []usedtemp=Arrays.copyOfRange(used,0,size);//本层去重
+    boolean []usedtemp=new boolean[n];//本层去重
     for(int i=start;;i++){
         if(条件){
             if(!usedtemp[i]){
@@ -308,6 +330,45 @@ public List<List<String>> fun(int []nums){
 
 ```
 
+利用排序树层去重
+```java
+
+public List<List<String>> results=new ArraysList<>();
+public List<String> result=new ArraysList<>();
+boolean []used;
+public void trace(){
+    if()
+    return ;
+
+    if()
+    results.add(new Linked<>(result));
+
+    
+    for(int i=start;;i++){
+        if(条件){
+            if(i>start&&nums[i]!=nums[i-1]){//去除与  已经验证过且比后来相同的树枝更有可能成功的  相同的树枝
+                usedtemp[i]=true;
+                result.add(nums[i]);
+                trace(i+1);
+                result.remove(result.size()-1);
+
+            }
+        }
+    }
+}
+public List<List<String>> fun(int []nums){
+    used=new boolean[size];
+    if(){
+
+    }
+    Arrays.sort(nums);
+    trace();
+    return results;
+}
+
+```
+
+
 
 ## 贪心算法
 尝试寻找一个比较合适局部最优算法推广到全局最优，并且找不到反例，可以试一试。
@@ -329,11 +390,11 @@ public List<List<String>> fun(int []nums){
 > 有n件物品和一个最多能背重量为w 的背包。第i件物品的重量是weight[i]，得到的价值是value[i] 。每件物品只能用一次，求解将哪些物品装入背包里物品价值总和最大。
 
 
-
+**先遍历 物品还是先遍历背包重量其实都可以**
 对于背包问题，有一种写法， 是使用二维数组，即`dp[i][j] `表示从下标为`[0-i]`的物品里任意取，放进容量为`j`的背包，价值总和最大是多少。
 ```java
  //遍历顺序：先遍历物品，再遍历背包容量
-for (int i = 1; i <= wlen; i++){
+for (int i = 1; i <= weight.length; i++){
     for (int j = 1; j <= bagsize; j++){
         if (j < weight[i - 1]){
             dp[i][j] = dp[i - 1][j];
@@ -344,7 +405,7 @@ for (int i = 1; i <= wlen; i++){
 }
 
 ```
-对于一维数dp，我们知道01背包内嵌的循环是从大到小遍历，为了保证每个物品仅被添加一次。
+对于一维数组dp，我们知道01背包内嵌的循环是**从大到小**遍历，为了保证每个物品仅被添加一次。
 ```java
 for(int i = 0; i < weight.length; i++) { // 遍历物品
     for(int j = bagWeight; j >= weight[i]; j--) { // 遍历背包容量
@@ -372,6 +433,15 @@ for(int i = 0; i < weight.size(); i++) { // 遍历物品
 
 如果求排列数就是外层for遍历背包，内层for循环遍历物品。
 
+
+
+### 多层dp
+动态规划，二维数组`dp[][]`
+每一层的dp结果有上一层的dp决定，每一个`dp[i][j]`都可由上层的每一个`dp[i-1][k]`决定。
+是一种简单暴力方法
+### 反方向dp
+### 根据之前的状态选择dp的结果打家劫舍
+### 根据选择划分多个dp的类，股票
 
 ## 单调栈
 
@@ -897,9 +967,44 @@ String ss=s1+s2;
 >也就是说我们要计算子串每一个位置j对应的k，所以用一个数组next来保存，next[j] = k，表示当T[i] != P[j]时，j指针的下一个位置。另一个非常有用且恒等的定义，因为下标从0开始的，k值实际是j位前的子串的最大重复子串的长度
 
 
-最常见的代码
+求 `next`
 
-求 next
+常见的改进过的代码
+```java
+ public static int[] getNext3(String ps) {
+ 
+        char[] p = ps.toCharArray();
+    
+        int[] next = new int[p.length];
+    
+        next[0] = -1;
+    
+        int j = 0;
+    
+        int k = -1;
+    
+        while (j < p.length - 1) {
+    
+           if (k == -1 || p[j] == p[k]) {
+    
+               next[++j] = ++k;
+    
+           } else {
+    
+               k = next[k];
+    
+           }
+    
+        }
+    
+        return next;
+    
+    }
+
+```
+
+
+最常见的代码
 ```java
 
     public static int[] getNext2(String ps) {
@@ -942,40 +1047,9 @@ String ss=s1+s2;
    
     
 ```
-常见的改进过的代码
 
-```java
- public static int[] getNext3(String ps) {
- 
-        char[] p = ps.toCharArray();
-    
-        int[] next = new int[p.length];
-    
-        next[0] = -1;
-    
-        int j = 0;
-    
-        int k = -1;
-    
-        while (j < p.length - 1) {
-    
-           if (k == -1 || p[j] == p[k]) {
-    
-               next[++j] = ++k;
-    
-           } else {
-    
-               k = next[k];
-    
-           }
-    
-        }
-    
-        return next;
-    
-    }
 
-```
+
 
 自己写的
 ```java
@@ -1056,21 +1130,25 @@ public int getint(char c) {
 }
 
 public pabin(String s1,String s2){
-     char[] sc1 = s1.toCharArray();
-      char[] sc1= s2.toCharArray();
+    char[] sc1 = s1.toCharArray();
+    char[] sc2= s2.toCharArray();
     int target=0;
     int RE=进制;
+    int x=0;
     for(int i=0;i<sc1.length;i++){
         target*=RE;
         target+=getint(sc1[i]);
+        if(i==sc2.length) x=target;
     }
     int loop=0;
-    for(int i=0;i<sc1.length;i++){
+    for(int i=0;i<sc2.length;i++){
         loop*=RE;
         loop+=getint(sc2[i]);
     }
     int right=RE+1;
     int left=1;
+
+
     while (right <= sc1.length) {
             int y = getint(sc1[left - 1]);
 
@@ -1083,7 +1161,8 @@ public pabin(String s1,String s2){
             
             left++;
             right++;
-        }
+    }
+    return ;
 }
 
 ```
@@ -1397,7 +1476,7 @@ for(int i=0;graph.length;i++){
     trace(graph,i,path);
 }
 // 记录被遍历过的节点
-boolean[] visited;
+boolean[] visited;//若是没有环可以省略，相当于多叉树
 // 记录从起点到当前节点的路径
 boolean[] onPath;
 
@@ -1416,6 +1495,73 @@ void traverse(Graph graph, int s) {
 }
 ```
 
+##  拓扑排序
+重点不是`（a,b）`并不是绝对的`a->b`或者`b->a`是指b到a有条路径或者说，b在a之前
+注意路径上添加的节点顺序，是在遍历外后续节点之后添加。
+
+```java
+class Solution {
+    int numCourses;
+    List<Integer> graph[],path,indegree;
+    boolean hascycle,visited[], onpath[];
+
+    public void build(int [][]prerequisites) {
+        graph = new ArrayList[numCourses];
+        indegree = new ArrayList<>();
+        for (int i=0; i < numCourses; i++) {
+            graph[i] = new ArrayList<>();
+        }
+        int count[]=new int[numCourses];
+        for (int []prere : prerequisites) {
+            graph[prere[0]].add(prere[1]);
+            count[prere[1]]++;
+        }
+        for(int i=0;i<numCourses;i++){
+            if(count[i]==0){
+                indegree.add(i);
+            }
+        }
+    }
+    public int[] findOrder(int numCourses, int[][] prerequisites) {
+        this.numCourses = numCourses;
+        visited = new boolean[numCourses];
+        onpath = new boolean[numCourses];
+        path = new ArrayList<>();
+
+        build(prerequisites);
+
+        for (int i : indegree) {
+            trace(i);
+        }
+        if (hascycle || path.size() < numCourses) return new int[] {};
+        int answer[] = new int[numCourses];
+         System.out.println(indegree);
+        System.out.println(Arrays.toString(graph));
+
+        for (int i = 0; i < numCourses; i++) {
+            // answer[i] = path.get(numCourses-1-i);
+            answer[i] = path.get(i);
+        }
+        return answer;
+
+    }
+    public void trace(int course){
+        if(onpath[course]){
+            hascycle=true;
+            return ;
+        }
+        if(hascycle||visited[course]) return ;
+        visited[course]=true;
+        onpath[course]=true;
+      
+        for(int precourse:graph[course]){
+            trace(precourse);
+        }  path.add(course);
+
+        onpath[course]=false;
+    }
+}
+```
 
 
 
@@ -1853,4 +1999,318 @@ int Dijkstra(int start,int end,int [][]graph){
 
 
 ### Flod算法
+
+
+
+
+# 操作系统算法
+
+## LRU,最近没被使用过
+### 自写
+```java
+
+import java.util.HashMap;
+import java.util.Map;
+
+/*
+ * @lc app=leetcode.cn id=146 lang=java
+ *
+ * [146] LRU 缓存
+ */
+
+// @lc code=start
+class LRUCache {
+    class Node {
+        int val, key;
+        Node pre, next;
+
+        Node(int key, int val) {
+            this.key = key;
+            this.val = val;
+        }
+    }
+
+    class DoubleList {
+        int size;
+        Node head, tail;
+
+        DoubleList() {
+            this.size = 0;
+            head = new Node(0, 0);
+            tail = new Node(0, 0);
+            head.next = tail;
+            tail.pre = head;
+        }
+
+        Node removeNode(Node node) {
+            Node prenode = node.pre, nextnode = node.next;
+            prenode.next = nextnode;
+            nextnode.pre = prenode;
+            size--;
+            return node;
+        }
+
+        Node removeFirst() {
+            if (size != 0) {
+                return removeNode(head.next);
+                // size--;
+            }
+            return null;
+        }
+
+        void addLast(Node node) {
+            node.next = tail;
+            node.pre = tail.pre;
+            tail.pre.next = node;
+            tail.pre = node;
+            size++;
+        }
+
+    }
+
+    int capacity;
+    Map<Integer, Node> map;
+    DoubleList cache;
+
+    public LRUCache(int capacity) {
+        this.capacity = capacity;
+        map = new HashMap<>();
+        cache = new DoubleList();
+    }
+
+    public int get(int key) {
+        // System.out.println(map);
+
+        if (!map.containsKey(key))
+            return -1;
+        Node node = map.get(key);
+        cache.removeNode(node);
+        cache.addLast(node);
+        return node.val;
+    }
+
+    public void put(int key, int value) {
+        // System.out.println(map);
+        if (map.containsKey(key)) {
+            Node node = new Node(key,value);
+            cache.removeNode(map.get(key));
+            cache.addLast(node);
+            map.put(key,node);
+            return;
+        }
+        if (cache.size == capacity) {
+            Node delnode = cache.removeFirst();
+            map.remove(delnode.key);
+        }
+        Node node = new Node(key, value);
+        cache.addLast(node);
+        map.put(key, node);
+    }
+    public void makeRecently(int key){
+        //确定一定有
+        Node node=map.get(key);
+        cache.removeNode(node);
+        cache.addLast(node);
+
+    }
+    public void addRecently(int key,int val){
+        if(cache.size==capacity){
+            Node node=cache.removeFirst();
+            map.remove(node.key);
+        }
+        Node newnode=new Node(key,val);
+        cache.addLast(newnode);
+        map.put(key,newnode);
+    }
+    public int  deleteKey(int key) {
+        Node x = map.get(key);
+        cache.removeNode(x);
+        map.remove(key);
+        return x.val;
+    }
+    public int reremoveLastRecently() {
+        Node deletenode = cache.removeFirst();
+        map.remove(deletenode.key);
+        return deletenode.val;
+    }
+}
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache obj = new LRUCache(capacity);
+ * int param_1 = obj.get(key);
+ * obj.put(key,value);
+ */
+// @lc code=end
+
+```
+
+
+
+### java内置LinkedHashMap
+```java
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+class LRUCache {
+
+    int capacity;
+    LinkedHashMap<Integer, Integer> cache;
+
+    public LRUCache(int capacity) {
+        this.capacity = capacity;
+        cache = new LinkedHashMap<>();
+    }
+
+    public int get(int key) {
+        if (!cache.containsKey(key))
+            return -1;
+        makeRecently(key);
+        return cache.get(key);
+    }
+
+    public void put(int key, int value) {
+        if (cache.containsKey(key)) {
+            cache.put(key, value);
+            makeRecently(key);
+            return;
+        }
+        if (cache.size() >= capacity) {
+            removeLastRecently();
+        }
+        cache.put(key, value);
+
+    }
+
+    public void makeRecently(int key) {
+        int val = cache.get(key);
+        cache.remove(key);
+        cache.put(key, val);
+
+    }
+
+    public void addRecently(int key, int val) {
+        if (cache.size() >= capacity) {
+            removeLastRecently();
+        }
+        cache.put(key, val);
+    }
+
+    public void deleteKey(int key) {
+        cache.remove(key);
+    }
+
+    public int removeLastRecently() {
+        int deleteKey = cache.keySet().iterator().next();
+        int val = cache.get(deleteKey);
+        cache.remove(deleteKey);
+        return val;
+    }
+}
+
+```
+
+## LFU算法 使用次数最少淘汰
+
+```java
+/*
+ * @lc app=leetcode.cn id=460 lang=java
+ *
+ * [460] LFU 缓存
+ */
+
+// @lc code=start
+class LFUCache {
+    int capacity, minFreq;
+    //键到值的映射
+    HashMap<Integer, Integer> keyToVal;
+    //键到频率的映射
+    HashMap<Integer, Integer> keyToFreq;
+    //每个频率之下的
+    HashMap<Integer, LinkedHashSet<Integer>> freqToKeys;
+
+    public LFUCache(int capacity) {
+        this.capacity = capacity;
+        keyToFreq = new HashMap<>();
+        keyToVal = new HashMap<>();
+        freqToKeys = new HashMap<>();
+        minFreq = 1;
+    }
+
+    public int get(int key) {
+        if (!keyToVal.containsKey(key))
+            return -1;
+
+        increaseKey(key);
+
+        return keyToVal.get(key);
+    }
+
+    public void put(int key, int val) {
+        if (capacity <= 0)
+            return;
+
+        if (keyToVal.containsKey(key)) {
+            keyToVal.put(key, val);
+            increaseKey(key);
+            return ;
+          
+        }
+
+        if (capacity <= keyToVal.size()) {
+            removeMinFreq();
+        }
+        keyToVal.put(key, val);
+        if (!freqToKeys.containsKey(1))
+            freqToKeys.put(1, new LinkedHashSet<>());
+        freqToKeys.get(1).add(key);
+        keyToFreq.put(key, 1);
+
+        minFreq = 1;
+    }
+
+    public void increaseKey(int key) {
+        int freq = keyToFreq.get(key);
+        keyToFreq.put(key, freq + 1);
+        if (!freqToKeys.containsKey(freq + 1)) {
+            freqToKeys.put(freq + 1, new LinkedHashSet<>());
+        }
+        freqToKeys.get(freq + 1).add(key);
+        freqToKeys.get(freq).remove(key);
+
+        if (freqToKeys.get(freq).isEmpty()) {
+            freqToKeys.remove(freq);
+        }
+        if (freq == minFreq && freqToKeys.get(freq) == null) {
+            
+            minFreq++;
+        }
+     
+    }
+
+    public void removeMinFreq() {
+        LinkedHashSet<Integer> keyList = freqToKeys.get(minFreq);
+        int deleteKey = keyList.iterator().next();
+        keyList.remove(deleteKey);
+        if (keyList.isEmpty()) {
+            freqToKeys.remove(minFreq);
+        }
+        keyToVal.remove(deleteKey);
+        keyToFreq.remove(deleteKey);
+    }
+}
+
+```
+
+
+
+
+
+
+
+
+
+
+
 
