@@ -443,9 +443,105 @@ for(int i = 0; i < weight.size(); i++) { // 遍历物品
 ### 根据之前的状态选择dp的结果打家劫舍
 ### 根据选择划分多个dp的类，股票
 
+## 状态压缩dp
+
+状态一共有n种
+使用n位数字来表示n个种类，n一般不会特比大，一般在16一下
+二进制表示状态集合，使用十进制存储
+
+实例
+例如一共5种状态，某个时刻状态比较多有3，2，4三种状态
+可以写成
+```java
+4,3,2 
+1,1,1,0,0
+16+8+4+0+0=28//使用28来表示当前的状态集合
+
+```
+
+### 状态压缩动态规划常用位操作
+```java
+int c;
+int A;
+//一般由右向左数
+A|=(1<<c);//A的c位变为1，即加入c位的状态
+//未知c位有状态
+A&=~(1<<c);//A的c位变为0，即去掉c位的状态
+//已知c位有状态
+A^=1<<c;//A的c位变为0，即去掉c位的状态
+
+a&(-a);//寻找最低位1 返回结果比如2（1），4（2），8（3）
+
+
+//取最高位
+int highbit(){
+    int p=lowbit(x);
+    while(p!=x){
+        x-=p;
+        p=lowbit(x);
+    }
+    return p;
+}
+
+
+A=0;//值为空集合
+A|=B;//并集合
+A&=B;//交集合
+ALL=(1<<(c+1))-1;//全1全集
+All^A;//求A的补集
+(A&B)==B;//判断B是否位A的子集
+
+//枚举某一个集合的子集
+int subset=A;
+do{
+    subset=(subset-1)&A;
+}while(subset!=A);
+
+
+//数一下某个集合里面的元素一共有多少个
+int count=0;
+for(int i=0;i<n;i++){
+    if(A&(1<<i)!=0)
+        count++;
+}
+
+int count=0;
+for(int i=A;i;i>>=1)
+    count+=i&1;
+
+
+
+//判断是否为2的幂次
+x&(x-1)==0;
+```
+
+
+### 记忆化搜索
+> 记录下来搜索过的路径，以避免重复搜索
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## 单调栈
 
 >通常是一维数组，要寻找任一个元素的右边或者左边第一个比自己大或者小的元素的位置，此时我们就要想到可以用单调栈了。
+
+1. 可以记录右边或者左边**第一个**比自己大或者小的元素，或者元素位置。是**第一个较而不是最大、小**
+2. 通常使用`sta栈`记录栈的状态，使用一个一维数组记录每个位置的结果
+3. 可以采用赋值为0的做法，每次遇到单调栈顶元素++可以求解，某方向上单调递增、递减的元素个数
+4. 可以同时使用左右单调栈求左右两个较大、较小位置的元素
 
 
 >以寻找元素右边第一个大的元素为例
@@ -501,6 +597,44 @@ int[] nextGreaterElement(int[] nums) {
 
 ```   
 
+## 单调队列
+
+1. 单调队列用于求解，需要使用已经路过的几个位置中的**最值**。
+2. 滑动窗口可以记录路过的路径但是不能记录下来最值信息。
+3. 单调队列与滑动窗口类似可分析之后取用的是最左端`left`的值还是路过路径（或者说是当前窗口）的最值
+4. 常与动态规划连用
+
+一般来讲，单调队列为双端队列，按照降序或者升序纪律窗口内容，按照限制去掉`First`未知的最值，按照单调性对比去除`last`位置的元素，加入到`last`中当前元素
+
+
+```java
+
+class Solution {
+    public int fun(int[] nums) {
+        
+        
+        //单掉队列
+        Deque<Integer> dq = new ArrayDeque<>();
+        dq.addLast(0);
+        for (int i = 1; i <= n; i++) { 
+            while (!dq.isEmpty() && nums[dq.peekLast()] >= nums[i]) {
+                dq.pollLast();
+            }
+            while (!dq.isEmpty() && nums[i]-nums[dq.peekFirst()]>=k) {
+                // dq.pollFirst(); 
+                answer=Math.min(answer,i-dq.pollFirst());
+            }
+            // if(!dq.isEmpty()&&sums[i]-sums[dq.peekFirst()]>=k){
+               
+            // }
+
+           
+            dq.addLast(i);
+        }
+        return answer;
+    }
+}
+
 ```
 
 
@@ -538,6 +672,7 @@ class NumArray {
 就是某个位置左右两边的和或者乘积的时候。
 - 使用`Deque`双端队列保存一个滑动窗口
 - 前缀和与哈希表一起使用
+
 
 
 
@@ -589,13 +724,69 @@ public class Difference {
 ```
 
 ## 树状数组
+s树状数组
+## 区间技巧
+将二维数组按照一定顺序排列
+```java
+Arrays.sort(nums,(a,b)->{
+    return a[0]==b[0]?b[1]-a[1]:a[0]-b[0];
+});
+
+```
+先0位置由小到大，再1位置由大到小，确保之后计算的时候不会重复计算
+
+## 扫描线算法
+
+1. 针对于求二维面积等问题
+2. 将二维的问题转化为两个一维的问题
+
+
+1. 先按照x排序，利用每个间隔或者每个x进行下一步处理
+2. 在y轴用一条线自左向右扫描，乘或者取和。
+3. y轴运算可以采用区间技巧 
+## 一些算法技巧
+
+### 模幂运算
+运算数字太大
+```java
+b=c+d;
+d=e*f;
+a**b=(a**c)*(a**d);
+a**b=(a**c)*(a**e)**f
+```
+
+### 随机数技巧
+
+> 概率算法的蒙特卡罗方法
+
+在面临未知的链表或者数组的时候可以采用,
+保证每次在面临新的元素的时候概率是一致的
+
+```java
+Random ram=new Random();
+int index=0;
+for(int i=0;i<nums.length;i++){
+    if(nums[i]==target){
+        index++;    
+        res=(0==ram.nextInt(index))?nums[i]:res;
+
+    }
+
+}
+
+```
 
 
 
 
 
 
-## TrieMap 字典树，前缀树，单词查找树
+
+
+
+
+
+# TrieMap 字典树，前缀树，单词查找树
 
 > val字段存储键对应的值，children数组存储指向子节点的指针。
 
@@ -2001,7 +2192,84 @@ int Dijkstra(int start,int end,int [][]graph){
 ### Flod算法
 
 
+# 最大堆
+```java
+class MaxPQ {
+    int pq[];
+    int size;
 
+    MaxPQ(int capacity) {
+        pq = new int[capacity + 1];
+        size = 0;
+    }
+
+    public int MAX() {
+        return pq[1];
+    }
+
+    public void insert(int x) {
+        size++;
+        pq[size] = x;
+        swim(size);
+    }
+
+    public int delMax() {
+        int m = pq[1];
+        swap(1, size);
+        size--;
+        sink(1);
+        return m;
+    }
+
+    // 上浮
+    private void swim(int x) {
+        while (x > 1 && less(parent(x), x)) {
+            swap(x, parent(x));
+            x = parent(x);
+        }
+    }
+
+    // 下潜
+    private void sink(int x) {
+        while (x < size && left(x) <= size) {
+            int max = left(x);
+            if (right(x) <= size && less(left(x), right(x))) {
+                max = right(x);
+            }
+            if (less(max, x))
+                break;
+            swap(x, max);
+            x = max;
+
+        }
+
+    }
+
+    private int left(int x) {
+        return x * 2 > size ? -1 : x * 2;
+    }
+
+    private int right(int x) {
+        return x * 2 + 1 > size ? -1 : x * 2 + 1;
+    }
+
+    private int parent(int x) {
+        return x / 2;
+    }
+
+    private void swap(int x, int y) {
+        int temp = pq[x];
+        pq[x] = pq[y];
+        pq[y] = temp;
+    }
+
+    private boolean less(int x, int y) {
+        return pq[x] < pq[y];
+    }
+
+}
+
+```
 
 # 操作系统算法
 
