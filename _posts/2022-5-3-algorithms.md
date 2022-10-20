@@ -23,7 +23,7 @@ O(1)常数阶 < O(logn)对数阶 < O(n)线性阶 < O(n^2)平方阶 < O(n^3)(立�
 public int searchInsert(int []nums,int target){}
     int head=0,tail=nums.length-1,mid=tail/2;
     // int index=0;
-    if(target>nums[tail])
+    if(target>nums[tail])   
         return tail+1;
     if(target<nums[head])
         return 0; 
@@ -58,6 +58,25 @@ public int binarySearch(int nums[],int target){
 
 }
 
+```
+
+#### 查找最右边界
+```java
+int right_bound(int[] nums, int target) {
+    int left = 0, right = nums.length;
+    
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+        if (nums[mid] == target) {
+            left = mid + 1; // 注意
+        } else if (nums[mid] < target) {
+            left = mid + 1;
+        } else if (nums[mid] > target) {
+            right = mid;
+        }
+    }
+    return left - 1; // 注意
+}
 ```
 ### 双指针法
 安静两个循环变成一个循环 27
