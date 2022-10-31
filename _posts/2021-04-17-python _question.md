@@ -196,3 +196,30 @@ Help on function hh in module __main__:
 '''
 ```
 
+## 排序
+### 普通排序
+```python
+list.sort();# 会修改list，效率较高默认升序，无返回值reverse=True,降序
+a=sorted(list);# 不会修改原list，返回修改的kist。效率较低默认升序，reverse=True,降序
+
+```
+`sort()`仅可用于List列表
+`sorted`可用于所有可迭代的序列
+
+### 对于复杂的列表
+```python
+list=[(2, 1), (5, 0), (4, 3), (4, 2), (2, 5), (7, 6)]
+#按照第一个元素排序
+list.sort(key=(lambda x:x[0]))
+sorted(list,key=(lambda x:x[0]))
+
+def takeSecond(a):
+    return a[0] 
+list.sort(key=takeSecond)
+sorted(list,key=takeSecond)
+```
+### 对于字典排序
+```python
+sorted(dist);#默认安装key排序
+sorted(key_value.items(), key = lambda kv:(kv[1], kv[0]))#先按照value排序再按照key排序
+```
