@@ -50,3 +50,15 @@ class Demo {
 }
 ```
 在循环，或者线程里面每次都要new一个新的输出流对象，尤其是ObjectOutputStram是基于其他OutPutStream转换过来的时候
+
+
+# mysql的DateTime类型
+使用java.sql.TimeStamp接受
+
+# mysql列名和java字段不一致
+mysql映射到对象会根据set字段名去匹配
+SQL语句调整
+
+```shell
+select name as personName;
+```
