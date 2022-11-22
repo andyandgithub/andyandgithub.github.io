@@ -152,16 +152,20 @@ IDE：idea 2019.2 构建工具：maven3.5.4 服务器：tomcat8.5 Spring版本�
 </servlet-mapping>
 ```
 
-<url-pattern>标签中使用/和/*的区别： /所匹配的请求可以是/login或.html或.js或.css方式的请求路径，但是/不能匹配.jsp请求路径的请求
+`<url-pattern>`标签中使用/和/*的区别：
 
-因此就可以避免在访问jsp页面时，该请求被DispatcherServlet处理，从而找不到相应的页面/*则能够匹配所有请求，例如在使用过滤器时，若需要对所有请求进行过滤，就需要使用/*的写法
+`/`所匹配的请求可以是`/login`或`.html`或`.js`或`.css`方式的请求路径，但是/不能匹配.jsp请求路径的请求
+
+因此就可以避免在访问jsp页面时，该请求被`DispatcherServlet`处理，从而找不到相应的页面
+
+`/*`则能够匹配所有请求，例如在使用过滤器时，若需要对所有请求进行过滤，就需要使用`/*`的写法
 
 ## 创建请求控制器
 
 由于前端控制器对浏览器发送的请求进行了统一的处理，但是具体的请求有不同的处理过程，因此需要创建处理具体请求的类，即请求控制器
 
 请求控制器中每一个处理请求的方法成为控制器方法
-因为SpringMVC的控制器由一个POJO（普通的Java类）担任，因此需要通过@Controller注解将其标识为一个控制层组件，交给Spring的IoC容器管理，此时SpringMVC才能够识别控制器的存在
+因为SpringMVC的控制器由一个POJO（普通的Java类）担任，因此需要通过`@Controller`注解将其标识为一个控制层组件，交给Spring的IoC容器管理，此时SpringMVC才能够识别控制器的存在
 
 ```java
 
@@ -237,7 +241,13 @@ public String index(){
 //设置视图名称
         return"index";
         }
-
+        
+@RequestMapping("/test/a")
+publicvoid index(){
+//设置视图名称
+        
+        }
+//默认无返回值会去寻找/test/a.html
 ```
 
 ②通过超链接跳转到指定页面 在主页index.html中设置超链接
@@ -269,8 +279,8 @@ public String HelloWorld(){
 
 ## 总结
 
-浏览器发送请求，若请求地址符合前端控制器的url-pattern，该请求就会被前端控制器 DispatcherServlet处理。前端控制器会读取SpringMVC的核心配置文件，通过扫描组件找到控制器，
-将请求地址和控制器中@RequestMapping注解的value属性值进行匹配，若匹配成功，该注解所标识的 控制器方法就是处理请求的方法。处理请求的方法需要返回一个字符串类型的视图名称，该视图名称会
+浏览器发送请求，若请求地址符合前端控制器的`url-pattern`，该请求就会被前端控制器 `DispatcherServlet`处理。前端控制器会读取SpringMVC的核心配置文件，通过扫描组件找到控制器，
+将请求地址和控制器中`@RequestMapping`注解的`value`属性值进行匹配，若匹配成功，该注解所标识的 控制器方法就是处理请求的方法。处理请求的方法需要返回一个字符串类型的视图名称，该视图名称会
 被视图解析器解析，加上前缀和后缀组成视图的路径，通过Thymeleaf对视图进行渲染，最终转发到视 图所对应页面
 
 # @RequestMapping注解
@@ -414,7 +424,7 @@ not met for actual request parameters: username={admin}, password={123456}
 
 ## produces
 
-指定返回的内容类型，仅当request请求头中的(Accept)类型中包含该指定类型才返回
+指定返回的内容类型，仅当`request`请求头中的(`Accept`)类型中包含该指定类型才返回
 
 ## SpringMVC支持ant风格的路径
 
@@ -563,6 +573,7 @@ public String testPOJO(User user){
 ## 解决获取请求参数的乱码问题
 
 解决获取请求参数的乱码问题，可以使用SpringMVC提供的编码过滤器`CharacterEncodingFilter`，但是 必须在web.xml中进行注册
+`web.xml`
 
 ```xml
 <!--配置springMVC的编码过滤器-->
@@ -584,11 +595,14 @@ public String testPOJO(User user){
 </filter-mapping>
 ```
 
+- tomcat7没有解决乱码问题
+- tomcat8解决了get的乱码问题，没有解决post的乱码问题
+
 注： SpringMVC中处理编码的过滤器一定要配置到其他过滤器之前，否则无效
 
 解决请求参数获取时候的乱码问题 此过滤器一定要配置到最前面，要不然会无效，因为在设置编码之前一定不能设置请求参数。
 
-没有`forcceEncoding`的话只会编码处理请求的参数，设置为真时候也可以处理响应`response`的编码
+没有`forcceEncoding`的话只会编码处理请求的参数，设置为真的时候也可以处理响应`response`的编码
 
 # 域对象共享数据
 
@@ -681,7 +695,7 @@ public class BindingAwareModelMap extends ExtendedModelMap {
 public String testSession(HttpSession session){
         session.setAttribute("testSessionScope","hello,session");
         return"success";
-}
+        }
 ```
 
 ```html
@@ -698,13 +712,15 @@ public String testApplication(HttpSession session){
         ServletContext application=session.getServletContext();
         application.setAttribute("testApplicationScope","hello,application");
         return"success";
-}
+        }
 ```
 
 # SpringMVC的视图
 
-SpringMVC中的视图是View接口，视图的作用渲染数据，将模型Model中的数据展示给用户 SpringMVC视图的种类很多，默认有转发视图和重定向视图 当工程引入jstl的依赖，转发视图会自动转换为JstlView
-若使用的视图技术为Thymeleaf，在SpringMVC的配置文件中配置了Thymeleaf的视图解析器，由此视 图解析器解析之后所得到的是ThymeleafView
+SpringMVC中的视图是View接口，视图的作用渲染数据，将模型Model中的数据展示给用户
+
+SpringMVC视图的种类很多，默认有转发视图和重定向视图 当工程引入jstl的依赖，转发视图会自动转换为JstlView 若使用的视图技术为Thymeleaf，在SpringMVC的配置文件中配置了Thymeleaf的视图解析器，由此视
+图解析器解析之后所得到的是ThymeleafView 最终都会封装到一个ModelAndView对象中。
 
 ## ThymeleafView
 
@@ -713,8 +729,8 @@ SpringMVC中的视图是View接口，视图的作用渲染数据，将模型Mode
 ```java
 @RequestMapping("/testHello")
 public String testHello(){
-    return"hello";
-}
+        return"hello";
+        }
 ```
 
 ## 转发视图
@@ -725,10 +741,13 @@ SpringMVC中默认的转发视图是InternalResourceView SpringMVC中创建转�
 ```java
 @RequestMapping("/testForward")
 public String testForward(){
-    return "forward:/testHello";
-}
+        return"forward:/testHello";
+        }
 
 ```
+
+地址不变还是`testFrward`
+此种方式不会解析页面中的thymeleaf语句,不会渲染视图
 
 ## 重定向视图
 
@@ -744,7 +763,7 @@ public String testRedirect(){
         }
 ```
 
-注： 重定向视图在解析时，会先将redirect:前缀去掉，然后会判断剩余部分是否以/开头，若是则会自 动拼接上下文路径
+注： 重定向视图在解析时，会先将redirect:前缀去掉，然后会判断剩余部分是否以/开头，若是则会自 动拼接上下文路径 地址变为testHello
 
 ## 视图控制器view-controller
 
@@ -765,7 +784,9 @@ view-name：设置请求地址所对应的视图名称
 
 ## RESTful简介
 
-REST：Representational State Transfer，表现层资源状态转移。 ①资源
+REST：Representational State Transfer，表现层资源状态转移。
+
+①资源
 
 资源是一种看待服务器的方式，即，将服务器看作是由很多离散的资源组成。每个资源是服务器上一个 可命名的抽象概念。因为资源是一个抽象的概念，所以它不仅仅能代表服务器文件系统中的一个文件、
 数据库中的一张表等等具体的东西，可以将资源设计的要多抽象有多抽象，只要想象力允许而且客户端 应用开发者能够理解。与面向对象设计类似，资源是以名词为核心来组织的，首先关注的是名词。一个
@@ -792,10 +813,13 @@ REST：Representational State Transfer，表现层资源状态转移。 ①资�
 
 ## HiddenHttpMethodFilter
 
-由于浏览器只支持发送get和post方式的请求，那么该如何发送put和delete请求呢？ SpringMVC 提供了 HiddenHttpMethodFilter 帮助我们将 POST 请求转换为 DELETE 或 PUT 请求
-HiddenHttpMethodFilter 处理put和delete请求的条件： a>当前请求的请求方式必须为post b>当前请求必须传输请求参数_method 满足以上条件，HiddenHttpMethodFilter
-过滤器就会将当前请求的请求方式转换为请求参数
-_method的值，因此请求参数_method的值才是最终的请求方式 在web.xml中注册HiddenHttpMethodFilte
+由于浏览器只支持发送get和post方式的请求，那么该如何发送put和delete请求呢？
+
+SpringMVC 提供了 HiddenHttpMethodFilter 帮助我们将 POST 请求转换为 DELETE 或 PUT 请求 HiddenHttpMethodFilter 处理put和delete请求的条件：
+
+a>当前请求的请求方式必须为`post`
+b>当前请求必须传输请求参数`_method` 满足以上条件，`HiddenHttpMethodFilter`过滤器就会将当前请求的请求方式转换为请求参数`_method`的值，因此请求参数_method的值才是最终的请求方式
+在web.xml中注册`HiddenHttpMethodFilte`
 
 ```xml
 filter>
@@ -808,21 +832,83 @@ filter>
 </filter-mapping>
 ```
 
-目前为止，SpringMVC中提供了两个过滤器：CharacterEncodingFilter和HiddenHttpMethodFilter
+```html
 
-在web.xml中注册时，必须先注册CharacterEncodingFilter，再注册HiddenHttpMethodFilter 原因：
+<form th:action="@{/user/1}" method="post">
+    <!--    真正的请求方式-->
+    <input type="hidden" name="_method" value="DELETE"/>
+    <input type="submit" value="删除用户"/>
+</form>
+```
 
-在CharacterEncodingFilter 中通过 request.setCharacterEncoding(encoding) 方法设置字符集的request.setCharacterEncoding(encoding)
+目前为止，SpringMVC中提供了两个过滤器`：CharacterEncodingFilter`和`HiddenHttpMethodFilter`
+
+在web.xml中注册时，必须先注册`CharacterEncodingFilter`，再注册`HiddenHttpMethodFilter` 原因：
+
+在`CharacterEncodingFilter` 中通过 `request.setCharacterEncoding(encoding)` 方法设置字符集的`request.setCharacterEncoding(encoding)`
 方法要求前面不能有任何获取请求参数的操作 而 HiddenHttpMethodFilter 恰恰有一个获取请求方式的操作：
 `String paramValue = request.getParameter(this.methodParam);`
 
 # RESTful案例
 
-## 准备工作
+## 静态资源
 
-和传统 CRUD 一样，实现对员工信息的增删改查。 搭建环境 准备实体类
+使用默认配置的Servlet处理静态资源 当前工程的web.xml 配置的前端控制器 `DispatcherServlet` 的` url-pattern `是 `/ Tomcat` 的 `web.xml `
+配置的 `DefaultServlet`
+的`url-pattern `也是 `/` 此时，浏览器发送的请求会优先被` DispatcherServlet` 进行处理，但是` DispatcherServlet` 无法处理静态资源
+若配置了 `<mvc:default-servlet-handler /> `，则所有请求都会被` DefaultServlet` 处理。 若配置了`<mvc:default-servlet-handler />`
+和 `<mvc:annotation-driven /> `，则浏览器发送的请求会先被
+`DispatcherServlet` 处理，无法处理的在交给 `DefaultServlet` .
+
+```xml
+
+<mvc:default-servlet-handler/>
+<mvc:annotation-driven/>
+```
+
+## 拼接路径
+
+```html
+<a th:href="@{'/employee/update/'+${employee.id}}">update</a>
+```
 
 # SpringMVC处理ajax请求
+
+```html
+
+<div id="app">
+    <h1>index</h1>
+
+
+    <input type="button" @click="testAjax()" value="测试ajax">
+</div>
+<script type="text/javascript" th:src="@{/static/js/vue.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/axios.min.js}"></script>
+<script type="text/javascript">
+    var vue = new Vue({
+        el: "#app",
+        methods: {
+            testAjax() {
+                axios.post(
+                        "/SpringMVC/test/ajax?id=123",
+                        {username: "admin", password: "12346"}
+                ).then(response => {
+                    console.log(response.data);
+                })
+            }
+        }
+    });
+</script>
+```
+
+```java
+   @RequestMapping("/test/ajax")
+public void testAjax(Integer id,@RequestBody String requestbody,HttpServletResponse httpServletResponse)throws IOException{
+        System.out.println(requestbody);
+        httpServletResponse.getWriter().write("hello ajax");
+        }
+        }
+```
 
 ## @RequestBody
 
@@ -849,6 +935,628 @@ public String testRequestBody(@RequestBody String requestBody){
 
 ## @RequestBody获取json格式的请求参数
 
-在使用了axios发送ajax请求之后，浏览器发送到服务器的请求参数有两种格式： 1、name=value&name=value...，此时的请求参数可以通过request.getParameter()获取，对应
-SpringMVC中，可以直接通过控制器方法的形参获取此类请求参数 2、{key:value,key:value,...}，此时无法通过request.getParameter()获取，之前我们使用操作
-json的相关jar包gson或jackson处理此类请求参数，可以将其转换为指定的实体类对象或map集 合。在SpringMVC中，直接使用@RequestBody注解标识控制器方法的形参即可将此类请求参数 转换为java对象
+在使用了axios发送ajax请求之后，浏览器发送到服务器的请求参数有两种格式： 1、name=value&name=value...，此时的请求参数可以通过request.getParameter()
+获取，对应SpringMVC中，可以直接通过控制器方法的形参获取此类请求参数
+
+2、{key:value,key:value,...}，此时无法通过request.getParameter()获取，之前我们使用操作 json的相关jar包gson或jackson处理此类请求参数，可以将其转换为指定的实体类对象或map集
+合。在SpringMVC中，直接使用@RequestBody注解标识控制器方法的形参即可将此类请求参数 转换为java对象
+
+使用@RequestBody获取json格式的请求参数的条件： 1、导入jackson的依赖
+
+```xml
+dependency>
+<groupId>com.fasterxml.jackson.core</groupId>
+<artifactId>jackson-databind</artifactId>
+<version>2.12.1</version>
+        </dependency>
+
+```
+
+2、SpringMVC的配置文件中设置开启mvc的注解驱动
+
+```xml
+<!--开启mvc的注解驱动-->
+<mvc:annotation-driven/>
+```
+
+3、在控制器方法的形参位置，设置json格式的请求参数要转换成的java类型（实体类或map）的参 数，并使用@RequestBody注解标识
+
+```html
+<input type="button" value="测试@RequestBody获取json格式的请求参数"
+       @click="testRequestBody()"><br>
+<script type="text/javascript" th:src="@{/js/vue.js}"></script>
+<script type="text/javascript" th:src="@{/js/axios.min.js}"></script>
+<script type="text/javascript">
+    var vue = new Vue({
+        el: "#app",
+        methods: {
+            testRequestBody() {
+                axios.post(
+                        "/SpringMVC/test/RequestBody/json",
+                        {username: "admin", password: "123456"}
+                ).then(response => {
+                    console.log(response.data);
+                });
+            }
+        }
+    });
+</script>
+```
+
+```java
+//将json格式的数据转换为map集合
+@RequestMapping("/test/RequestBody/json")
+public void testRequestBody(@RequestBody Map<String, Object> map,
+        HttpServletResponse response)throws IOException{
+        System.out.println(map);
+//{username=admin, password=123456}
+        response.getWriter().print("hello,axios");
+        }
+//将json格式的数据转换为实体类对象
+@RequestMapping("/test/RequestBody/json")
+<input type="button"value="测试@RequestBody获取json格式的请求参数"
+@click="testRequestBody()"><br>
+<script type="text/javascript"th:src="@{/js/vue.js}"></script>
+<script type="text/javascript"th:src="@{/js/axios.min.js}"></script>
+<script type="text/javascript">
+        var vue=new Vue({
+        el:"#app",
+        methods:{
+        testRequestBody(){
+        axios.post(
+        "/SpringMVC/test/RequestBody/json",
+        {username:"admin",password:"123456"}
+        ).then(response=>{
+        console.log(response.data);
+        });
+        }
+        }
+        });
+</script>
+//将json格式的数据转换为map集合
+@RequestMapping("/test/RequestBody/json")
+public void testRequestBody(@RequestBody Map<String, Object> map,
+        HttpServletResponse response)throws IOException{
+        System.out.println(map);
+//{username=admin, password=123456}
+        response.getWriter().print("hello,axios");
+        }
+//将json格式的数据转换为实体类对象
+@RequestMapping("/test/RequestBody/json")
+public void testRequestBody(@RequestBody User user,HttpServletResponse
+        response)throws IOException{
+        System.out.println(user);
+//User{id=null, username='admin', password='123456', age=null,
+        gender='null'}
+        response.getWriter().print("hello,axios");
+        }
+```
+
+## @ResponseBody
+
+@ResponseBody用于标识一个控制器方法，可以将该方法的返回值直接作为响应报文的响应体响应到浏览器
+
+```java
+@RequestMapping("/testResponseBody")
+public String testResponseBody(){
+//此时会跳转到逻辑视图success所对应的页面
+        return"success";
+        }
+@RequestMapping("/testResponseBody")
+@ResponseBody
+public String testResponseBody(){
+//此时响应浏览器数据success
+        return"success";
+        }
+```
+
+## @ResponseBody响应浏览器json数据
+
+服务器处理ajax请求之后，大多数情况都需要向浏览器响应一个java对象，此时必须将java对象转换为 json字符串才可以响应到浏览器，之前我们使用操作json数据的jar包gson或jackson将java对象转换为
+json字符串。在SpringMVC中，我们可以直接使用`@ResponseBody`注解实现此功能` @ResponseBody`响应浏览器json数据的条件：
+
+1. 导入`jackson`的依赖
+2. SpringMVC的配置文件中设置开启mvc的注解驱动
+3. 使用`@ResponseBody`注解标识控制器方法，在方法中，将需要转换为json字符串并响应到浏览器 的java对象作为控制器方法的返回值，此时SpringMVC就可以将此对象直接转换为json字符串并响应到浏览器
+
+```xml
+
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.13.3</version>
+</dependency>
+```
+
+```html
+<input type="button" value="测试@ResponseBody响应浏览器json格式的数据"
+       @click="testResponseBody()"><br>
+<script type="text/javascript" th:src="@{/js/vue.js}"></script>
+<script type="text/javascript" th:src="@{/js/axios.min.js}"></script>
+<script type="text/javascript">
+    var vue = new Vue({
+        el: "#app",
+        methods: {
+            testResponseBody() {
+                axios.post("/SpringMVC/test/ResponseBody/json").then(response => {
+                    console.log(response.data);
+                });
+            }
+        }
+    });
+</script>
+```
+
+map,实体类->json对象
+
+list->json数组
+
+```java
+//响应浏览器list集合
+@RequestMapping("/test/ResponseBody/json")
+@ResponseBody
+public List<User> testResponseBody(){
+        User user1=new User(1001,"admin1","123456",23,"男");
+        User user2=new User(1002,"admin2","123456",23,"男");
+        User user3=new User(1003,"admin3","123456",23,"男");
+        List<User> list=Arrays.asList(user1,user2,user3);
+        return list;
+        }
+//响应浏览器map集合
+@RequestMapping("/test/ResponseBody/json")
+@ResponseBody
+public Map<String, Object> testResponseBody(){
+        User user1=new User(1001,"admin1","123456",23,"男");
+        User user2=new User(1002,"admin2","123456",23,"男");
+        User user3=new User(1003,"admin3","123456",23,"男");
+        Map<String, Object> map=new HashMap<>();
+        map.put("1001",user1);
+        map.put("1002",user2);
+        map.put("1003",user3);
+        return map;
+        }
+//响应浏览器实体类对象
+@RequestMapping("/test/ResponseBody/json")
+@ResponseBody
+public User testResponseBody(){
+        return user;
+        }
+
+```
+
+## @RestController注解
+
+`@RestController`注解是springMVC提供的一个**_复合注解_**，标识在控制器的类上，
+
+就相当于为类添加了 `@Controller`注解，并且为其中的每个方法添加了`@ResponseBody`注解
+
+# 文件上传和下载
+
+## 文件下载
+
+`ResponseEntity`用于控制器方法的返回值类型，该控制器方法的返回值就是响应到浏览器的响应报文 使用ResponseEntity实现下载文件的功能
+
+```java
+@RequestMapping("/testDown")
+public ResponseEntity<byte[]>testResponseEntity(HttpSession session)throws IOException{
+//获取ServletContext对象
+        ServletContext servletContext=session.getServletContext();
+//获取服务器中文件的真实路径
+        String realPath=servletContext.getRealPath("/static/img/1.jpg");
+//创建输入流
+        InputStream is=new FileInputStream(realPath);
+//创建字节数组
+        byte[]bytes=new byte[is.available()];
+//将流读到字节数组中
+        is.read(bytes);
+//创建HttpHeaders对象设置响应头信息
+        MultiValueMap<String, String> headers=new HttpHeaders();
+//设置要下载方式以及下载文件的名字
+        headers.add("Content-Disposition","attachment;filename=1.jpg");
+//设置响应状态码
+        HttpStatus statusCode=HttpStatus.OK;
+//创建ResponseEntity对象
+        ResponseEntity<byte[]>responseEntity=new ResponseEntity<>(bytes,headers,
+        statusCode);
+//关闭输入流
+        is.close();
+        return responseEntity;
+        }
+```
+
+## 文件上传
+
+文件上传要求form表单的请求方式必须为`post`，并且添加属性`enctype="multipart/form-data"`
+
+SpringMVC中将上传的文件封装到`MultipartFile`对象中，通过此对象可以获取文件相关信息 
+
+上传步骤： 
+
+①添加依赖
+
+```xml
+<!-- https://mvnrepository.com/artifact/commons-fileupload/commons-fileupload --
+>
+<dependency>
+<groupId>commons-fileupload</groupId>
+<artifactId>commons-fileupload</artifactId>
+<version>1.3.1</version>
+</dependency
+```
+
+②在SpringMVC的配置文件中添加配置：
+
+```xml
+<!--必须通过文件解析器的解析才能将文件转换为MultipartFile对象-->
+<bean id="multipartResolver"
+      class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+</bean>
+```
+
+③控制器方法：
+
+```java
+@RequestMapping("/testUp")
+public String testUp(MultipartFile photo,HttpSession session)throws
+        IOException{
+//获取上传的文件的文件名
+        String fileName=photo.getOriginalFilename();
+//处理文件重名问题
+        String hzName=fileName.substring(fileName.lastIndexOf("."));
+        fileName=UUID.randomUUID().toString()+hzName;
+//获取服务器中photo目录的路径
+        ServletContext servletContext=session.getServletContext();
+        String photoPath=servletContext.getRealPath("photo");
+        File file=new File(photoPath);
+        if(!file.exists()){
+        file.mkdir();
+        }
+        String finalPath=photoPath+File.separator+fileName;
+//实现上传功能
+        photo.transferTo(new File(finalPath));
+        return"success";
+        }
+
+```
+
+# 拦截器
+
+## 拦截器的配置
+
+SpringMVC中的拦截器用于拦截控制器方法的执行 
+
+SpringMVC中的拦截器需要实现`HandlerInterceptor` 
+
+SpringMVC的拦截器必须在SpringMVC的配置文件中进行配置
+
+默认为所有请求拦截
+```xml
+<mvc:interceptors>
+        <bean  id="firstInterceptor" class="com.andy.interceptor.FirstInterceptor"></bean>
+    </mvc:interceptors>
+```
+
+
+```xml
+
+<bean class="com.andy.interceptor.FirstInterceptor"></bean>
+<ref bean="firstInterceptor"></ref>
+        <!-- 以上两种配置方式都是对DispatcherServlet所处理的所有的请求进行拦截 -->
+<mvc:interceptors>
+  <mvc:interceptor>
+<!--    第一次目录的请求-->
+    <mvc:mapping path="/*"/>
+<!--    所有路径的请求-->
+    <mvc:mapping path="/**"/>
+<!--    排除扫描-->
+    <mvc:exclude-mapping path="/testRequestEntity"/>
+    <ref bean="firstInterceptor"></ref>
+  </mvc:interceptor>
+</mvc:interceptors>
+        <!--
+        以上配置方式可以通过ref或bean标签设置拦截器，通过mvc:mapping设置需要拦截的请求，通过
+        mvc:exclude-mapping设置需要排除的请求，即不需要拦截的请求
+        -->
+```
+
+```java
+package com.andy.interceptor;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@Component
+public class FirstInterceptor implements HandlerInterceptor {
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        System.out.println("FirstInterceptor -->[pre]Handle");
+//        return HandlerInterceptor.super.preHandle(request, response, handler);
+        return true;
+    }
+
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+        HandlerInterceptor.super.postHandle(request, response, handler, modelAndView);
+
+        System.out.println("FirstInterceptor -->[post]Handle");
+
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        HandlerInterceptor.super.afterCompletion(request, response, handler, ex);
+        System.out.println("FirstInterceptor -->[after]Handle");
+
+    }
+}
+
+```
+
+## 拦截器的三个抽象方法
+
+SpringMVC中的拦截器有三个抽象方法： 
+- `preHandle`：控制器方法执行之前执行`preHandle()`，其boolean类型的返回值表示是否拦截或放行，返回true为放行，即调用控制器方法；返回false表示拦截，即不调用控制器方法 
+- `postHandle`：控制器方法执行之后执行`postHandle()`
+- `afterCompletion`：处理完视图和模型数据，渲染视图稳定完毕之后执行`afterCompletion()`
+
+## 多个拦截器的执行顺序
+
+①若每个拦截器的preHandle()都返回true
+
+此时多个拦截器的执行顺序和拦截器在SpringMVC的配置文件的配置顺序有关：
+
+`preHandle()`会按照配置的顺序执行，
+
+而`postHandle()`和`afterCompletion()`会按照配置的反序执行
+
+②若某个拦截器的`preHandle()`返回了false
+
+`preHandle()`返回false和它之前的拦截器的`preHandle()`都会执行，
+
+`postHandle()`都不执行，
+
+返回false 的拦截器之前的拦截器的`afterCompletion()`会执行
+
+# 异常处理器
+
+## 基于配置的异常处理
+
+SpringMVC提供了一个处理控制器方法执行过程中所出现的异常的接口：`HandlerExceptionResolver`
+
+HandlerExceptionResolver接口的实现类有：`DefaultHandlerExceptionResolver`和` SimpleMappingExceptionResolver`
+
+SpringMVC提供了自定义的异常处理器`SimpleMappingExceptionResolver`，
+
+使用方式：
+
+```xml
+
+<bean
+        class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+    <property name="exceptionMappings">
+        <props>
+            <!--
+            properties的键表示处理器方法执行过程中出现的异常
+            properties的值表示若出现指定异常时，设置一个新的视图名称，跳转到指定页面
+            -->
+            <prop key="java.lang.ArithmeticException">error</prop>
+        </props>
+    </property>
+    <!--
+    exceptionAttribute属性设置一个属性名，将出现的异常信息在请求域中进行共享,即异常信息的属性名、键名
+    -->
+    <property name="exceptionAttribute" value="ex"></property>
+</bean>
+```
+
+## 基于注解的异常处理
+
+```java
+//@ControllerAdvice将当前类标识为异常处理的组件
+@ControllerAdvice
+public class ExceptionController {
+    //@ExceptionHandler用于设置所标识方法处理的异常
+    @ExceptionHandler(ArithmeticException.class)
+//ex表示当前请求处理中出现的异常对象
+    public String handleArithmeticException(Exception ex, Model model) {
+        model.addAttribute("ex", ex);
+        return "error";
+    }
+}
+
+```
+
+# 注解配置SpringMVC
+
+使用配置类和注解代替web.xml和SpringMVC配置文件的功能
+
+## 创建初始化类，代替web.xml
+
+在Servlet3.0环境中，容器会在类路径中查找实现`javax.servlet.ServletContainerInitializer`接口的类.如果找到的话就用它来配置Servlet容器。 
+
+Spring提供了这个接口的实现，名为`SpringServletContainerInitializer`，这个类反过来又会查找实现`WebApplicationInitializer`的类并将配
+置的任务交给它们来完成。
+
+Spring3.2引入了一个便利的`WebApplicationInitializer`基础实现，名为
+`AbstractAnnotationConfigDispatcherServletInitializer`，当我们的类扩展了
+`AbstractAnnotationConfigDispatcherServletInitializer`并将其部署到Servlet3.0容器的时候，容器会自 动发现它，并用它来配置Servlet上下文。
+
+```java
+public class WebInit extends
+        AbstractAnnotationConfigDispatcherServletInitializer {
+    /**
+     * 指定spring的配置类
+     * @return
+     */
+    @Override
+    protected Class<?>[] getRootConfigClasses() {
+        return new Class[]{SpringConfig.class};
+    }
+
+    /**
+     * 指定SpringMVC的配置类
+     * @return
+     */
+    @Override
+    protected Class<?>[] getServletConfigClasses() {
+        return new Class[]{WebConfig.class};
+    }
+
+    /**
+     * 指定DispatcherServlet的映射规则，即url-pattern
+     * @return
+     */
+    @Override
+    protected String[] getServletMappings() {
+        return new String[]{"/"};
+    }
+
+    /**
+     * 添加过滤器
+     * @return
+     */
+    @Override
+    protected Filter[] getServletFilters() {
+        CharacterEncodingFilter encodingFilter = new CharacterEncodingFilter();
+        encodingFilter.setEncoding("UTF-8");
+        encodingFilter.setForceRequestEncoding(true);
+        HiddenHttpMethodFilter hiddenHttpMethodFilter = new
+                HiddenHttpMethodFilter();
+        return new Filter[]{encodingFilter, hiddenHttpMethodFilter};
+    }
+}
+
+```
+
+## 创建SpringConfig配置类，代替spring的配置文件
+
+```java
+//标识为内部类
+@Configuration
+public class SpringConfig {
+//ssm整合之后，spring的配置信息写在此类中
+}
+
+```
+
+## 创建WebConfig配置类，代替SpringMVC的配置文件
+
+```java
+
+@Configuration
+//扫描组件
+@ComponentScan("com.andy.mvc.controller")
+//开启MVC注解驱动
+@EnableWebMvc
+public class WebConfig implements WebMvcConfigurer {
+    //使用默认的servlet处理静态资源
+    @Override
+    public void configureDefaultServletHandling(DefaultServletHandlerConfigurer
+                                                        configurer) {
+        configurer.enable();
+    }
+
+    //配置文件上传解析器
+  //bean注解可以将方法的返回值 作为bean进行管理，bean的id为方法的方法名字
+    @Bean
+    public CommonsMultipartResolver multipartResolver() {
+        return new CommonsMultipartResolver();
+    }
+
+    //配置拦截器
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        FirstInterceptor firstInterceptor = new FirstInterceptor();
+        registry.addInterceptor(firstInterceptor).addPathPatterns("/**");
+    }
+
+    //配置视图控制
+/*@Override
+public void addViewControllers(ViewControllerRegistry registry) {
+registry.addViewController("/").setViewName("index");
+}*/
+//配置异常映射
+/*@Override
+public void
+configureHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
+SimpleMappingExceptionResolver exceptionResolver = new
+SimpleMappingExceptionResolver();
+Properties prop = new Properties();
+prop.setProperty("java.lang.ArithmeticException", "error");
+//设置异常映射
+exceptionResolver.setExceptionMappings(prop);
+//设置共享异常信息的键
+exceptionResolver.setExceptionAttribute("ex");
+resolvers.add(exceptionResolver);
+}*/
+//配置生成模板解析器
+    @Bean
+    public ITemplateResolver templateResolver() {
+        WebApplicationContext webApplicationContext =
+                ContextLoader.getCurrentWebApplicationContext();
+// ServletContextTemplateResolver需要一个ServletContext作为构造参数，可通过
+        WebApplicationContext 的方法获得
+        ServletContextTemplateResolver templateResolver = new
+                ServletContextTemplateResolver(
+                webApplicationContext.getServletContext());
+        templateResolver.setPrefix("/WEB-INF/templates/");
+        templateResolver.setSuffix(".html");
+        templateResolver.setCharacterEncoding("UTF-8");
+        templateResolver.setTemplateMode(TemplateMode.HTML);
+        return templateResolver;
+    }
+
+    //生成模板引擎并为模板引擎注入模板解析器
+    @Bean
+    public SpringTemplateEngine templateEngine(ITemplateResolver
+                                                       templateResolver) {
+        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+        templateEngine.setTemplateResolver(templateResolver);
+        return templateEngine;
+    }
+
+    //生成视图解析器并未解析器注入模板引擎
+    @Bean
+    public ViewResolver viewResolver(SpringTemplateEngine templateEngine) {
+        ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
+        viewResolver.setCharacterEncoding("UTF-8");
+        viewResolver.setTemplateEngine(templateEngine);
+        return viewResolver;
+    }
+}
+
+
+```
+
+## 测试功能
+
+```java
+@RequestMapping("/")
+public String index(){
+        return"index";
+        }
+
+```
+
+# SpringMVC执行流程
+
+## SpringMVC常用组件
+
+- DispatcherServlet：前端控制器，不需要工程师开发，由框架提供
+    - 作用：统一处理请求和响应，整个流程控制的中心，由它调用其它组件处理用户的请求
+- HandlerMapping：处理器映射器，不需要工程师开发，由框架提供
+    - 作用：根据请求的url、method等信息查找Handler，即控制器方法
+- Handler：处理器，需要工程师开发
+    - 作用：在DispatcherServlet的控制下Handler对具体的用户请求进行处理
+- HandlerAdapter：处理器适配器，不需要工程师开发，由框架提供
+    - 作用：通过HandlerAdapter对处理器（控制器方法）进行执行
+- ViewResolver：视图解析器，不需要工程师开发，由框架提供
+    - 作用：进行视图解析，得到相应的视图，例如：ThymeleafView、InternalResourceView、 RedirectView
+- View：视图
+    - 作用：将模型数据通过页面展示给用户
+
+## DispatcherServlet初始化过程
+
+DispatcherServlet 本质上是一个 Servlet，所以天然的遵循 Servlet 的生命周期。所以宏观上是 Servlet 生命周期来进行调度。
