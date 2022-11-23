@@ -119,7 +119,7 @@ IDE：idea 2019.2 构建工具：maven3.5.4 服务器：tomcat8.5 Spring版本�
 
 ②扩展配置方式
 
-可通过init-param标签设置SpringMVC配置文件的位置和名称，通过load-on-startup标签设置SpringMVC前端控制器DispatcherServlet的初始化时间
+可通过`init-para`m标签设置SpringMVC配置文件的位置和名称，通过`load-on-startup`标签设置SpringMVC前端控制器`DispatcherServlet`的初始化时间
 
 ```xml
 <!-- 配置SpringMVC的前端控制器，对浏览器发送的请求统一进行处理 -->
@@ -152,7 +152,7 @@ IDE：idea 2019.2 构建工具：maven3.5.4 服务器：tomcat8.5 Spring版本�
 </servlet-mapping>
 ```
 
-`<url-pattern>`标签中使用/和/*的区别：
+`<url-pattern>`标签中使用`/`和`/*`的区别：
 
 `/`所匹配的请求可以是`/login`或`.html`或`.js`或`.css`方式的请求路径，但是/不能匹配.jsp请求路径的请求
 
@@ -164,8 +164,8 @@ IDE：idea 2019.2 构建工具：maven3.5.4 服务器：tomcat8.5 Spring版本�
 
 由于前端控制器对浏览器发送的请求进行了统一的处理，但是具体的请求有不同的处理过程，因此需要创建处理具体请求的类，即请求控制器
 
-请求控制器中每一个处理请求的方法成为控制器方法
-因为SpringMVC的控制器由一个POJO（普通的Java类）担任，因此需要通过`@Controller`注解将其标识为一个控制层组件，交给Spring的IoC容器管理，此时SpringMVC才能够识别控制器的存在
+请求控制器中每一个处理请求的方法成为控制器方法 因为SpringMVC的控制器由一个POJO（普通的Java类）担任，因此需要通过`@Controller`
+注解将其标识为一个控制层组件，交给Spring的IoC容器管理，此时SpringMVC才能够识别控制器的存在
 
 ```java
 
@@ -241,11 +241,11 @@ public String index(){
 //设置视图名称
         return"index";
         }
-        
+
 @RequestMapping("/test/a")
 publicvoid index(){
 //设置视图名称
-        
+
         }
 //默认无返回值会去寻找/test/a.html
 ```
@@ -715,6 +715,13 @@ public String testApplication(HttpSession session){
         }
 ```
 
+## 域对象的区别
+
+- `pageContext`对象的范围只适用于当前页面范围，即超过这个页面就不能够使用了。所以使用`pageContext`对象向其它页面传递参数是不可能的。
+- `request`对象的范围是指在一JSP网页发出请求到另一个JSP网页之间，随后这个属性就失效。
+- `session`的作用范围为一段用户持续和服务器所连接的时间，但与服务器断线后，这个属性就无效。比如断网或者关闭浏览器。
+- `application`的范围在服务器一开始执行服务，到服务器关闭为止。它的范围最大，生存周期最长。
+
 # SpringMVC的视图
 
 SpringMVC中的视图是View接口，视图的作用渲染数据，将模型Model中的数据展示给用户
@@ -818,14 +825,16 @@ REST：Representational State Transfer，表现层资源状态转移。
 SpringMVC 提供了 HiddenHttpMethodFilter 帮助我们将 POST 请求转换为 DELETE 或 PUT 请求 HiddenHttpMethodFilter 处理put和delete请求的条件：
 
 a>当前请求的请求方式必须为`post`
+
 b>当前请求必须传输请求参数`_method` 满足以上条件，`HiddenHttpMethodFilter`过滤器就会将当前请求的请求方式转换为请求参数`_method`的值，因此请求参数_method的值才是最终的请求方式
 在web.xml中注册`HiddenHttpMethodFilte`
 
 ```xml
-filter>
-<filter-name>HiddenHttpMethodFilter</filter-name>
-<filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filterclass>
-        </filter>
+
+<filter>
+    <filter-name>HiddenHttpMethodFilter</filter-name>
+    <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filterclass>
+</filter>
 <filter-mapping>
 <filter-name>HiddenHttpMethodFilter</filter-name>
 <url-pattern>/*</url-pattern>
@@ -846,7 +855,7 @@ filter>
 在web.xml中注册时，必须先注册`CharacterEncodingFilter`，再注册`HiddenHttpMethodFilter` 原因：
 
 在`CharacterEncodingFilter` 中通过 `request.setCharacterEncoding(encoding)` 方法设置字符集的`request.setCharacterEncoding(encoding)`
-方法要求前面不能有任何获取请求参数的操作 而 HiddenHttpMethodFilter 恰恰有一个获取请求方式的操作：
+方法要求前面不能有任何获取请求参数的操作 而 `HiddenHttpMethodFilter` 恰恰有一个获取请求方式的操作：
 `String paramValue = request.getParameter(this.methodParam);`
 
 # RESTful案例
@@ -1168,9 +1177,9 @@ public ResponseEntity<byte[]>testResponseEntity(HttpSession session)throws IOExc
 
 文件上传要求form表单的请求方式必须为`post`，并且添加属性`enctype="multipart/form-data"`
 
-SpringMVC中将上传的文件封装到`MultipartFile`对象中，通过此对象可以获取文件相关信息 
+SpringMVC中将上传的文件封装到`MultipartFile`对象中，通过此对象可以获取文件相关信息
 
-上传步骤： 
+上传步骤：
 
 ①添加依赖
 
@@ -1181,7 +1190,7 @@ SpringMVC中将上传的文件封装到`MultipartFile`对象中，通过此对�
 <groupId>commons-fileupload</groupId>
 <artifactId>commons-fileupload</artifactId>
 <version>1.3.1</version>
-</dependency
+</dependency>
 ```
 
 ②在SpringMVC的配置文件中添加配置：
@@ -1223,19 +1232,20 @@ public String testUp(MultipartFile photo,HttpSession session)throws
 
 ## 拦截器的配置
 
-SpringMVC中的拦截器用于拦截控制器方法的执行 
+SpringMVC中的拦截器用于拦截控制器方法的执行
 
-SpringMVC中的拦截器需要实现`HandlerInterceptor` 
+SpringMVC中的拦截器需要实现`HandlerInterceptor`
 
 SpringMVC的拦截器必须在SpringMVC的配置文件中进行配置
 
 默认为所有请求拦截
-```xml
-<mvc:interceptors>
-        <bean  id="firstInterceptor" class="com.andy.interceptor.FirstInterceptor"></bean>
-    </mvc:interceptors>
-```
 
+```xml
+
+<mvc:interceptors>
+    <bean id="firstInterceptor" class="com.andy.interceptor.FirstInterceptor"></bean>
+</mvc:interceptors>
+```
 
 ```xml
 
@@ -1243,15 +1253,15 @@ SpringMVC的拦截器必须在SpringMVC的配置文件中进行配置
 <ref bean="firstInterceptor"></ref>
         <!-- 以上两种配置方式都是对DispatcherServlet所处理的所有的请求进行拦截 -->
 <mvc:interceptors>
-  <mvc:interceptor>
-<!--    第一次目录的请求-->
+<mvc:interceptor>
+    <!--    第一次目录的请求-->
     <mvc:mapping path="/*"/>
-<!--    所有路径的请求-->
+    <!--    所有路径的请求-->
     <mvc:mapping path="/**"/>
-<!--    排除扫描-->
+    <!--    排除扫描-->
     <mvc:exclude-mapping path="/testRequestEntity"/>
     <ref bean="firstInterceptor"></ref>
-  </mvc:interceptor>
+</mvc:interceptor>
 </mvc:interceptors>
         <!--
         以上配置方式可以通过ref或bean标签设置拦截器，通过mvc:mapping设置需要拦截的请求，通过
@@ -1261,9 +1271,11 @@ SpringMVC的拦截器必须在SpringMVC的配置文件中进行配置
 
 ```java
 package com.andy.interceptor;
+
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -1296,8 +1308,9 @@ public class FirstInterceptor implements HandlerInterceptor {
 
 ## 拦截器的三个抽象方法
 
-SpringMVC中的拦截器有三个抽象方法： 
-- `preHandle`：控制器方法执行之前执行`preHandle()`，其boolean类型的返回值表示是否拦截或放行，返回true为放行，即调用控制器方法；返回false表示拦截，即不调用控制器方法 
+SpringMVC中的拦截器有三个抽象方法：
+
+- `preHandle`：控制器方法执行之前执行`preHandle()`，其boolean类型的返回值表示是否拦截或放行，返回true为放行，即调用控制器方法；返回false表示拦截，即不调用控制器方法
 - `postHandle`：控制器方法执行之后执行`postHandle()`
 - `afterCompletion`：处理完视图和模型数据，渲染视图稳定完毕之后执行`afterCompletion()`
 
@@ -1374,10 +1387,9 @@ public class ExceptionController {
 
 ## 创建初始化类，代替web.xml
 
-在Servlet3.0环境中，容器会在类路径中查找实现`javax.servlet.ServletContainerInitializer`接口的类.如果找到的话就用它来配置Servlet容器。 
+在Servlet3.0环境中，容器会在类路径中查找实现`javax.servlet.ServletContainerInitializer`接口的类.如果找到的话就用它来配置Servlet容器。
 
-Spring提供了这个接口的实现，名为`SpringServletContainerInitializer`，这个类反过来又会查找实现`WebApplicationInitializer`的类并将配
-置的任务交给它们来完成。
+Spring提供了这个接口的实现，名为`SpringServletContainerInitializer`，这个类反过来又会查找实现`WebApplicationInitializer`的类并将配 置的任务交给它们来完成。
 
 Spring3.2引入了一个便利的`WebApplicationInitializer`基础实现，名为
 `AbstractAnnotationConfigDispatcherServletInitializer`，当我们的类扩展了
@@ -1387,7 +1399,7 @@ Spring3.2引入了一个便利的`WebApplicationInitializer`基础实现，名�
 public class WebInit extends
         AbstractAnnotationConfigDispatcherServletInitializer {
     /**
-     * 指定spring的配置类
+     * 指定spring的配置类代替spring的配置文件
      * @return
      */
     @Override
@@ -1396,7 +1408,7 @@ public class WebInit extends
     }
 
     /**
-     * 指定SpringMVC的配置类
+     * 指定SpringMVC的配置类，代替SpringMvc的配置文件
      * @return
      */
     @Override
@@ -1406,6 +1418,7 @@ public class WebInit extends
 
     /**
      * 指定DispatcherServlet的映射规则，即url-pattern
+     * 设置SpringMvc的前端控制器DispatchServlet的url-parrern
      * @return
      */
     @Override
@@ -1415,6 +1428,7 @@ public class WebInit extends
 
     /**
      * 添加过滤器
+     * 返回过滤器数组
      * @return
      */
     @Override
@@ -1423,7 +1437,7 @@ public class WebInit extends
         encodingFilter.setEncoding("UTF-8");
         encodingFilter.setForceRequestEncoding(true);
         HiddenHttpMethodFilter hiddenHttpMethodFilter = new
-                HiddenHttpMethodFilter();
+                HiddenHttpMethodFilter();//默认的过滤容器
         return new Filter[]{encodingFilter, hiddenHttpMethodFilter};
     }
 }
@@ -1458,8 +1472,8 @@ public class WebConfig implements WebMvcConfigurer {
         configurer.enable();
     }
 
-    //配置文件上传解析器
-  //bean注解可以将方法的返回值 作为bean进行管理，bean的id为方法的方法名字
+    //配置文件上传解析器,配置bean
+    //bean注解可以将方法的返回值 作为bean进行管理，bean的id为方法的方法名字
     @Bean
     public CommonsMultipartResolver multipartResolver() {
         return new CommonsMultipartResolver();
@@ -1497,7 +1511,7 @@ resolvers.add(exceptionResolver);
         WebApplicationContext webApplicationContext =
                 ContextLoader.getCurrentWebApplicationContext();
 // ServletContextTemplateResolver需要一个ServletContext作为构造参数，可通过
-        WebApplicationContext 的方法获得
+        //WebApplicationContext 的方法获得
         ServletContextTemplateResolver templateResolver = new
                 ServletContextTemplateResolver(
                 webApplicationContext.getServletContext());
@@ -1547,11 +1561,11 @@ public String index(){
 - DispatcherServlet：前端控制器，不需要工程师开发，由框架提供
     - 作用：统一处理请求和响应，整个流程控制的中心，由它调用其它组件处理用户的请求
 - HandlerMapping：处理器映射器，不需要工程师开发，由框架提供
-    - 作用：根据请求的url、method等信息查找Handler，即控制器方法
-- Handler：处理器，需要工程师开发
-    - 作用：在DispatcherServlet的控制下Handler对具体的用户请求进行处理
+    - 作用：根据请求的url、method等信息查找Handler，即控制器方法。匹配控制器方法
+- Handler：处理器，需要工程师开发`/controller`
+    - 作用：在DispatcherServlet的控制下Handler对具体的用户请求进行处理。
 - HandlerAdapter：处理器适配器，不需要工程师开发，由框架提供
-    - 作用：通过HandlerAdapter对处理器（控制器方法）进行执行
+    - 作用：通过HandlerAdapter对处理器（控制器方法）进行执行。调用控制器方法
 - ViewResolver：视图解析器，不需要工程师开发，由框架提供
     - 作用：进行视图解析，得到相应的视图，例如：ThymeleafView、InternalResourceView、 RedirectView
 - View：视图
@@ -1559,4 +1573,724 @@ public String index(){
 
 ## DispatcherServlet初始化过程
 
-DispatcherServlet 本质上是一个 Servlet，所以天然的遵循 Servlet 的生命周期。所以宏观上是 Servlet 生命周期来进行调度。
+`DispatcherServlet` 本质上是一个 Servlet，所以天然的遵循 Servlet 的生命周期。所以宏观上是 Servlet 生命周期来进行调度。
+
+①初始化`WebApplicationContext`
+
+所在类：`org.springframework.web.servlet.FrameworkServlet`
+
+②创建`WebApplicationContext`
+
+所在类：`org.springframework.web.servlet.FrameworkServlet`
+
+③`DispatcherServlet`初始化策略
+
+`FrameworkServlet`创建`WebApplicationContext`后，刷新容器，调用`onRefresh(wac)`，
+
+此方法在`DispatcherServlet`中进行了重写，调用了`initStrategies(context)`方法，初始化策略，即初始化`DispatcherServlet`的各个组件
+所在类：`org.springframework.web.servlet.DispatcherServlet`
+
+## DispatcherServlet调用组件处理请求
+
+①`processRequest()`
+
+`FrameworkServlet`重写HttpServlet中的service()和doXxx()，这些方法中调用了`processRequest(request, response)`
+
+所在类：`org.springframework.web.servlet.FrameworkServlet`
+
+②doService()
+
+所在类：`org.springframework.web.servlet.DispatcherServlet`
+
+③doDispatch()
+
+所在类：`org.springframework.web.servlet.DispatcherServlet`
+
+④`processDispatchResult()`
+
+## SpringMVC的执行流程
+
+1) 用户向服务器发送请求，请求被SpringMVC 前端控制器 DispatcherServlet捕获。
+2) DispatcherServlet对请求URL进行解析，得到请求资源标识符（URI），判断请求URI对应的映射： a) 不存在
+
+   i. 再判断是否配置了mvc:default-servlet-handler
+
+   ii. 如果没配置，则控制台报映射查找不到，客户端展示404错误
+
+   iii. 如果有配置，则访问目标资源（一般为静态资源，如：JS,CSS,HTML），找不到客户端也会展示404 错误
+
+   b) 存在则执行下面的流程
+3) 根据该URI，调用HandlerMapping获得该Handler配置的所有相关的对象（包括Handler对象以及 Handler对象对应的拦截器），最后以HandlerExecutionChain执行链对象的形式返回。
+4) DispatcherServlet 根据获得的Handler，选择一个合适的HandlerAdapter。
+5) 如果成功获得HandlerAdapter，此时将开始执行拦截器的preHandler(…)方法【正向】
+6) 提取Request中的模型数据，填充Handler入参，开始执行Handler（Controller)方法，处理请求。 在填充Handler的入参过程中，根据你的配置，Spring将帮你做一些额外的工作： a)
+   HttpMessageConveter： 将请求消息（如Json、xml等数据）转换成一个对象，将对象转换为指定 的响应信息
+
+   b) 数据转换：对请求消息进行数据转换。如String转换成Integer、Double等
+
+   c) 数据格式化：对请求消息进行数据格式化。 如将字符串转换成格式化数字或格式化日期等
+
+   d) 数据验证： 验证数据的有效性（长度、格式等），验证结果存储到BindingResult或Error中
+7) Handler执行完成后，向DispatcherServlet 返回一个ModelAndView对象。
+8) 此时将开始执行拦截器的postHandle(...)方法【逆向】。
+9) 根据返回的ModelAndView（此时会判断是否存在异常：如果存在异常，则执行 HandlerExceptionResolver进行异常处理）选择一个适合的ViewResolver进行视图解析，根据Model
+   和View，来渲染视图。
+10) 渲染视图完毕执行拦截器的afterCompletion(…)方法【逆向】。
+11) 将渲染结果返回给客户端。
+
+# SSM整合
+
+整合：Spring 和SpringMVC各自创建自己的IOC容器，各自管理自己的组件
+
+SpringMVC的ioc容器是在DispatchServlet初始化的时候创建。
+
+Spring的Ioc容器床架必须早于SpringMVC
+
+监听器->过滤器->Servlet
+
+Springioc容器的创建可以放在监听器或者过滤器的初始化过程中创建
+
+springMVC和spring的ioc容器初始化的关系
+
+spring的ioc容器是父容器，springmvc中的ioc容器是子容器，父容器不能访问子容器的bean，子容器能够访问父容器的bean
+
+- mvc的初始化时机是在mvc的前端控制器初始化的时候初始化的
+- 而前端控制器初始化之前会经过 监听器和过滤器 这里使用的是监听器
+- 所以是要在监听器里面写代码 让sping的ioc容器在监听器里面初始化
+- 而这个监听器spring已经写好提供给你了
+- 就是服务器启动时一次性将所有bean加载到应用域
+
+## ContextLoaderListener
+
+Spring提供了监听器`ContextLoaderListener`，实现`ServletContextListener`
+接口，可监听ServletContext的状态，在web服务器的启动，读取Spring的配置文件，创建Spring的IOC容器。web 应用中必须在web.xml中配置
+
+```xml
+
+<listener>
+    <!--
+    配置Spring的监听器，在服务器启动时加载Spring的配置文件
+        Spring配置文件默认位置和名称：/WEB-INF/applicationContext.xml
+    可通过上下文参数自定义Spring配置文件的位置和名称
+    -->
+    <listenerclass>org.springframework.web.context.ContextLoaderListener</listener-class>
+</listener>
+        <!--自定义Spring配置文件的位置和名称-->
+<context-param>
+<param-name>contextConfigLocation</param-name>
+<param-value>classpath:spring.xml</param-value>
+</context-param>
+
+```
+
+## 准备工作
+
+①创建Maven Module
+
+②导入依赖
+
+```xml
+
+<packaging>war</packaging>
+<properties>
+<spring.version>5.3.1</spring.version>
+</properties>
+<dependencies>
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-context</artifactId>
+    <version>${spring.version}</version>
+</dependency>
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-beans</artifactId>
+    <version>${spring.version}</version>
+</dependency>
+<!--springmvc-->
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-web</artifactId>
+    <version>${spring.version}</version>
+</dependency>
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-webmvc</artifactId>
+    <version>${spring.version}</version>
+</dependency>
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-jdbc</artifactId>
+    <version>${spring.version}</version>
+</dependency>
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-aspects</artifactId>
+    <version>${spring.version}</version>
+</dependency>
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-test</artifactId>
+    <version>${spring.version}</version>
+</dependency>
+<!-- Mybatis核心 -->
+<dependency>
+    <groupId>org.mybatis</groupId>
+    <artifactId>mybatis</artifactId>
+    <version>3.5.7</version>
+</dependency>
+<!--mybatis和spring的整合包-->
+<dependency>
+    <groupId>org.mybatis</groupId>
+    <artifactId>mybatis-spring</artifactId>
+    <version>2.0.6</version>
+</dependency>
+<!-- 连接池 -->
+<dependency>
+    <groupId>com.alibaba</groupId>
+    <artifactId>druid</artifactId>
+    <version>1.0.9</version>
+</dependency>
+<!-- junit测试 -->
+<dependency>
+    <groupId>junit</groupId>
+    <artifactId>junit</artifactId>
+    <version>4.12</version>
+    <scope>test</scope>
+</dependency>
+<!-- MySQL驱动 -->
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.16</version>
+</dependency>
+<!-- log4j日志 -->
+<dependency>
+    <groupId>log4j</groupId>
+    <artifactId>log4j</artifactId>
+    <version>1.2.17</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/com.github.pagehelper/pagehelper -->
+<dependency>
+    <groupId>com.github.pagehelper</groupId>
+    <artifactId>pagehelper</artifactId>
+    <version>5.2.0</version>
+</dependency>
+<!-- 日志 -->
+<dependency>
+    <groupId>ch.qos.logback</groupId>
+    <artifactId>logback-classic</artifactId>
+    <version>1.2.3</version>
+</dependency>
+<!-- ServletAPI -->
+<dependency>
+    <groupId>javax.servlet</groupId>
+    <artifactId>javax.servlet-api</artifactId>
+    <version>3.1.0</version>
+    <scope>provided</scope>
+</dependency>
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.12.1</version>
+</dependency>
+<dependency>
+    <groupId>commons-fileupload</groupId>
+    <artifactId>commons-fileupload</artifactId>
+    <version>1.3.1</version>
+</dependency>
+<!-- Spring5和Thymeleaf整合包 -->
+<dependency>
+    <groupId>org.thymeleaf</groupId>
+    <artifactId>thymeleaf-spring5</artifactId>
+    <version>3.0.12.RELEASE</version>
+</dependency>
+</dependencies>
+```
+
+|**
+包**| javax.servlet-api |
+|----|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|spring-webmvc| 间接依赖 springioc的四个核心jar包 + spring-web包 | |jackson-databind| springmvc 在异步请求处理JSON数据的时候会使用 |
+|thymeleaf-spring5| springmvc + thymeleaf 整合 | |spring-jdbc| 只使用里面的事务支持，其会为我们提供已经编写好的事务管理的切面类 | |spring-aspects|
+AOP功能的支持 | |mybatis| 持久层框架 | |pagehelper| 为mybatis 提供分页功能的插件 | |mybatis-spring| mybatis 和 spring 的整合包 :
+其提供了一个SqlSessionFactoryBean，用于创建SqlSession | |druid| 德鲁伊连接池，提供数据源 | |mysql-connector-java| MYSQL驱动 | |spring-test|
+Spring提供的测试功能，可以直接在测试代码中注入容器当中的Bean | |log4j （**druid/mybatis 选用**）| 日志 （经验证发现 , Druid / mybatis 内部使用 log4j，而且是 **
+provide**的间接依赖，可能是检测到有包就用，当你在系统里面依赖 log4j ，不提供log4j的配置文件，则会发生提示 ：log4j:WARN No appenders could be found for logger (
+com.alibaba.druid.pool.DruidDataSource).<br>log4j:WARN Please initialize the log4j system properly.）<br><br>因此：要么就依赖
+log4j.jar 且 配置 log4j.properties/log4j.xml 给 Druid 使用，要么就不提供依赖，druid也不会检测到系统有jar包，不会给出 WARN | |logback-classic（**Spring
+/thymeleaf 整合包使用**）| slf4j的日志实现<br>1. thymeleaf 使用了 sl4j 的依赖，因此需要提高 logback 实现，并且配置logback;  <br>2. spring-context 会
+间接依赖spring.jcl 包判断日志实现的时候会默认为 slfj 的具体实现（发现机制），因此可以配置个 slf4j 的具体实现使用Spring的日志。若系统内部没有 slf4j ，会搜寻 log4j2，还是没有则默认使用 JUL
+日志输出。 | |javax.servlet-api| MVC的Controller中可能会使用到Servlet的API | |commons-fileupload| SpringMVC底层支持文件上传需要jar包 |
+
+③创建表
+
+```sql
+CREATE TABLE `t_emp`
+(
+    `emp_id`   int(11) NOT NULL AUTO_INCREMENT,
+    `emp_name` varchar(20) DEFAULT NULL,
+    `age`      int(11) DEFAULT NULL,
+    `sex`      char(1)     DEFAULT NULL,
+    `email`    varchar(50) DEFAULT NULL,
+    PRIMARY KEY (`emp_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+```
+
+## 配置web.xml
+
+```xml
+<!-- 配置Spring的编码过滤器 -->
+<filter>
+    <filter-name>CharacterEncodingFilter</filter-name>
+    <filterclass>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+        <param-name>encoding</param-name>
+        <param-value>UTF-8</param-value>
+    </init-param>
+    <init-param>
+        <param-name>forceEncoding</param-name>
+        <param-value>true</param-value>
+    </init-param>
+</filter>
+<filter-mapping>
+<filter-name>CharacterEncodingFilter</filter-name>
+<url-pattern>/*</url-pattern>
+</filter-mapping>
+        <!-- 配置处理请求方式PUT和DELETE的过滤器 -->
+<filter>
+<filter-name>HiddenHttpMethodFilter</filter-name>
+<filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filterclass>
+</filter>
+<filter-mapping>
+<filter-name>HiddenHttpMethodFilter</filter-name>
+<url-pattern>/*</url-pattern>
+</filter-mapping>
+        <!-- 配置SpringMVC的前端控制器 -->
+<servlet>
+<servlet-name>DispatcherServlet</servlet-name>
+<servlet-class>org.springframework.web.servlet.DispatcherServlet</servletclass>
+<!-- 设置SpringMVC的配置文件的位置和名称 -->
+<init-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>classpath:SpringMVC.xml</param-value>
+</init-param>
+<load-on-startup>1</load-on-startup>
+</servlet>
+<servlet-mapping>
+<servlet-name>DispatcherServlet</servlet-name>
+<url-pattern>/</url-pattern>
+</servlet-mapping>
+        <!-- 设置Spring的配置文件的位置和名称 -->
+<context-param>
+<param-name>contextConfigLocation</param-name>
+<param-value>classpath:Spring.xml</param-value>
+</context-param>
+        <!-- 配置Spring的监听器 -->
+<listener>
+<listenerclass>org.springframework.web.context.ContextLoaderListener</listener-class>
+</listener>
+```
+
+## 创建SpringMVC的配置文件并配置
+
+```xml
+<!--扫描组件-->
+<context:component-scan base-package="com.andy.ssm.controller">
+</context:component-scan>
+        <!--配置视图解析器-->
+<bean id="viewResolver"
+      class="org.thymeleaf.spring5.view.ThymeleafViewResolver">
+<property name="order" value="1"/>
+<property name="characterEncoding" value="UTF-8"/>
+<property name="templateEngine">
+    <bean class="org.thymeleaf.spring5.SpringTemplateEngine">
+        <property name="templateResolver">
+            <bean
+                    class="org.thymeleaf.spring5.templateresolver.SpringResourceTemplateResolver">
+                <!-- 视图前缀 -->
+                <property name="prefix" value="/WEB-INF/templates/"/>
+                <!-- 视图后缀 -->
+                <property name="suffix" value=".html"/>
+                <property name="templateMode" value="HTML5"/>
+                <property name="characterEncoding" value="UTF-8"/>
+            </bean>
+        </property>
+    </bean>
+</property>
+</bean>
+        <!-- 配置访问首页的视图控制 -->
+<mvc:view-controller path="/" view-name="index"></mvc:view-controller>
+        <!-- 配置默认的servlet处理静态资源 -->
+<mvc:default-servlet-handler/>
+        <!-- 开启MVC的注解驱动 -->
+<mvc:annotation-driven/>
+```
+
+## 搭建MyBatis环境
+
+①创建属性文件jdbc.properties
+
+```properties
+jdbc.user=boss
+jdbc.password=123456
+jdbc.url=jdbc:mysql://localhost:3306/ssm?serverTimezone=UTC
+jdbc.driver=com.mysql.cj.jdbc.Driver
+```
+
+②创建MyBatis的核心配置文件mybatis-config.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <!--将下划线映射为驼峰-->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
+    <plugins>
+        <!--配置分页插件-->
+        <plugin interceptor="com.github.pagehelper.PageInterceptor"></plugin>
+    </plugins>
+</configuration>
+```
+
+③创建Mapper接口和映射文件
+
+```java
+public interface EmployeeMapper {
+    List<Employee> getEmployeeList();
+}
+```
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.andy.ssm.mapper.EmployeeMapper">
+    <select id="getEmployeeList" resultType="Employee">
+        select * from t_emp
+    </select>
+</mapper>
+```
+
+④创建日志文件log4j.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+    <appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
+        <param name="Encoding" value="UTF-8"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%-5p %d{MM-dd HH:mm:ss,SSS}
+%m (%F:%L) \n"/>
+        </layout>
+    </appender>
+    <logger name="java.sql">
+        <level value="debug"/>
+    </logger>
+    <logger name="org.apache.ibatis">
+        <level value="info"/>
+    </logger>
+    <root>
+        <level value="debug"/>
+        <appender-ref ref="STDOUT"/>
+    </root>
+</log4j:configuration>
+
+```
+
+## 创建Spring的配置文件并配置
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/context
+https://www.springframework.org/schema/context/spring-context.xsd">
+    <!--扫描组件-->
+    <context:component-scan base-package="com.andy.ssm">
+        <context:exclude-filter type="annotation"
+                                expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+    <!-- 引入jdbc.properties -->
+    <context:property-placeholder location="classpath:jdbc.properties">
+    </context:property-placeholder>
+    <!-- 配置Druid数据源 -->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"></property>
+        <property name="url" value="${jdbc.url}"></property>
+        <property name="username" value="${jdbc.username}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+    </bean>
+    <!-- 配置用于创建SqlSessionFactory的工厂bean可以在Spring的ioc容器中直接获取SQLsession对象 -->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 设置MyBatis核心配置文件的路径（可以不设置） -->
+        <property name="configLocation" value="classpath:mybatis-config.xml">
+        </property>
+        <!-- 设置数据源 -->
+        <property name="dataSource" ref="dataSource"></property>
+        <!-- 设置类型别名所对应的包 -->
+        <property name="typeAliasesPackage" value="com.andy.ssm.pojo">
+        </property>
+        <!--
+        设置映射文件的路径
+        若映射文件所在路径和mapper接口所在路径一致，则不需要设置
+        -->
+        <!--
+        <property name="mapperLocations" value="classpath:mapper/*.xml">
+        </property>
+        -->
+    </bean>
+    <!--
+    配置mapper接口的扫描配置
+    由mybatis-spring提供，可以将指定包下所有的mapper接口通过SqlSession    创建动态代理
+    并将这些动态代理作为IOC容器的bean管理
+    -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.andy.ssm.mapper"></property>
+    </bean>
+
+
+    <!--    配置事务管理器-->
+    <bean id="dataSourceTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="datasource"></property>
+    </bean>
+    <!--    开启事务的注解驱动，使用注解@Transactional标识的方法和或类中所有的方法进行管理-->
+    <tx:annotation-driven transaction-manager="dataSourceTransactionManager"/>
+</beans>
+```
+
+## 分页操作
+
+分页页面
+
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>title</title>
+    <link rel="stylesheet" th:href="@{/static/css/index_work.css}">
+</head>
+<body>
+<!--<h1>首页</h1>-->
+<!--<a th:href="@{/hello}">HelloWorld</a><br/>-->
+<div id="app">
+
+    <table border="1" cellpadding="0" cellspacing="0" style="text-align:center;" id="dataTable">
+        <tr th:colspan="6">employee list</tr>
+        <tr>
+            <th>流水号</th>
+            <th>id</th>
+            <th>empName</th>
+            <th>age</th>
+            <th>gender</th>
+            <th>option(<a th:href="@{/to/add}">add</a>)</th>
+        </tr>
+        <tr th:each="employee ,status: ${page.list}">
+            <td th:text="${status.count}"></td>
+            <td th:text="${employee.empId}"></td>
+            <td th:text="${employee.empName}"></td>
+            <td th:text="${employee.age}"></td>
+            <td th:text="${employee.gender}"></td>
+            <td>
+                <a @click="deleteEmployee()" th:href="@{'/employee/'+${employee.empId}}">delete</a>
+                <a th:href="@{'/employee/'+${employee.empId}}">update</a>
+            </td>
+
+        </tr>
+    </table>
+    <div style="text-align:center;">
+        <a th:if="${page.hasPreviousPage}" th:href="@{/employee/page/1}"> 首页</a>
+        <a th:if="${page.hasPreviousPage}" th:href="@{'/employee/page/'+${page.prePage}}"> 上一页</a>
+        <span th:each="num: ${page.navigatepageNums}">
+            <a th:if="${ page.pageNum==num}" style="color: darkred" th:href="@{'/employee/page/'+${num}}"
+               th:text="'['+${num}+']'"></a>
+            <a th:if="${page.pageNum!=num}" style="color: blue" th:href="@{'/employee/page/'+${num}}"
+               th:text="${num}"></a>
+        </span>
+
+        <a th:if="${page.hasNextPage}" th:href="@{'/employee/page/'+${page.nextPage}}"> 下一页</a>
+        <a th:if="${page.hasNextPage}" th:href="@{'/employee/page/'+${page.pages}}"> 尾页</a>
+    </div>
+    <!--    <form method="post">-->
+    <!--        <input type="hidden" name="_method" value="delete">-->
+    <!--    </form>-->
+</div>
+<!--<script type="text/javascript" th:src="@{/static/js/vue.js}"></script>-->
+<!--<script type="text/javascript">-->
+<!--    var vue = new Vue({-->
+<!--        el: "#app",-->
+<!--        methods: {-->
+<!--            deleteEmployee() {-->
+<!--                console.log("day day day ");-->
+<!--                var form = document.getElementsByTagName("form")[0];-->
+<!--                form.action = event.target.href;-->
+<!--                form.submit();-->
+<!--                event.preventDefault();-->
+<!--            }-->
+<!--        }-->
+<!--    });-->
+
+<!--</script>-->
+</body>
+</html>
+```
+
+Employeecontroller.java
+
+```java
+package com.andy.controller;
+
+import com.andy.pojo.Employee;
+import com.andy.service.EmployeeService;
+import com.github.pagehelper.PageInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import java.util.List;
+
+@Controller
+public class EmployeeCotroller {
+    @Autowired
+    private EmployeeService employeeService;
+
+    @RequestMapping(value = "/employee", method = RequestMethod.GET)
+    public String getEmployeeList(Model model) {
+        List<Employee> list = employeeService.getAllEmployee();
+        model.addAttribute("allemployee", list);
+        return "employeelist";
+    }
+
+    @RequestMapping(value = "/employee/page/{pagenum}", method = RequestMethod.GET)
+    public String getEmployeePage(@PathVariable("pagenum") Integer pagenum, Model model) {
+        PageInfo<Employee> page = employeeService.getEmployeePage(pagenum);
+        model.addAttribute("page", page);
+        return "employeepage";
+    }
+}
+
+```
+
+EmployeeService.java
+
+```java
+package com.andy.service;
+
+import com.andy.mapper.EmployeeMapper;
+import com.andy.pojo.Employee;
+import com.github.pagehelper.PageInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+
+public interface EmployeeService {
+
+    List<Employee> getAllEmployee();
+
+    PageInfo<Employee> getEmployeePage(Integer pagenum);
+}
+
+```
+
+实现类
+
+```java
+package com.andy.service;
+
+import com.andy.mapper.EmployeeMapper;
+import com.andy.pojo.Employee;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@Transactional
+public class EmployeeServiceImpl implements EmployeeService {
+    @Autowired
+    protected EmployeeMapper employeeMapper;
+
+    @Override
+    public List<Employee> getAllEmployee() {
+        List<Employee> list = employeeMapper.getAllEmployee();
+        System.out.println(list);
+        return list;
+
+    }
+
+    @Override
+    public PageInfo<Employee> getEmployeePage(Integer pagenum) {
+        PageHelper.startPage(pagenum, 4);
+        List<Employee> list = employeeMapper.getAllEmployee();
+        PageInfo<Employee> page = new PageInfo<>(list, 5);
+
+        return page;
+    }
+}
+
+```
+
+employeeMapper.java
+
+```java
+package com.andy.mapper;
+
+//import org.apache.ibatis.annotations.Mapper;
+
+import com.andy.pojo.Employee;
+
+import java.util.List;
+
+//@Mapper
+public interface EmployeeMapper {
+
+    List<Employee> getAllEmployee();
+}
+
+```
+
+EmployeeMapper.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.andy.mapper.EmployeeMapper">
+    <select id="getAllEmployee" resultType="Employee">
+        select * from t_emp
+    </select>
+</mapper>
+```
+
+> 注意，` PageHelper.startPage(pagenum,4);`是在mapper.xml的sql之后加上 `limit pageNum ;`不可以在原有的select sql语句中加上;否则会报sql语法错误
+
+
+
+
+
+
+
+
+
+
+
+
+
+

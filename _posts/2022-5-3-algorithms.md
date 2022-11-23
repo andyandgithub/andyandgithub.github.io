@@ -802,10 +802,58 @@ for(int i=0;i<nums.length;i++){
 
 ```
 
+### 求最大公约数
+#### 辗转相除法
+时间复杂度不太好计算，可以近似为O(log(max(a, b)))，但是取模运算性能较差
+```java
+public int gcd(int a,int b){
+    return b==0:a:gcd(b,a%b);
+}
+```
+#### 更相减损术
+避免了取模运算，但是算法性能不稳定，最坏时间复杂度为O(max(a, b)))
+```java
+public int gcd(int a,int b){
+    if(a==b){
+        return a;
+    }
+    if(a>b){
+        return gcd(a-b,b);
+    }
+    if(a<b){
+        return gcd(b-a,a);
+    }
 
+}
+```
 
-
-
+#### 更损相减术与移位结合
+避免了取模运算，但是算法性能不稳定，最坏时间复杂度为O(max(a, b)))
+```java
+public int gcd(int a,int b){
+    if(a==b){
+        return a;
+    }
+    if(a<b){
+        return gcd(b,a);
+    }
+    if(a<b){
+        return gcd(b-a,a);
+    }
+    boolean aiseven=((a&1)!=1);
+    boolean biseven=((b&1)!=1);
+    if(aiseven&&biseven){
+        return gcd(a>>1,b>>1)<<1;
+    }else if(!aiseven&&biseven){
+        return gcd(a,b>>1);
+    }
+    }else if(aiseven&&!biseven){
+        return gcd(a>>1,b);
+    }else {
+        return gcd(b,a-b);
+    }
+}
+```
 
 
 
