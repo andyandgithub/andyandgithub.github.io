@@ -95,7 +95,9 @@ public class demoController {
 # SptringBoot配置解析
 SpringBoot是基于约定的，所以很多配置都有默认值，但如果想使用自己的配置替换默认配置的话，就可以使用application.properties或者application.yml（application.yaml）进行配置
 同一目录之下，优先级`.properties>.yml>.yaml`
+
 .properties
+
 ```properties
 server.port=3000
 server.address=/test

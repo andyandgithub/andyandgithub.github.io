@@ -1822,6 +1822,7 @@ log4j.jar 且 配置 log4j.properties/log4j.xml 给 Druid 使用，要么就不�
 间接依赖spring.jcl 包判断日志实现的时候会默认为 slfj 的具体实现（发现机制），因此可以配置个 slf4j 的具体实现使用Spring的日志。若系统内部没有 slf4j ，会搜寻 log4j2，还是没有则默认使用 JUL
 日志输出。 | |javax.servlet-api| MVC的Controller中可能会使用到Servlet的API | |commons-fileupload| SpringMVC底层支持文件上传需要jar包 |
 
+
 ③创建表
 
 ```sql
@@ -1837,6 +1838,12 @@ CREATE TABLE `t_emp`
 ```
 
 ## 配置web.xml
+配置四个东西 ：
+
+1. 核心控制器 DispatcherServlet ; 
+2. ContextLoaderListener ; 
+3. 编码过滤器（放过滤器中最前）；
+4. 请发方法处理器 HiddenMethodFilter
 
 ```xml
 <!-- 配置Spring的编码过滤器 -->
@@ -1891,7 +1898,17 @@ CREATE TABLE `t_emp`
 </listener>
 ```
 
+
 ## 创建SpringMVC的配置文件并配置
+
+只列出必选项 和 推荐项：
+1. Controller包的扫描 （必选）
+2. thymeleaf 的视图解析器（必选）
+3. 静态资源处理 （必选）
+4. 视图控制器（可选）
+5. 注解驱动（必选）
+
+
 
 ```xml
 <!--扫描组件-->
@@ -1927,6 +1944,10 @@ CREATE TABLE `t_emp`
 ```
 
 ## 搭建MyBatis环境
+
+1. resources/mybatis-config.xml 中编写配置，其中关于数据源的配置交给  在Spring中进行配置，向SpringIOC容器中注入 SqlSessionFactory 对象。
+2. resources/ 下创建同包的路径的Mapper目录，并编写mapper.xml 
+3. 配置分页插件
 
 ①创建属性文件jdbc.properties
 
@@ -1978,6 +1999,8 @@ public interface EmployeeMapper {
 
 ④创建日志文件log4j.xml
 
+非必须，但还是配下好。
+在 resources/ 下编写 log4j.xml，创建就能生效了。
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
@@ -2003,7 +2026,53 @@ public interface EmployeeMapper {
 
 ```
 
+lockback 日志(Spring/mybatis) 
+
+非必须，但还是配下好。
+在 resources/ 下编写 log4j.xml，创建就能生效了。
+
+```xml
+xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration>
+<configuration debug="true">
+    <!-- 指定日志的输出位置 -->
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!-- 日志的输出格式 -->
+            <!-- 按照顺序分别是: 时间、日志级别、线程名称、打印日志的类、日志的主体内容、换行 -->
+            <pattern>[%d{HH:mm:ss.SSS}] [%-5level] [%thread] [%logger] [%msg]%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 根据特殊需求指定局部的日志级别 : SQL 语句是 info 级别 -->
+    <logger name="com.atguigu.crowd.mapper">
+        <level value="DEBUG"/>
+    </logger>
+
+    <!-- 设置全局的日志级别。日志级别分别是 : DEBUG、INFO、WARN、ERROR -->
+    <!-- 指定任何一个日志级别都只打印当前级别和后面级别的日志 -->
+    <root level="error">
+        <!-- 指定打印日志的appender，这里通过 STDOUT 引用了前面配置的 appender -->
+        <appender-ref ref="stdout"/>
+    </root>
+</configuration>
+```
+
+
 ## 创建Spring的配置文件并配置
+配置分为三大部分：
+一： 1. 包扫描、排除@Controller
+
+二：事务相关
+1. 事务管理器
+2. 事务注解驱动
+
+三：MyBaits需要的配置：
+1. 引入 jdbc.properties
+2. druid 数据源（需要1）
+3. SqlSessionFactoryBean 注册到IOC（需要2）
+4.. 产生的mapper代理类注册到IOC → 即配置 MapperScannerConfigurer
+
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -2067,6 +2136,8 @@ https://www.springframework.org/schema/context/spring-context.xsd">
     <tx:annotation-driven transaction-manager="dataSourceTransactionManager"/>
 </beans>
 ```
+
+测试：直接访问视图控制器配置的首页看是否正常即可。
 
 ## 分页操作
 
@@ -2282,7 +2353,11 @@ EmployeeMapper.xml
 > 注意，` PageHelper.startPage(pagenum,4);`是在mapper.xml的sql之后加上 `limit pageNum ;`不可以在原有的select sql语句中加上;否则会报sql语法错误
 
 
+ 使用上述方式快速搭建SSM环境的时候，需要注意扫描包路径、别名路径等都需要改，自行根据下方列出的地方进行检查。
 
+1. MyBatis ：别名包路径。
+2. Spring：包扫描路径(注意排除 Controller)、MapperScannerConfigurer中指定Mapper的扫描路径。
+3. SpringMVC：Controller包扫描、视图解析器的prefix。
 
 
 
