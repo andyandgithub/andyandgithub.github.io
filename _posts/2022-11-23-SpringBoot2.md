@@ -423,8 +423,8 @@ public class MainApplication {
 
 ```
 
-- 配置 类组件之间无依赖关系用Lite模式加速容器启动过程，减少判断
-- 配置 类组件之间有依赖关系，方法会被调用得到之前单实例组件，用Full模式（默认）
+- 配置 类组件之间无依赖关系用`Lite`模式加速容器启动过程，减少判断
+- 配置 类组件之间有依赖关系，方法会被调用得到之前单实例组件，用`Full`模式（默认）
 
 #### @Bean、@Component、@Controller、@Service、@Repository
 #### @ComponentScan、@Import
@@ -619,14 +619,19 @@ public @interface SpringBootApplication{}
 #### @ComponentScan
 指定扫描哪些，Spring注解
 #### @EnableAutoConfiguration
+
 ```java
 @AutoConfigurationPackage
 @Import(AutoConfigurationImportSelector.class)
 public @interface EnableAutoConfiguration {}
 ```
+
 ##### @AutoConfigurationPackage
+
 自动配置包？指定了默认的包规则
-@SpringBootConfigRuation 中包含@AutoConfigurationPakage是将主类所在包以及子包中的类导入
+
+`@SpringBootConfigRuation` 中包含`@AutoConfigurationPakage`是将主类所在包以及子包中的类导入
+
 ```java
 @Import(AutoConfigurationPackages.Registrar.class)  //给容器中导入一个组件
 public @interface AutoConfigurationPackage {}
@@ -637,8 +642,11 @@ public @interface AutoConfigurationPackage {}
 ##### @Import(AutoConfigurationImportSelector.class)
 
 1、利用`getAutoConfigurationEntry(annotationMetadata)`;给容器中批量导入一些组件
+
 2、调用`List<String> configurations = getCandidateConfigurations(annotationMetadata, attributes)`获取到所有需要导入到容器中的配置类
+
 3、利用工厂加载 `Map<String, List<String>> loadSpringFactories(@Nullable ClassLoader classLoader)；`得到所有的组件
+
 4、从META-INF/spring.factories位置来加载一个文件。	默认扫描我们当前系统里面所有 `META-INF/spring.factories` 位置的文件    `spring-boot-autoconfigure-2.3.4.RELEASE.jar`包里面也有` META-INF/spring.factories`
 
 全部加载按需配置
@@ -830,10 +838,10 @@ xxxxxAutoConfiguration ---> 组件  ---> xxxxProperties里面拿值  ----> appli
 ## Lombok
 简化JavaBean开发
 ```xml
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
+<dependency>
+    <groupId>org.projectlombok</groupId>
+    <artifactId>lombok</artifactId>
+</dependency>
 
 
 <!-- idea中搜索安装lombok插件 -->
@@ -876,18 +884,21 @@ public class HelloController {
 ```
 ## dev-tools
 ```xml
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <optional>true</optional>
-        </dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-devtools</artifactId>
+    <optional>true</optional>
+</dependency>
 ```
 项目或者页面修改以后：Ctrl+F9；
 
 ## Spring Initailizr（项目初始化向导）
 0、选择我们需要的开发场景
+
 1、自动依赖引入
+
 2、自动创建项目结构
+
 3、自动编写好主配置类
 
 # SpringBoot核心功能
@@ -921,7 +932,7 @@ k: v
 对象：键值对的集合。map、hash、set、object 
 ```yaml
 # 行内写法：  
-k: {k1:v1,k2:v2,k3:v3}
+k: {k1: v1,k2: v2,k3: v3}
 #或
 k: 
 	k1: v1
@@ -990,7 +1001,7 @@ person:
             <optional>true</optional>
         </dependency>
 
-
+<!-- 打包的时候去除掉这个提示包 -->
  <build>
         <plugins>
             <plugin>
@@ -1042,7 +1053,7 @@ The auto-configuration adds the following features on top of Spring’s defaults
 ### 简单功能分析
 #### 静态资源访问
 ##### 静态资源目录
-只要静态资源放在类路径下： ` /static (or /public or /resources or /META-INF/resources`
+只要静态资源放在类路径下： ` /static ` (or ` /public ` or ` /resources ` or ` /META-INF/resources `
 
 访问 ： 当前项目根路径/ + 静态资源名 
 
@@ -1334,12 +1345,12 @@ protected void doDispatch(HttpServletRequest request, HttpServletResponse respon
                 
                 //HandlerMapping：处理器映射。/xxx->>xxxx
 ```
-RequestMappingHandlerMapping：保存了所有@RequestMapping 和handler的映射规则
+`RequestMappingHandlerMapping`：保存了所有`@RequestMapping` 和handler的映射规则
 
 所有的请求映射都在HandlerMapping中。
 
-- SpringBoot自动配置欢迎页的 WelcomePageHandlerMapping 。访问 /能访问到index.html；
-- SpringBoot自动配置了默认 的 RequestMappingHandlerMapping
+- SpringBoot自动配置欢迎页的 `WelcomePageHandlerMapping `。访问 /能访问到index.html；
+- SpringBoot自动配置了默认 的 `RequestMappingHandlerMapping`
 - 请求进来，挨个尝试所有的HandlerMapping看是否有请求信息。
   - 如果有就找到这个请求对应的handler
   - 如果没有就是下一个 HandlerMapping
@@ -1367,21 +1378,21 @@ RequestMappingHandlerMapping：保存了所有@RequestMapping 和handler的映�
 public class ParameterTestController {
 
 
-    //  car/2/owner/zhangsan
-    @GetMapping("/car/{id}/owner/{username}")
-    public Map<String,Object> getCar(@PathVariable("id") Integer id,
-                                     @PathVariable("username") String name,
-                                     @PathVariable Map<String,String> pv,
-                                     @RequestHeader("User-Agent") String userAgent,
-                                     @RequestHeader Map<String,String> header,
-                                     @RequestParam("age") Integer age,
-                                     @RequestParam("inters") List<String> inters,
-                                     @RequestParam Map<String,String> params,
-                                     @CookieValue("_ga") String _ga,
-                                     @CookieValue("_ga") Cookie cookie){
+//  car/2/owner/zhangsan  
+@GetMapping("/car/{id}/owner/{username}")
+public Map<String,Object> getCar(@PathVariable("id") Integer id,
+                                  @PathVariable("username") String name,
+                                  @PathVariable Map<String,String> pv,
+                                  @RequestHeader("User-Agent") String userAgent,
+                                  @RequestHeader Map<String,String> header,
+                                  @RequestParam("age") Integer age,
+                                  @RequestParam("inters") List<String> inters,
+                                  @RequestParam Map<String,String> params,
+                                  @CookieValue("_ga") String _ga,
+                                  @CookieValue("_ga") Cookie cookie){
 
 
-        Map<String,Object> map = new HashMap<>();
+    Map<String,Object> map = new HashMap<>();
 
 //        map.put("id",id);
 //        map.put("name",name);
@@ -1519,6 +1530,9 @@ public class Pet {
 
 result
 ```
+
+
+
 #### POJO封装过程
 ● ServletModelAttributeMethodProcessor
 #### 参数处理原理
@@ -1598,20 +1612,20 @@ protected Object[] getMethodArgumentValues(NativeWebRequest request, @Nullable M
 ```
 ###### 挨个判断所有参数解析器那个支持解析这个参数
 ```java
-	@Nullable
-	private HandlerMethodArgumentResolver getArgumentResolver(MethodParameter parameter) {
-		HandlerMethodArgumentResolver result = this.argumentResolverCache.get(parameter);
-		if (result == null) {
-			for (HandlerMethodArgumentResolver resolver : this.argumentResolvers) {
-				if (resolver.supportsParameter(parameter)) {
-					result = resolver;
-					this.argumentResolverCache.put(parameter, result);
-					break;
-				}
-			}
-		}
-		return result;
-	}
+@Nullable
+private HandlerMethodArgumentResolver getArgumentResolver(MethodParameter parameter) {
+  HandlerMethodArgumentResolver result = this.argumentResolverCache.get(parameter);
+  if (result == null) {
+    for (HandlerMethodArgumentResolver resolver : this.argumentResolvers) {
+      if (resolver.supportsParameter(parameter)) {
+        result = resolver;
+        this.argumentResolverCache.put(parameter, result);
+        break;
+      }
+    }
+  }
+  return result;
+}
 ```
 ###### 解析这个参数的值
 调用各自 HandlerMethodArgumentResolver 的 resolveArgument 方法即可
@@ -1705,7 +1719,7 @@ WebDataBinder binder = binderFactory.createBinder(webRequest, attribute, name);
 WebDataBinder :web数据绑定器，将请求参数的值绑定到指定的JavaBean里面
 WebDataBinder 利用它里面的 Converters 将请求数据转成指定的数据类型。再次封装到JavaBean中
 
-GenericConversionService：在设置每一个值的时候，找它里面的所有converter那个可以将这个数据类型（request带来参数的字符串）转换到指定的类型（JavaBean -- Integer）
+GenericConversionService：在设置每一个值的时候，找它里面的所有converter那个可以将这个数据类型（request带来参数的字符串）转换到指定的类型（JavaBean -- Integer）（for循环判断符合条件的converter转换器）
 byte -- > file
 
 `@FunctionalInterfacepublic interface Converter<S, T>`
@@ -1817,45 +1831,644 @@ protected void exposeModelAsRequestAttributes(Map<String, Object> model,
 	}
 ```
 ### 数据响应与内容协商
+#### 响应JSON
+##### jackson.jar+@ResponseBody
+```xml
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+web场景自动引入了json场景
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-json</artifactId>
+      <version>2.3.4.RELEASE</version>
+      <scope>compile</scope>
+    </dependency>
+
+```
+给前端自动返回json数据；
 
 
+1、返回值解析器
+```java
+try {
+			this.returnValueHandlers.handleReturnValue(
+					returnValue, getReturnValueType(returnValue), mavContainer, webRequest);
+		}
+```
+```java
+	@Override
+	public void handleReturnValue(@Nullable Object returnValue, MethodParameter returnType,
+			ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
+
+		HandlerMethodReturnValueHandler handler = selectHandler(returnValue, returnType);
+		if (handler == null) {
+			throw new IllegalArgumentException("Unknown return value type: " + returnType.getParameterType().getName());
+		}
+		handler.handleReturnValue(returnValue, returnType, mavContainer, webRequest);
+	}
+```
+```java
+RequestResponseBodyMethodProcessor  	
+@Override
+	public void handleReturnValue(@Nullable Object returnValue, MethodParameter returnType,
+			ModelAndViewContainer mavContainer, NativeWebRequest webRequest)
+			throws IOException, HttpMediaTypeNotAcceptableException, HttpMessageNotWritableException {
+
+		mavContainer.setRequestHandled(true);
+		ServletServerHttpRequest inputMessage = createInputMessage(webRequest);
+		ServletServerHttpResponse outputMessage = createOutputMessage(webRequest);
+
+		// Try even with null return value. ResponseBodyAdvice could get involved.
+        // 使用消息转换器进行写出操作
+		writeWithMessageConverters(returnValue, returnType, inputMessage, outputMessage);
+	}
+```
+
+返回值解析器原理
+
+- 返回值处理器判断是否支持这种类型返回值 supportsReturnType
+- 返回值处理器调用 handleReturnValue 进行处理
+- RequestResponseBodyMethodProcessor 可以处理返回值标了@ResponseBody 注解的。
+  - 利用 MessageConverters 进行处理 将数据写为json
+  - 内容协商（浏览器默认会以请求头的方式告诉服务器他能接受什么样的内容类型）
+  - 服务器最终根据自己自身的能力，决定服务器能生产出什么样内容类型的数据，
+  - SpringMVC会挨个遍历所有容器底层的 HttpMessageConverter ，看谁能处理？
+    - 得到MappingJackson2HttpMessageConverter可以将对象写为json
+    - 利用MappingJackson2HttpMessageConverter将对象转为json再写出去。
+
+##### SpringMVC到底支持哪些返回值
+```java
+ModelAndView
+Model
+View
+ResponseEntity 
+ResponseBodyEmitter
+StreamingResponseBody
+HttpEntity
+HttpHeaders
+Callable
+DeferredResult
+ListenableFuture
+CompletionStage
+WebAsyncTask
+有 @ModelAttribute 且为对象类型的
+@ResponseBody 注解 ---> RequestResponseBodyMethodProcessor；
+```
+##### HTTPMessageConverter原理
+
+1、MessageConverter规范
+
+HttpMessageConverter: 看是否支持将 此 Class类型的对象，转为MediaType类型的数据。
+例子：Person对象转为JSON。或者 JSON转为Person
+
+2、默认的MessageConverter
+
+0 - 只支持Byte类型的
+1 - String
+2 - String
+3 - Resource
+4 - ResourceRegion
+5 - DOMSource.class \ SAXSource.class) \ StAXSource.class \StreamSource.class \Source.class
+6 - MultiValueMap
+7 - true 
+8 - true
+9 - 支持注解方式xml处理的。
+
+最终 MappingJackson2HttpMessageConverter  把对象转为JSON（利用底层的jackson的objectMapper转换的
+
+#### 内容协商
+根据客户端接收能力不同，返回不同媒体类型的数据。
+1、引入xml依赖
+```xml
+ <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+</dependency>
+```
+
+2、postman分别测试返回json和xml
+只需要改变请求头中Accept字段。Http协议中规定的，告诉服务器本客户端可以接收的数据类型。
+
+3、开启浏览器参数方式内容协商功能
+为了方便内容协商，开启基于请求参数的内容协商功能
+
+```yaml
+spring:
+    contentnegotiation:
+      favor-parameter: true  #开启请求参数内容协商模式
+```
+`localhost:8080:/hello?format=json`
+`localhost:8080:/hello?format=xml`
+之前是只有基于请求头的协商策略现在是多了一个基于请求头的协商策略且比较靠前
+
+确定客户端接收什么样的内容类型；
+- `Parameter`策略优先确定是要返回json数据（获取请求头中的format的值）
+- 最终进行内容协商返回给客户端json即可。
+  
+4、内容协商原理
+
+- 判断当前响应头中是否已经有确定的媒体类型。MediaType
+- 获取客户端（PostMan、浏览器）支持接收的内容类型。（获取客户端Accept请求头字段）【application/xml】
+  - `contentNegotiationManager` 内容协商管理器 默认使用基于请求头的策略
+  - `HeaderContentNegotiationStrategy`  确定客户端可以接收的内容类型 
+- 遍历循环所有当前系统的 `MessageConverter`，看谁支持操作这个对象（Person）
+- 找到支持操作Person的converter，把converter支持的媒体类型统计出来。
+- 客户端需要【application/xml】。服务端能力【10种、json、xml】
+- 进行内容协商的***最佳匹配***媒体类型
+- 用 支持 将对象转为 最佳匹配媒体类型 的converter。调用它进行转化 。
+
+导入了jackson处理xml的包，xml的converter就会自动进来
+
+早webmvcConfig中添加额外的messageConverter
+```java
+WebMvcConfigurationSupport
+jackson2XmlPresent = ClassUtils.isPresent("com.fasterxml.jackson.dataformat.xml.XmlMapper", classLoader);
+
+if (jackson2XmlPresent) {
+			Jackson2ObjectMapperBuilder builder = Jackson2ObjectMapperBuilder.xml();
+			if (this.applicationContext != null) {
+				builder.applicationContext(this.applicationContext);
+			}
+			messageConverters.add(new MappingJackson2XmlHttpMessageConverter(builder.build()));
+		}
+```
+
+5、自定义 MessageConverter
+
+实现多协议数据兼容。json、xml、pdf,excle  xxxConvert
+- 0、@ResponseBody 响应数据出去 调用 RequestResponseBodyMethodProcessor 处理
+- 1、Processor 处理方法返回值。通过 MessageConverter 处理
+- 2、所有 MessageConverter 合起来可以支持各种媒体类型数据的操作（读、写）
+- 3、内容协商找到最终的 messageConverter；
+
+1、 添加自定义的MessageConvert类型进入系统底层
+
+2、 系统底层就会统计出所有的messageconvert能操作什么类型
+
+3、 客户端内容协商[xxx-->xxx]
+
+SpringMVC的什么功能。一个入口给容器中添加一个  WebMvcConfigurer
+```java
+ @Bean
+    public WebMvcConfigurer webMvcConfigurer(){
+        return new WebMvcConfigurer() {
+
+            @Override
+            public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+
+            }
+        }
+    }
+```
+webMvcConfig配置,自定义内容协商策略（参数类型，目前只支持xml和json想要添加自定义的参数内容协商类型）
+```java
+@OverRide
+public void configureContentNegotitation(ContentNegotitationConfigurer configurer  ){
+    Map<String MediaType> mediatypes=new HashMap<>();
+    mediaTypes.put("json",MediaTypes.APPLICATION_JSON);
+    mediaTypes.put("xml",MediaTypes.APPLICATION_XML);
+    mediaTypes.put("wode",MediaTypes.parseMediaType("application/wode"));
+    
+    ParameterContentNegotitationStrategy parameterStragety=new ParameterContentNegotitationStrategy(mediaTypes);
+    HeaderContentNegotitationStrategy header=new HeaderContentNegotitationStrategy();
+    //甚至可以写其他的基于路径，参数的等等等
+    configurer.strategies(Arrays.asList(parameterStragety,header));
+}
+```
+有可能我们添加的自定义的功能会覆盖默认很多功能，导致一些默认的功能失效。
+大家考虑，上述功能除了我们完全自定义外？SpringBoot有没有为我们提供基于配置文件的快速修改媒体类型功能？怎么配置呢？【提示：参照SpringBoot官方文档web开发内容协商章节】
+### 视图解析与模板引擎
+视图解析：SpringBoot默认不支持 JSP，需要引入第三方模板引擎技术实现页面渲染
+
+#### 视图解析
+- 1、视图解析原理流程
+- 1、目标方法处理的过程中，所有数据都会被放在 ModelAndViewContainer 里面。包括数据和视图地址
+- 2、方法的参数是一个自定义类型对象（从请求参数中确定的），把他重新放在 ModelAndViewContainer 
+- 3、任何目标方法执行完成以后都会返回 ModelAndView（数据和视图地址）。
+- 4、processDispatchResult  处理派发结果（页面改如何响应）
+ - 1、render(mv, request, response); 进行页面渲染逻辑
+   - 1、根据方法的String返回值得到 View 对象【定义了页面的渲染逻辑】
+     - 1、所有的视图解析器尝试是否能根据当前返回值得到View对象
+     - 2、得到了  redirect:/main.html --> Thymeleaf new RedirectView()
+    - 3、ContentNegotiationViewResolver 里面包含了下面所有的视图解析器，内部还是利用下面所有视图解析器得到视图对象。
+    - 4、view.render(mv.getModelInternal(), request, response);   视图对象调用自定义的render进行页面渲染工作
+      -  RedirectView 如何渲染【重定向到一个页面】
+       - 1、获取目标url地址
+       - 2、response.sendRedirect(encodedURL);
 
 
+视图解析：
+  - ○ 返回值以 forward: 开始： new InternalResourceView(forwardUrl); -->  转发request.getRequestDispatcher(path).forward(request, response); 
+  - ○ 返回值以 redirect: 开始： new RedirectView() --》 render就是重定向 
+  - ○ 返回值是普通字符串： new ThymeleafView（）--->
+
+#### 模板引擎-Thymeleaf
+##### thymeleaf简介
+Thymeleaf is a modern server-side Java template engine for both web and standalone environments, capable of processing HTML, XML, JavaScript, CSS and even plain text.
+现代化、服务端Java模板引擎
+
+##### 基本语法
+1、表达式
+
+|表达式名字|	语法	|用途|
+|----|----|----|
+|变量取值|	${...} 	|获取请求域、session域、对象等值|
+|选择变量	|*{...}	|获取上下文对象值|
+|消息	|#{...}	|获取国际化等值|
+|链接	|@{...}|	生成链接|
+|片段表达式|	~{...}	|jsp:include 作用，引入公共页面片段|
+
+2、字面量
+文本值: 'one text' , 'Another one!' ,…数字: 0 , 34 , 3.0 , 12.3 ,…布尔值: true , false
+
+空值: null
+
+变量： one，two，.... 变量不能有空格
+
+3、文本操作
+
+字符串拼接: +
+
+变量替换: |The name is ${name}| 
+
+4、数学运算
+运算符: + , - , * , / , %
+
+5、布尔运算
+
+运算符:  and , or
+
+一元运算: ! , not 
 
 
+6、比较运算
+
+比较: > , < , >= , <= ( gt , lt , ge , le )等式: == , != ( eq , ne ) 
+
+7、条件运算
+
+If-then: (if) ? (then)
+
+If-then-else: (if) ? (then) : (else)
+
+Default: (value) ?: (defaultvalue) 
+
+8、特殊操作
+
+无操作： _
+
+###### 设置属性值-th:attr
+
+设置单个值
+
+```html
+<form action="subscribe.html" th:attr="action=@{/subscribe}">
+  <fieldset>
+    <input type="text" name="email" />
+    <input type="submit" value="Subscribe!" th:attr="value=#{subscribe.submit}"/>
+  </fieldset>
+</form>
+```
+设置多个值
+
+```html
+<img src="../../images/gtvglogo.png"  th:attr="src=@{/images/gtvglogo.png},title=#{logo},alt=#{logo}" />
+```
+以上两个的代替写法 th:xxxx
+```html
+<input type="submit" value="Subscribe!" th:value="#{subscribe.submit}"/>
+<form action="subscribe.html" th:action="@{/subscribe}">
+```
+[所有h5兼容的标签写法](https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html#setting-value-to-specific-attributes)
+
+###### 迭代
+```html
+<tr th:each="prod : ${prods}">
+        <td th:text="${prod.name}">Onions</td>
+        <td th:text="${prod.price}">2.41</td>
+        <td th:text="${prod.inStock}? #{true} : #{false}">yes</td>
+</tr>
+```
+```html
+<tr th:each="prod,iterStat : ${prods}" th:class="${iterStat.odd}? 'odd'">
+  <td th:text="${prod.name}">Onions</td>
+  <td th:text="${prod.price}">2.41</td>
+  <td th:text="${prod.inStock}? #{true} : #{false}">yes</td>
+</tr>
+```
+###### 条件运算
+```html
+<a href="comments.html"
+th:href="@{/product/comments(prodId=${prod.id})}"
+th:if="${not #lists.isEmpty(prod.comments)}">view</a>
+```
+```html
+<div th:switch="${user.role}">
+  <p th:case="'admin'">User is an administrator</p>
+  <p th:case="#{roles.manager}">User is a manager</p>
+  <p th:case="*">User is some other thing</p>
+</div>
+```
+###### 属性优先级
+
+|Order|Feature|Attributes|
+|----|----|----|
+|1|Fragment inclusion|th:insert,th:replace|
+|2|Fragment iteration|th:each|
+|3|Conditional evaluation|th:if,th:unless,th:switch,th:case|
+|4|Local variable definition|th:object,th:with|
+|5|General attribute modification|th:attr,th:attrprepend,th:attrappend|
+|6|Specific attribute modification|th:value,th:href,th:src|
+|7|Text (tag body modification)|th:text,th:utext|
+|8|Fragment specification|th:fragment|
+|9|Fragment removal|th:remove|
+
+##### thymeleaf使用
+1、引入Starter
+
+```xml
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+```
+
+2.自动配置好了thymeleaf
+```java
+@Configuration(proxyBeanMethods = false)
+@EnableConfigurationProperties(ThymeleafProperties.class)
+@ConditionalOnClass({ TemplateMode.class, SpringTemplateEngine.class })
+@AutoConfigureAfter({ WebMvcAutoConfiguration.class, WebFluxAutoConfiguration.class })
+public class ThymeleafAutoConfiguration { }
+```
+自动配好的策略
+- ● 1、所有thymeleaf的配置值都在 ThymeleafProperties
+- ● 2、配置好了 SpringTemplateEngine 
+- ● 3、配好了 ThymeleafViewResolver 
+- ● 4、我们只需要直接开发页面
+
+```java
+	public static final String DEFAULT_PREFIX = "classpath:/templates/";
+
+	public static final String DEFAULT_SUFFIX = ".html";  //xxx.html
+
+```
+3.页面开发
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1 th:text="${msg}">哈哈</h1>
+<h2>
+    <a href="www.atguigu.com" th:href="${link}">去百度</a>  <br/>
+    <a href="www.atguigu.com" th:href="@{link}">去百度2</a>
+</h2>
+</body>
+</html>
+```
+##### 构建后台管理系统
+1、项目创建
+`thymeleaf、web-starter、devtools、lombok`
+
+2、静态资源处理
+自动配置好，我们只需要把所有静态资源放到 static 文件夹下
+3、路径构建
+`th:action="@{/login}"`
+
+4、模板抽取
+`th:insert/replace/include`
+
+5、页面跳转
+```java
+    @PostMapping("/login")
+    public String main(User user, HttpSession session, Model model){
+
+        if(StringUtils.hasLength(user.getUserName()) && "123456".equals(user.getPassword())){
+            //把登陆成功的用户保存起来
+            session.setAttribute("loginUser",user);
+            //登录成功重定向到main.html;  重定向防止表单重复提交
+            return "redirect:/main.html";
+        }else {
+            model.addAttribute("msg","账号密码错误");
+            //回到登录页面
+            return "login";
+        }
+
+    }
+```
+
+6.数据渲染
+
+```java
+    @GetMapping("/dynamic_table")
+    public String dynamic_table(Model model){
+        //表格内容的遍历
+        List<User> users = Arrays.asList(new User("zhangsan", "123456"),
+                new User("lisi", "123444"),
+                new User("haha", "aaaaa"),
+                new User("hehe ", "aaddd"));
+        model.addAttribute("users",users);
+
+        return "table/dynamic_table";
+    }
+```
+```html
+        <table class="display table table-bordered" id="hidden-table-info">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>用户名</th>
+            <th>密码</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="gradeX" th:each="user,stats:${users}">
+            <td th:text="${stats.count}">Trident</td>
+            <td th:text="${user.userName}">Internet</td>
+            <td >[[${user.password}]]</td>
+        </tr>
+        </tbody>
+        </table>
+```
+### 拦截器
+#### HandlerInterceptor 接口
+```java
+/**
+ * 登录检查
+ * 1、配置好拦截器要拦截哪些请求
+ * 2、把这些配置放在容器中
+ */
+@Slf4j
+public class LoginInterceptor implements HandlerInterceptor {
+
+    /**
+     * 目标方法执行之前
+     * @param request
+     * @param response
+     * @param handler
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
+        String requestURI = request.getRequestURI();
+        log.info("preHandle拦截的请求路径是{}",requestURI);
+
+        //登录检查逻辑
+        HttpSession session = request.getSession();
+
+        Object loginUser = session.getAttribute("loginUser");
+
+        if(loginUser != null){
+            //放行
+            return true;
+        }
+
+        //拦截住。未登录。跳转到登录页
+        request.setAttribute("msg","请先登录");
+//        re.sendRedirect("/");
+        request.getRequestDispatcher("/").forward(request,response);
+        return false;
+    }
+
+    /**
+     * 目标方法执行完成以后
+     * @param request
+     * @param response
+     * @param handler
+     * @param modelAndView
+     * @throws Exception
+     */
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+        log.info("postHandle执行{}",modelAndView);
+    }
+
+    /**
+     * 页面渲染以后
+     * @param request
+     * @param response
+     * @param handler
+     * @param ex
+     * @throws Exception
+     */
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        log.info("afterCompletion执行异常{}",ex);
+    }
+}
+```
+#### 配置拦截器
+
+```java
+/**
+ * 1、编写一个拦截器实现HandlerInterceptor接口
+ * 2、拦截器注册到容器中（实现WebMvcConfigurer的addInterceptors）
+ * 3、指定拦截规则【如果是拦截所有，静态资源也会被拦截】
+ */
+@Configuration
+public class AdminWebConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new LoginInterceptor())
+                .addPathPatterns("/**")  //所有请求都被拦截包括静态资源
+                .excludePathPatterns("/","/login","/css/**","/fonts/**","/images/**","/js/**"); //放行的请求
+    }
+}
+```
+#### 拦截器原理
+- 1、根据当前请求，找到HandlerExecutionChain【可以处理请求的handler以及handler的所有 拦截器】
+- 2、先来顺序执行 所有拦截器的 preHandle方法
+  - ● 1、如果当前拦截器prehandler返回为true。则执行下一个拦截器的preHandle
+  - ● 2、如果当前拦截器返回为false。直接    倒序执行所有已经执行了的拦截器的  afterCompletion；
+- 3、如果任何一个拦截器返回false。直接跳出不执行目标方法
+- 4、所有拦截器都返回True。执行目标方法
+- 5、倒序执行所有拦截器的postHandle方法。
+- 6、前面的步骤有任何异常都会直接倒序触发 afterCompletion
+- 7、页面成功渲染完成以后，也会倒序触发 afterCompletion
+
+### 文件上传
+#### 页面表单
+```html
+<form method="post" action="/upload" enctype="multipart/form-data">
+    <input type="file" name="file"><br>
+    <input type="submit" value="提交">
+</form>
+```
+#### 文件上传代码
+```java
+    /**
+     * MultipartFile 自动封装上传过来的文件
+     * @param email
+     * @param username
+     * @param headerImg
+     * @param photos
+     * @return
+     */
+    @PostMapping("/upload")
+    public String upload(@RequestParam("email") String email,
+                         @RequestParam("username") String username,
+                         @RequestPart("headerImg") MultipartFile headerImg,
+                         @RequestPart("photos") MultipartFile[] photos) throws IOException {
+
+        log.info("上传的信息：email={}，username={}，headerImg={}，photos={}",
+                email,username,headerImg.getSize(),photos.length);
+
+        if(!headerImg.isEmpty()){
+            //保存到文件服务器，OSS服务器
+            String originalFilename = headerImg.getOriginalFilename();
+            headerImg.transferTo(new File("H:\\cache\\"+originalFilename));
+        }
+
+        if(photos.length > 0){
+            for (MultipartFile photo : photos) {
+                if(!photo.isEmpty()){
+                    String originalFilename = photo.getOriginalFilename();
+                    photo.transferTo(new File("H:\\cache\\"+originalFilename));
+                }
+            }
+        }
 
 
+        return "main";
+    }
+```
+#### 自动配置原理
+文件上传自动配置类-`MultipartAutoConfiguration-MultipartProperties`
+- ● 自动配置好了 `StandardServletMultipartResolver`   【文件上传解析器】
+- ● 原理步骤
+  - ○ 1、请求进来使用文件上传解析器判断（`isMultipart`）并封装（resolveMultipart，返回`MultipartHttpServletRequest`）文件上传请求
+  - ○ 2、参数解析器来解析请求中的文件内容封装成`MultipartFile`
+  - ○ 3、将request中文件信息封装为一个Map；`MultiValueMap<String, MultipartFile>`
 
+`FileCopyUtils`。实现文件流的拷贝
 
+```java
+    @PostMapping("/upload")
+    public String upload(@RequestParam("email") String email,
+                         @RequestParam("username") String username,
+                         @RequestPart("headerImg") MultipartFile headerImg,
+                         @RequestPart("photos") MultipartFile[] photos)
+```
+### 异常处理
+#### 1、错误处理
+1、默认规则
+- ● 默认情况下，Spring Boot提供/error处理所有错误的映射
+- ● 对于机器客户端，它将生成JSON响应，其中包含错误，HTTP状态和异常消息的详细信息。对于浏览器客户端，响应一个“ whitelabel”错误视图，以HTML格式呈现相同的数据
+  
+2、 定制错误处理逻辑
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+- ● 自定义错误页
+  - ○ error/404.html   error/5xx.html；有精确的错误状态码页面就匹配精确，没有就找 4xx.html；如果都没有就触发白页
+- ● @ControllerAdvice+@ExceptionHandler处理全局异常；底层是 ExceptionHandlerExceptionResolver 支持的
+- ● @ResponseStatus+自定义异常 ；底层是 ResponseStatusExceptionResolver ，把responsestatus注解的信息底层调用 response.sendError(statusCode, resolvedReason)；tomcat发送的/error
+- ● Spring底层的异常，如 参数类型转换异常；DefaultHandlerExceptionResolver 处理框架底层的异常。
+  - ○ response.sendError(HttpServletResponse.SC_BAD_REQUEST, ex.getMessage());
