@@ -5117,13 +5117,24 @@ public class MyComHealthIndicator extends AbstractHealthIndicator {
 }
 ```
 
+类名前的名字就为健康监测的名称
+```json
+myCom: {
+    status: "UP",
+    details: {
+    code: 100,
+    ms: 100,
+    count: 1
+}
+},
+```
 
 
 #### 定制info信息
 
 常用两种方式：
 
-- 编写配置文件
+- 1编写配置文件
 
 ```yaml
 info:
@@ -5133,7 +5144,7 @@ info:
   mavenProjectVersion: @project.version@
 ```
 
-- 编写InfoContributor
+- 2编写InfoContributor
 
 ```java
 import java.util.Collections;
@@ -5195,7 +5206,8 @@ MeterBinder queueSize(Queue queue) {
 public class DockerEndpoint {
 
     @ReadOperation
-    public Map getDockerInfo(){
+    //  端点的读操作
+    public Map getDockerInfo(){//get相当于属性，不能传参
         return Collections.singletonMap("info","docker started...");
     }
 
@@ -5214,7 +5226,7 @@ public class DockerEndpoint {
 
 
 
-### 80、指标监控-Boot Admin Server
+###  可视化指标监控-Boot Admin Server
 
 [官方Github]()
 
@@ -5228,9 +5240,50 @@ public class DockerEndpoint {
 
 [开始使用方法](https://codecentric.github.io/spring-boot-admin/2.3.1/#getting-started)
 
+1、 新建SpringBoot项目，只选择web
+
+2、引入依赖
+
+```xml
+<dependency>
+    <groupId>de.codecentric</groupId>
+    <artifactId>spring-boot-admin-starter-server</artifactId>
+    <version>2.3.1</version>
+</dependency>
+```
+3、主类添加注解`@EnableAdminServer`,开启Admin的监控功能
+```java
+@EnableAdminServer
+@SpringBootApplication
+public class AdminInspectApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(AdminInspectApplication.class, args);
+    }
+
+}
+```
+4、 记得修改待监控应用不同的端口
+
+5、 注册客户端
+在要被监控的app里面引入
+```xml
+<dependency>
+    <groupId>de.codecentric</groupId>
+    <artifactId>spring-boot-admin-starter-client</artifactId>
+    <!-- <version>2.3.1</version> -->
+    <version>2.7.7</version>
+</dependency>
+
+<!-- 安全开发场景可不引入 -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+```
 ## 原理解析
 
-### 81、高级特性-Profile环境切换
+###  高级特性-Profile环境切换
 
 为了方便多环境适配，Spring Boot简化了profile功能。
 
@@ -5382,7 +5435,7 @@ spring.profiles.group.production[1]=prodmq
 
 
 
-### 82、高级特性-配置加载优先级
+###  高级特性-配置加载优先级
 
 #### 外部化配置
 
@@ -5442,7 +5495,7 @@ public class MyBean {
 
 
 
-### 83、高级特性-自定义starter细节
+###  高级特性-自定义starter细节
 
 #### starter启动原理
 
@@ -5695,7 +5748,7 @@ class HelloSpringBootStarterTestApplicationTests {
 
 
 
-### 84、原理解析-SpringApplication创建初始化流程
+###  原理解析-SpringApplication创建初始化流程
 
 #### SpringBoot启动过程
 
@@ -5804,7 +5857,7 @@ org.springframework.boot.liquibase.LiquibaseServiceLocatorApplicationListener
 
 
 
-#### 85、原理解析-SpringBoot完整启动过程
+####  原理解析-SpringBoot完整启动过程
 
 继续上一节，接着讨论`return new SpringApplication(primarySources).run(args)`的`run`方法
 
@@ -6162,7 +6215,7 @@ class SpringApplicationRunListeners {
 
 
 
-### 86、原理解析-自定义事件监听组件
+###  原理解析-自定义事件监听组件
 
 `MyApplicationContextInitializer.java`
 
@@ -6314,7 +6367,7 @@ org.springframework.boot.SpringApplicationRunListener=\
 
 
 
-### 87、后会有期
+###  后会有期
 
 > 路漫漫其修远兮，吾将上下而求索。
 
