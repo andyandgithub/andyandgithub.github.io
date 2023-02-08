@@ -9,11 +9,11 @@ toc: true
 # SpringSecurity从入门到精通
 
 用于资源保护，要求验证
-![image-20211215093906256](img/image-20211215093906256.png)
+![image-20211215093906256](/posts/img/image-20211215093906256.png)
 ## 0. 简介
 **Spring Security** 是 Spring 家族中的一个安全管理框架。相比与另外一个安全框架**Shiro**，它提供了更丰富的功能，社区资源也比Shiro丰富。
 一般来说中大型的项目都是使用**SpringSecurity** 来做安全框架。小项目有Shiro的比较多，因为相比与SpringSecurity，Shiro的上手更加的简单。
-
+__
  一般Web应用的需要进行**认证**和**授权**。
 
 **认证：验证当前访问系统的是不是本系统的用户，并且要确认具体是哪个用户**
@@ -105,7 +105,7 @@ public class HelloController {
 
 ### 2.1 登陆校验流程
 
-![image-20211215094003288](img/image-20211215094003288.png)
+![image-20211215094003288](/posts/img/image-20211215094003288.png)
 
 ### 2.2 原理初探
 
@@ -128,7 +128,7 @@ SpringSecurity的原理其实就是一个过滤器链，内部包含了提供各
 
 我们可以通过Debug查看当前系统中SpringSecurity过滤器链中有哪些过滤器及它们的顺序。
 
-![image-20211214145824903](img/image-20211214145824903.png)
+![image-20211214145824903](/posts/img/image-20211214145824903.png)
 
 
 
@@ -136,7 +136,7 @@ SpringSecurity的原理其实就是一个过滤器链，内部包含了提供各
 
 #### 2.2.2 认证流程详解
 
-![image-20211214151515385](img/image-20211214151515385.png)
+![image-20211214151515385](/posts/img/image-20211214151515385.png)
 
 概念速查:
 
@@ -1034,7 +1034,7 @@ public class LoginUser implements UserDetails {
 
 注意：如果要测试，需要往用户表中写入用户数据，并且如果你想让用户的密码是明文存储，需要在密码前加{noop}。例如
 
-![image-20211216123945882](img/image-20211216123945882.png)
+![image-20211216123945882](/posts/img/image-20211216123945882.png)
 
 这样登陆的时候就可以用sg作为用户名，1234作为密码来登陆了。
 
@@ -1505,7 +1505,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 ​	RBAC权限模型（Role-Based Access Control）即：基于角色的权限控制。这是目前最常被开发者使用也是相对易用、通用权限模型。
 
-​	![image-20211222110249727](img/image-20211222110249727.png)
+​	![image-20211222110249727](/posts/img/image-20211222110249727.png)
 
 ##### 3.2.3.2 准备工作
 
