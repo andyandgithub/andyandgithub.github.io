@@ -223,3 +223,11 @@ sorted(list,key=takeSecond)
 sorted(dist);#默认安装key排序
 sorted(key_value.items(), key = lambda kv:(kv[1], kv[0]))#先按照value排序再按照key排序
 ```
+
+
+# pyqt问题
+## RuntimeError: wrapped C/C++ object of type QMdiArea() has been deleted
+
+一般将该组件设置为self类组件就可以避免在函数运行结束后被删除
+
+有的控件如果使用被占据的话，在某个函数中调用类得组件就会出现该问题
