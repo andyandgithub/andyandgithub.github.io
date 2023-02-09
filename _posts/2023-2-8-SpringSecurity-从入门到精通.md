@@ -158,27 +158,27 @@ UserDetails接口：提供核心用户信息。通过UserDetailsService根据用
 
 登录
 
-​	①自定义登录接口  
+①自定义登录接口  
 
-​				调用ProviderManager的方法进行认证 如果认证通过生成jwt
+调用`ProviderManager`的方法进行认证 如果认证通过生成jwt
 
-​				把用户信息存入redis中
+把用户信息存入`redis`中
 
-​	②自定义UserDetailsService 
+②自定义`UserDetailsService `
 
-​				在这个实现类中去查询数据库
+在这个实现类中去查询数据库
 
 校验：
 
-​	①定义Jwt认证过滤器
+①定义Jwt认证过滤器
 
-​				获取token
+获取`token`
 
-​				解析token获取其中的userid
+解析token获取其中的userid
 
-​				从redis中获取用户信息
+从redis中获取用户信息
 
-​				存入SecurityContextHolder
+存入`SecurityContextHolder`
 
 #### 2.3.2 准备工作
 
@@ -490,6 +490,12 @@ public class JwtUtil {
 ```
 
 ```java
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.BoundSetOperations;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -892,14 +898,14 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
 ```
 
-​		定义Mapper接口
+		定义Mapper接口
 
 ```java
 public interface UserMapper extends BaseMapper<User> {
 }
 ```
 
-​		修改User实体类
+		修改User实体类
 
 ```java
 类名上加@TableName(value = "sys_user") ,id字段上加 @TableId
@@ -931,7 +937,7 @@ public class SimpleSecurityApplication {
 
 ```java
 /**
- * @Author 三更  B站： https://space.bilibili.com/663528522
+ * @Author andy  B站： https://space.bilibili.com/663528522
  */
 @SpringBootTest
 public class MapperTest {
