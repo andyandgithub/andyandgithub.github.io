@@ -1,12 +1,12 @@
 ---
 layout: post 
-title: SpringSecurity从入门到精通 
+title: SpringSecurity 学习 
 categories: study 
 tags : java 
 toc: true
 ---
 
-# SpringSecurity从入门到精通
+# SpringSecurity学习
 
 用于资源保护，要求验证
 ![image-20211215093906256](../images/_posts/2023-2-8-SpringSecurity-从入门到精通/image-20211215093906256.png)
@@ -1000,7 +1000,7 @@ public class LoginUser implements UserDetails {
 
 ![image-20211216123945882](../images/_posts/2023-2-8-SpringSecurity-从入门到精通/image-20211216123945882.png)
 
-这样登陆的时候就可以用sg作为用户名，1234作为密码来登陆了。
+这样登陆的时候就可以用jack作为用户名，1234作为密码来登陆了。
 
 ##### 2.3.3.2 密码加密存储
 
@@ -1269,29 +1269,29 @@ public class LoginServiceImpl implements LoginServcie {
 
 ### 3.0 权限系统的作用
 
- 	例如一个学校图书馆的管理系统，如果是普通学生登录就能看到借书还书相关的功能，不可能让他看到并且去使用添加书籍信息，删除书籍信息等功能。但是如果是一个图书馆管理员的账号登录了，应该就能看到并使用添加书籍信息，删除书籍信息等功能。
+例如一个学校图书馆的管理系统，如果是普通学生登录就能看到借书还书相关的功能，不可能让他看到并且去使用添加书籍信息，删除书籍信息等功能。但是如果是一个图书馆管理员的账号登录了，应该就能看到并使用添加书籍信息，删除书籍信息等功能。
 
- 	总结起来就是**不同的用户可以使用不同的功能**。这就是权限系统要去实现的效果。
+总结起来就是**不同的用户可以使用不同的功能**。这就是权限系统要去实现的效果。
 
- 	我们不能只依赖前端去判断用户的权限来选择显示哪些菜单哪些按钮。因为如果只是这样，如果有人知道了对应功能的接口地址就可以不通过前端，直接去发送请求来实现相关功能操作。
+我们不能只依赖前端去判断用户的权限来选择显示哪些菜单哪些按钮。因为如果只是这样，如果有人知道了对应功能的接口地址就可以不通过前端，直接去发送请求来实现相关功能操作。
 
- 	所以我们还需要在后台进行用户权限的判断，判断当前用户是否有相应的权限，必须具有所需权限才能进行相应的操作。
+所以我们还需要在后台进行用户权限的判断，判断当前用户是否有相应的权限，必须具有所需权限才能进行相应的操作。
 
 ### 3.1 授权基本流程
 
- 	在SpringSecurity中，会使用默认的FilterSecurityInterceptor来进行权限校验。在FilterSecurityInterceptor中会从SecurityContextHolder获取其中的Authentication，然后获取其中的权限信息。当前用户是否拥有访问当前资源所需的权限。
+在SpringSecurity中，会使用默认的FilterSecurityInterceptor来进行权限校验。在FilterSecurityInterceptor中会从SecurityContextHolder获取其中的Authentication，然后获取其中的权限信息。当前用户是否拥有访问当前资源所需的权限。
 
- 	所以我们在项目中只需要把当前登录用户的权限信息也存入Authentication。
+所以我们在项目中只需要把当前登录用户的权限信息也存入Authentication。
 
- 	然后设置我们的资源所需要的权限即可。
+然后设置我们的资源所需要的权限即可。
 
 ### 3.2 授权实现
 
 #### 3.2.1 限制访问资源所需权限
 
- 	SpringSecurity为我们提供了基于注解的权限控制方案，这也是我们项目中主要采用的方式。我们可以使用注解去指定访问对应的资源所需的权限。
+SpringSecurity为我们提供了基于注解的权限控制方案，这也是我们项目中主要采用的方式。我们可以使用注解去指定访问对应的资源所需的权限。
 
- 	但是要使用它我们需要先开启相关配置。
+但是要使用它我们需要先开启相关配置。
 
 ```java
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -1356,6 +1356,7 @@ public class LoginUser implements UserDetails {
 
     //存储SpringSecurity所需要的权限信息的集合
     @JSONField(serialize = false)
+    //GrandtedAuthority不是单纯的pojoJava类无法北序列化，序列化permission就可以，因此json序列化将其忽略
     private List<GrantedAuthority> authorities;
 
     @Override
@@ -1670,7 +1671,7 @@ public interface MenuMapper extends BaseMapper<Menu> {
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.sangeng.mapper.MenuMapper">
+<mapper namespace="com.andy.mapper.MenuMapper">
 
 
     <select id="selectPermsByUserId" resultType="java.lang.String">
@@ -1694,9 +1695,9 @@ public interface MenuMapper extends BaseMapper<Menu> {
 ```yaml
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/sg_security?characterEncoding=utf-8&serverTimezone=UTC
-    username: root
-    password: root
+    url: jdbc:mysql://localhost:3306/spring_security?characterEncoding=utf-8&serverTimezone=UTC
+    username: boss
+    password: boss
     driver-class-name: com.mysql.cj.jdbc.Driver
   redis:
     host: localhost
@@ -1872,19 +1873,15 @@ protected void configure(HttpSecurity http)throws Exception{
 
 ### 其它权限校验方法
 
- 	我们前面都是使用@PreAuthorize注解，然后在在其中使用的是hasAuthority方法进行校验。SpringSecurity还为我们提供了其它方法例如：hasAnyAuthority，hasRole，hasAnyRole等。
+我们前面都是使用`@PreAuthorize`注解，然后在在其中使用的是`hasAuthority`方法进行校验。SpringSecurity还为我们提供了其它方法例如：`hasAnyAuthority，hasRole，hasAnyRole`等。
 
-     
+这里我们先不急着去介绍这些方法，我们先去理解hasAuthority的原理，然后再去学习其他方法你就更容易理解，而不是死记硬背区别。并且我们也可以选择定义校验方法，实现我们自己的校验逻辑。
 
- 	这里我们先不急着去介绍这些方法，我们先去理解hasAuthority的原理，然后再去学习其他方法你就更容易理解，而不是死记硬背区别。并且我们也可以选择定义校验方法，实现我们自己的校验逻辑。
+hasAuthority方法实际是执行到了`SecurityExpressionRoot`的`hasAuthority`，大家只要断点调试既可知道它内部的校验原理。
 
- 	hasAuthority方法实际是执行到了SecurityExpressionRoot的hasAuthority，大家只要断点调试既可知道它内部的校验原理。
+它内部其实是调用authentication的getAuthorities方法获取用户的权限列表。然后判断我们存入的方法参数数据在权限列表中。
 
- 	它内部其实是调用authentication的getAuthorities方法获取用户的权限列表。然后判断我们存入的方法参数数据在权限列表中。
-
-
-
- 	hasAnyAuthority方法可以传入多个权限，只有用户有其中任意一个权限都可以访问对应资源。
+hasAnyAuthority方法可以传入多个权限，只有用户有其中任意一个权限都可以访问对应资源。
 
 ```java
     @PreAuthorize("hasAnyAuthority('admin','test','system:dept:list')")
@@ -1893,22 +1890,22 @@ public String hello(){
         }
 ```
 
- 	hasRole要求有对应的角色才可以访问，但是它内部会把我们传入的参数拼接上 **ROLE_** 后再去比较。所以这种情况下要用用户对应的权限也要有 **ROLE_** 这个前缀才可以。
+`hasRole`要求有对应的角色才可以访问，但是它内部会把我们传入的参数拼接上 **ROLE_** 后再去比较。所以这种情况下要用用户对应的权限也要有 **ROLE_** 这个前缀才可以。
 
 ```java
-    @PreAuthorize("hasRole('system:dept:list')")
+@PreAuthorize("hasRole('system:dept:list')")
 public String hello(){
-        return"hello";
-        }
+    return"hello";
+}
 ```
 
  	hasAnyRole 有任意的角色就可以访问。它内部也会把我们传入的参数拼接上 **ROLE_** 后再去比较。所以这种情况下要用用户对应的权限也要有 **ROLE_** 这个前缀才可以。
 
 ```java
-    @PreAuthorize("hasAnyRole('admin','system:dept:list')")
+@PreAuthorize("hasAnyRole('admin','system:dept:list')")
 public String hello(){
         return"hello";
-        }
+}
 ```
 
 ### 自定义权限校验方法
@@ -1920,18 +1917,18 @@ public String hello(){
 @Component("ex")
 public class SGExpressionRoot {
 
-    public boolean hasAuthority(String authority) {
-        //获取当前用户的权限
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        LoginUser loginUser = (LoginUser) authentication.getPrincipal();
-        List<String> permissions = loginUser.getPermissions();
-        //判断用户权限集合中是否存在authority
-        return permissions.contains(authority);
+  n  public boolean hasAuthority(String authority) {
+            //获取当前用户的权限
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            LoginUser loginUser = (LoginUser) authentication.getPrincipal();
+            List<String> permissions = loginUser.getPermissions();
+            //判断用户权限集合中是否存在authority
+            return permissions.contais(authority);
     }
 }
 ```
 
- 	 在SPEL表达式中使用 @ex相当于获取容器中bean的名字未ex的对象。然后再调用这个对象的hasAuthority方法
+ 在SPEL表达式中使用 `@ex`相当于获取容器中bean的名字未ex的对象。然后再调用这个对象的`hasAuthority`方法
 
 ```java
     @RequestMapping("/hello")
@@ -1943,7 +1940,7 @@ public String hello(){
 
 ### 基于配置的权限控制
 
- 	我们也可以在配置类中使用使用配置的方式对资源进行权限控制。
+我们也可以在配置类中使用使用配置的方式对资源进行权限控制。
 
 ```java
     @Override
@@ -1977,13 +1974,13 @@ protected void configure(HttpSecurity http)throws Exception{
 
 ### CSRF
 
- 	CSRF是指跨站请求伪造（Cross-site request forgery），是web常见的攻击之一。
+CSRF是指跨站请求伪造（Cross-site request forgery），是web常见的攻击之一。
 
- 	https://blog.csdn.net/freeking101/article/details/86537087
+https://blog.csdn.net/freeking101/article/details/86537087
 
- 	SpringSecurity去防止CSRF攻击的方式就是通过csrf_token。后端会生成一个csrf_token，前端发起请求的时候需要携带这个csrf_token,后端会有过滤器进行校验，如果没有携带或者是伪造的就不允许访问。
+SpringSecurity去防止CSRF攻击的方式就是通过csrf_token。后端会生成一个csrf_token，前端发起请求的时候需要携带这个csrf_token,后端会有过滤器进行校验，如果没有携带或者是伪造的就不允许访问。
 
- 	我们可以发现CSRF攻击依靠的是cookie中所携带的认证信息。但是在前后端分离的项目中我们的认证信息其实是token，而token并不是存储中cookie中，并且需要前端代码去把token设置到请求头中才可以，所以CSRF攻击也就不用担心了。
+我们可以发现CSRF攻击依靠的是cookie中所携带的认证信息。但是在前后端分离的项目中我们的认证信息其实是token，而token并不是存储中cookie中，并且需要前端代码去把token设置到请求头中才可以，所以CSRF攻击也就不用担心了。
 
 ### 认证成功处理器
 

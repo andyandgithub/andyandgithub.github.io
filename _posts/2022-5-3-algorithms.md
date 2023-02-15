@@ -810,7 +810,7 @@ for(int i=0;i<nums.length;i++){
 时间复杂度不太好计算，可以近似为O(log(max(a, b)))，但是取模运算性能较差
 ```java
 public int gcd(int a,int b){
-    return b==0:a:gcd(b,a%b);
+    return (b==0)?a:gcd(b,a%b);
 }
 ```
 #### 更相减损术
@@ -819,11 +819,11 @@ public int gcd(int a,int b){
 public int gcd(int a,int b){
     if(a==b){
         return a;
-    }
+    }else 
     if(a>b){
         return gcd(a-b,b);
     }
-    if(a<b){
+    else if(a<b){
         return gcd(b-a,a);
     }
 
