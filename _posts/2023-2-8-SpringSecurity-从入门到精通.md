@@ -212,7 +212,7 @@ import java.nio.charset.Charset;
 /**
  * Redis使用FastJson序列化
  *
- * @author sg
+ * @author andy
  */
 public class FastJsonRedisSerializer<T> implements RedisSerializer<T> {
 
@@ -376,7 +376,7 @@ public class JwtUtil {
     //有效期为
     public static final Long JWT_TTL = 60 * 60 * 1000L;// 60 * 60 *1000  一个小时
     //设置秘钥明文
-    public static final String JWT_KEY = "sangeng";
+    public static final String JWT_KEY = "andy";
 
     public static String getUUID() {
         String token = UUID.randomUUID().toString().replaceAll("-", "");
@@ -417,7 +417,7 @@ public class JwtUtil {
         return Jwts.builder()
                 .setId(uuid)              //唯一的ID
                 .setSubject(subject)   // 主题  可以是JSON数据
-                .setIssuer("sg")     // 签发者
+                .setIssuer("andy")     // 签发者
                 .setIssuedAt(now)      // 签发时间
                 .signWith(signatureAlgorithm, secretKey) //使用HS256对称加密算法签名, 第二个参数为秘钥
                 .setExpiration(expDate);
@@ -851,7 +851,7 @@ CREATE TABLE `sys_user`
 ```yml
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/sg_security?characterEncoding=utf-8&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/andy_security?characterEncoding=utf-8&serverTimezone=UTC
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -875,7 +875,7 @@ public interface UserMapper extends BaseMapper<User> {
 ```java
 
 @SpringBootApplication
-@MapperScan("com.sangeng.mapper")
+@MapperScan("com.andy.mapper")
 public class SimpleSecurityApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext run = SpringApplication.run(SimpleSecurityApplication.class);
@@ -1006,13 +1006,13 @@ public class LoginUser implements UserDetails {
 
 实际项目中我们不会把密码明文存储在数据库中。
 
-默认使用的PasswordEncoder要求数据库中的密码格式为：{id}password 。它会根据id去判断密码的加密方式。但是我们一般不会采用这种方式。所以就需要替换PasswordEncoder。
+默认使用的`PasswordEncoder`要求数据库中的密码格式为：`{id}password` 。它会根据id去判断密码的加密方式。但是我们一般不会采用这种方式。所以就需要替换`PasswordEncoder`。
 
-我们一般使用SpringSecurity为我们提供的BCryptPasswordEncoder。
+我们一般使用`SpringSecurity`为我们提供的`BCryptPasswordEncoder`。
 
-我们只需要使用把BCryptPasswordEncoder对象注入Spring容器中，SpringSecurity就会使用该PasswordEncoder来进行密码校验。
+我们只需要使用把`BCryptPasswordEncoder`对象注入Spring容器中，SpringSecurity就会使用该`PasswordEncoder`来进行密码校验。
 
-我们可以定义一个SpringSecurity的配置类，SpringSecurity要求这个配置类要继承WebSecurityConfigurerAdapter。
+我们可以定义一个SpringSecurity的配置类，SpringSecurity要求这个配置类要继承`WebSecurityConfigurerAdapter`。
 
 ```java
 /**
@@ -1464,10 +1464,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 ```sql
 
 CREATE
-DATABASE /*!32312 IF NOT EXISTS*/`sg_security` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
+DATABASE /*!32312 IF NOT EXISTS*/`andy_security` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
 
 USE
-`sg_security`;
+`andy_security`;
 
 /*Table structure for table `sys_menu` */
 
@@ -1740,15 +1740,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
 ## 4. 自定义失败处理
 
- 	我们还希望在认证失败或者是授权失败的情况下也能和我们的接口一样返回相同结构的json，这样可以让前端能对响应进行统一的处理。要实现这个功能我们需要知道SpringSecurity的异常处理机制。
+我们还希望在认证失败或者是授权失败的情况下也能和我们的接口一样返回相同结构的json，这样可以让前端能对响应进行统一的处理。要实现这个功能我们需要知道SpringSecurity的异常处理机制。
 
- 	在SpringSecurity中，如果我们在认证或者授权的过程中出现了异常会被ExceptionTranslationFilter捕获到。在ExceptionTranslationFilter中会去判断是认证失败还是授权失败出现的异常。
+在`SpringSecurity`中，如果我们在认证或者授权的过程中出现了异常会被`ExceptionTranslationFilter`捕获到。在`ExceptionTranslationFilter`中会去判断是认证失败还是授权失败出现的异常。
 
- 	如果是认证过程中出现的异常会被封装成AuthenticationException然后调用**AuthenticationEntryPoint**对象的方法去进行异常处理。
+如果是认证过程中出现的异常会被封装成`AuthenticationException`然后调用**AuthenticationEntryPoint**对象的方法去进行异常处理。
 
- 	如果是授权过程中出现的异常会被封装成AccessDeniedException然后调用**AccessDeniedHandler**对象的方法去进行异常处理。
+如果是授权过程中出现的异常会被封装成`AccessDeniedException`然后调用**AccessDeniedHandler**对象的方法去进行异常处理。
 
- 	所以如果我们需要自定义异常处理，我们只需要自定义AuthenticationEntryPoint和AccessDeniedHandler然后配置给SpringSecurity即可。
+所以如果我们需要自定义异常处理，我们只需要自定义`AuthenticationEntryPoint`和`AccessDeniedHandler`然后配置给SpringSecurity即可。
 
 ①自定义实现类
 
@@ -1915,9 +1915,10 @@ public String hello(){
 ```java
 
 @Component("ex")
-public class SGExpressionRoot {
+//起一个别名
+public class AndyExpressionRoot {
 
-  n  public boolean hasAuthority(String authority) {
+    public boolean hasAuthority(String authority) {
             //获取当前用户的权限
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             LoginUser loginUser = (LoginUser) authentication.getPrincipal();
@@ -1935,7 +1936,7 @@ public class SGExpressionRoot {
 @PreAuthorize("@ex.hasAuthority('system:dept:list')")
 public String hello(){
         return"hello";
-        }
+}
 ```
 
 ### 基于配置的权限控制
@@ -1984,14 +1985,14 @@ SpringSecurity去防止CSRF攻击的方式就是通过csrf_token。后端会生�
 
 ### 认证成功处理器
 
- 	实际上在UsernamePasswordAuthenticationFilter进行登录认证的时候，如果登录成功了是会调用AuthenticationSuccessHandler的方法进行认证成功后的处理的。AuthenticationSuccessHandler就是登录成功处理器。
+实际上在`UsernamePasswordAuthenticationFilter`进行登录认证的时候，如果登录成功了是会调用`AuthenticationSuccessHandler`的方法进行认证成功后的处理的。`AuthenticationSuccessHandler`就是登录成功处理器。
 
- 	我们也可以自己去自定义成功处理器进行成功后的相应处理。
+我们也可以自己去自定义成功处理器进行成功后的相应处理。
 
 ```java
 
 @Component
-public class SGSuccessHandler implements AuthenticationSuccessHandler {
+public class AndySuccessHandler implements AuthenticationSuccessHandler {
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -2011,6 +2012,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        //登录表单
         http.formLogin().successHandler(successHandler);
 
         http.authorizeRequests().anyRequest().authenticated();
@@ -2028,7 +2030,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 ```java
 
 @Component
-public class SGFailureHandler implements AuthenticationFailureHandler {
+public class AndyFailureHandler implements AuthenticationFailureHandler {
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         System.out.println("认证失败了");
@@ -2066,7 +2068,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 ```java
 
 @Component
-public class SGLogoutSuccessHandler implements LogoutSuccessHandler {
+public class AndyLogoutSuccessHandler implements LogoutSuccessHandler {
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         System.out.println("注销成功");
@@ -2109,5 +2111,3 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 ### 其他认证方案畅想
 
 ## 7. 源码讲解
-
- 	投票过50更新源码讲解
