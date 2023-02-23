@@ -858,6 +858,22 @@ public int gcd(int a,int b){
 }
 ```
 
+## 格雷码 
+
+格雷码，相邻的码之间只有一个位不同
+
+000，001，011，010，110，100，101，111
+
+求格雷码
+```java
+int n;
+int m=(1<<n);
+List<Integer> res=new ArrayList<>(m);
+for(int i=0;i<m;i++){
+    res.add(i^(i>>1));
+}
+
+```
 
 
 

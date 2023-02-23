@@ -111,12 +111,14 @@ server:
 ```
 ## yml
 ### yml语法
+
 - 大小写敏感
 - 数据值前边必须有空格，作为分隔符
 - 使用缩进表示层级关系
 - 缩进时不允许使用Tab键，只允许使用空格（各个系统 Tab对应的空格数目可能不同，导致层次混乱）。
 - 缩进的空格数目不重要，只要相同层级的元素左侧对齐即可
-- ''#" 表示注释，从这个字符一直到行尾，都会被解析器忽略
+- `#` 表示注释，从这个字符一直到行尾，都会被解析器忽略
+
 ### yml数据
 对象(map)：键值对的集合。
 ```yml
@@ -125,7 +127,7 @@ person:
 ```
 
 行内写法
-person: {name: tom}
+`person: {name: tom}`
 数组：一组按次序排列的值
 ```yml
 address:
@@ -134,7 +136,7 @@ address:
 ```
 
 行内写法
-address: [beijing,shanghai]
+`address: [beijing,shanghai]`
 纯量：单个的、不可再分的值
 ```yml
 msg1: 'hello \n world'  # 单引忽略转义字符
@@ -154,7 +156,7 @@ name1: tony
 person:
   name: tom
 ```
-1 @Value
+1 `@Value`
 ```java
 import org.springframework.beans.factory.annotation.Value;
 
@@ -167,7 +169,7 @@ System.out.println(name);
 String a;
 ```
 
-2Environment
+2 `Environment`
 ```java
 @Autowired
 private Environment env;
@@ -277,8 +279,10 @@ java -jar xxxx.jar --spring.profiles.active=dev
 - classpath:/config/：classpath的/config目录
 
 - classpath:/ ：classpath的根目录（../src/maini/resource）
+
 外部配置文件
 命令行
+
 ```shell
 java -jar myproject.jar --spring.config.location=d://application.properties
 java -jar app.jar --name="Spring“ --server.port=9000
@@ -295,14 +299,14 @@ import org.springframework.stereotype.Component;
 
 @Autowired//从springboot管理的容器中取值
 @Component//表示被springboot管理,把类注入到spring容器中
-@Mapper//将mapper放到容器当中,@Mapper注解是识别他为mybatis的mapper接口，会自动的把 加@Mapper 注解的接口生成动态代理类。
+@Mapper//将mapper放到容器当中,@Mapper注解是识别它为mybatis的mapper接口，会自动的把 加@Mapper 注解的接口生成动态代理类。
 
-@JsonIgnore //在entity类中使用该字段例如password使得前端接收不到
+@JsonIgnore //在entity类中使用该字段例如password会使得前端接收不到
 ```
 # 前后端交互
 ## 返回Json数据
 
-在 Controller 类上面用 @RestController 定义或者在方法上面用 @ResponseBody 定义，表明是在 Body 区域输出数据。
+在 Controller 类上面用 `@RestController` 定义或者在方法上面用` @ResponseBody` 定义，表明是在 `Body` 区域输出数据。
 
 
 ```java
@@ -337,10 +341,10 @@ Map<String,Object> getpages(){
         return "login"+username+password;
 }
 ```
-@PathVaribale 获取url中的数据
-@RequestParam 获取请求参数的值
-@GetMapping 组合注解，是 @RequestMapping(method = RequestMethod.GET) 的缩写
-@RequestBody 利用一个对象去获取前端传过来的数
+`@PathVaribale` 获取url中的数据
+`@RequestParam` 获取请求参数的值
+`@GetMapping` 组合注解，是` @RequestMapping(method = RequestMethod.GET)` 的缩写
+`@RequestBody` 利用一个对象去获取前端传过来的数
 
 ## 文件传递和展示
 ### 后端路由直接展示图片
@@ -436,7 +440,7 @@ public class UserServiceTest {
     }
 }
 ```
-# 数据接口swagge
+# 数据接口swagger
 依赖
 ```xml
 <dependency>
@@ -450,7 +454,7 @@ public class UserServiceTest {
             <version>2.8.0</version>
         </dependency>
 ```
-SaggerConfig。java
+SaggerConfig.java
 ```java
 package com.config
 import org.springframework.context.annotation.Bean;
@@ -597,8 +601,9 @@ spring:
         format_sql: true  # 输出多个对象时候换行‘
 ```
 ### 基本使用
-entity/user.java
+`entity/user.java`
 字段与数据库保持一致
+
 ```java
 @Entity
 @Data //lombook的注解
@@ -609,9 +614,10 @@ public class User{
     private String author;
 }
 ```
-repository/UserrePository.class之下
+`repository/UserrePository.class`之下
 ```java
 public UserRepository extends JpaRepository<User,int>{
+    // 它管理的实体的类型和Id字段的类型
 
 }
 ```
@@ -633,6 +639,7 @@ userRepository.findAll();//查询全部数据
 ```
 ## mybatis
 1. 引入依赖
+   
 ```xml
 <dependencies>
         <dependency>
@@ -656,6 +663,7 @@ userRepository.findAll();//查询全部数据
 
 2. 定义表和实体类
 3. 添加yml配置
+   
 ```yaml
 spring:
     datasource:
@@ -763,7 +771,9 @@ int insert(User user);
 @Delete("delete from sys_user where id=#{id}")
     Integer deleteById(@Param("id") Integer id);
 ```
-###查询
+
+### 查询
+
 ```java
     @Select("select count(*) from sys_user where username like concat('%',  #{username}, '%') and " +
         "address like concat('%',  #{address}, '%') and email like concat('%',  #{email}, '%');")
@@ -780,7 +790,7 @@ int insert(User user);
     int  update(User user);
 ```
 xml 方式可以实行按字段动态的更新
-在resource/mapper/User.xml
+在`resource/mapper/User.xml`
 ```xml
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
@@ -854,7 +864,9 @@ public interface UserXmlMapper {
 
 
 ## mybatis-plus
+
 不需要写sql了
+
 依赖
 ```xml
  <dependency>
@@ -865,7 +877,7 @@ public interface UserXmlMapper {
 ```
 
 配置
-config/MybatisPlusConfig.java
+`config/MybatisPlusConfig.java`
 
 ```java
 package com.config;
@@ -880,6 +892,7 @@ import org.springframework.context.annotation.Configuration;
 public class MyBatisPlusConfig {
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
+        //配置分页拦截器
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
         interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL);
         return interceptor;
@@ -889,7 +902,7 @@ public class MyBatisPlusConfig {
 
 
 `@Mapper`注解，目的就是为了不再写mapper映射文件，在mapper类之前加上
-或者使用`MapperScan`
+或者使用`MapperScan`在application主应用上面
 ```java
 @MapperScan("scan.your.mapper.package")
 
@@ -1090,7 +1103,8 @@ System.out.println("query: " + query + " | andQuery: " + result);
         }
     }
 ```
-####分页查询
+
+#### 分页查询
 
 ```java
 /**
