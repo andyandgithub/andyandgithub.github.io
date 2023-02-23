@@ -1267,22 +1267,26 @@ public class User {
     private String phone;
 }
 ```
-@NoArgsConstructor
-@AllArgsConstructor
+`@NoArgsConstructor`  添加无参构造函数
+`@AllArgsConstructor` 添加全部参数的构造函数
 
 
 # 自动配置
 ## condition
 SpringBoot 提供的常用条件注解：
 
-- ConditionalOnProperty：判断配置文件中是否有对应属性和值才初始化Bean
+- `ConditionalOnProperty`：判断配置文件中是否有对应属性和值才初始化Bean
 
-- ConditionalOnClass：判断环境中是否有对应字节码文件才初始化Bean
+-` ConditionalOnClass`：判断环境中是否有对应字节码文件才初始化Bean
 
-- ConditionalOnMissingBean：判断环境中没有对应Bean才初始化Bean
+- `ConditionalOnMissingBean`：判断环境中没有对应Bean才初始化Bean
+
+
 ## 切换内置服务器
 tomcat(默认),jetty,netty
+
 pom文件中的排除依赖效果
+
 ```xml
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -1302,30 +1306,33 @@ pom文件中的排除依赖效果
     <groupId>org.springframework.boot</groupId>
 </dependency>
 ```
+
 > 问你：为什么引入了starter-data-redis，我们就能项目中，直接拿redistemplate?
 
-> springboot中的autoconfig工程里把常用的对象的配置类都有了，只要工程中，引入了相关起步依赖，这些对象在我们本项目的容器中就有了。
+springboot中的autoconfig工程里把常用的对象的配置类都有了，只要工程中，引入了相关starter依赖，这些对象在我们本项目的容器中就有了。
+
 
 ## 引入第三方jar包
 
 三种解决方案：
 
-1. 使用@ComponentScan扫描com.ydlclass.config包
+1. 使用`@ComponentScan`扫描com.ydlclass.config包
 
-2. 可以使用@Import注解，加载类。这些类都会被Spring创建，并放入IOC容器
+2. 可以使用`@Import`注解，加载类。这些类都会被Spring创建，并放入IOC容器
 
-3. 可以对Import注解进行封装。
+3. 可以对`@Import`注解进行封装。
 
 重点：Enable注解底层原理是使用@Import注解实现Bean的动态加载
 
-重要：springbootapplication 由三个注解组成
+重要：SpringbootApplication 由三个注解组成
 
-@SpringBootConfiguration 自动配置相关
-@EnableAutoConfiguration
-@ComponentScan 扫本包及子包
+`@SpringBootConfiguration` 自动配置相关
+`@EnableAutoConfiguration`
+`@ComponentScan` 扫本包及子包
 
 
-pom中引入springboot-enable-other
+pom中引入`springboot-enable-other`
+
 ```xml
 
  	<dependency>
@@ -1334,25 +1341,27 @@ pom中引入springboot-enable-other
           <version>0.0.1-SNAPSHOT</version>
     </dependency>
 ```
-## import用法
-@Enable底层依赖于@Import注解导入一些类，使用@Import导入的类会被Spring加载到IOC容器中。而@Import提供4中用法：
 
-①导入Bean。注意bean名字是全限定名
+## import用法
+`@Enable`底层依赖于`@Import`注解导入一些类，使用`@Import`导入的类会被Spring加载到IOC容器中。而@Import提供4中用法：
+
+导入Bean。注意bean名字是全限定名
+
 ```java
 @Import(User.class)
 
 ```
-②导入配置类
+导入配置类
 
-③导入 ImportSelector 实现类。一般用于加载配置文件中的类
+导入 `ImportSelecto`r 实现类。一般用于加载配置文件中的类
 
-④导入 ImportBeanDefinitionRegistrar 实现类。
+④导入 `ImportBeanDefinitionRegistrar` 实现类。
 
-导入Bean @Import(User.class)
+导入Bean `@Import(User.class)`
 
-导入配置类 @Import(UserConfig.class)
+导入配置类` @Import(UserConfig.class)`
 
-导入 ImportSelector 实现类 @Import(MyImportSelector.class)
+导入 ImportSelector 实现类` @Import(MyImportSelector.class)`
 
 MyImportSelector
 
