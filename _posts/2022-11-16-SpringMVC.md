@@ -243,10 +243,10 @@ public String index(){
         }
 
 @RequestMapping("/test/a")
-publicvoid index(){
+public void index(){
 //设置视图名称
 
-        }
+}
 //默认无返回值会去寻找/test/a.html
 ```
 
@@ -272,8 +272,8 @@ publicvoid index(){
 ```java
 @RequestMapping("/hello")
 public String HelloWorld(){
-        return"target";
-        }
+    return"target";
+}
 
 ```
 
@@ -291,9 +291,9 @@ public String HelloWorld(){
 
 ## @RequestMapping注解的位置
 
-@RequestMapping标识一个类：设置映射请求的请求路径的初始信息
+`@RequestMapping`标识一个类：设置映射请求的请求路径的初始信息
 
-@RequestMapping标识一个方法：设置映射请求请求路径的具体信息
+`@RequestMapping`标识一个方法：设置映射请求请求路径的具体信息
 
 ```java
 
@@ -354,19 +354,19 @@ public String testRequestMapping(){
 
 注： 1、对于处理指定请求方式的控制器方法，SpringMVC中提供了@RequestMapping的派生注解
 
-- 处理get请求的映射-->@GetMapping
-- 处理post请求的映射-->@PostMapping
-- 处理put请求的映射-->@PutMapping
-- 处理delete请求的映射-->@DeleteMapping
+- 处理get请求的映射-->`@GetMapping`
+- 处理post请求的映射-->`@PostMapping`
+- 处理put请求的映射-->`@PutMapping`
+- 处理delete请求的映射-->`@DeleteMapping`
 
 2、常用的请求方式有get，post，put，delete
 
 但是目前浏览器只支持get和post，若在form表单提交时，为method设置了其他请求方式的字符串（put或delete），则按照默认的请求方式get处理
-若要发送put和delete请求，则需要通过spring提供的过滤器HiddenHttpMethodFilter，在`RESTful`部分会讲到
+若要发送put和delete请求，则需要通过spring提供的过滤器`HiddenHttpMethodFilter`，在`RESTful`部分会讲到
 
 ## @RequestMapping注解的params属性（了解）
 
-@RequestMapping注解的params属性通过请求的请求参数匹配请求映射 @RequestMapping注解的params属性是一个字符串类型的数组，可以通过四种表达式设置请求参数和请求映射的匹配关系
+`@RequestMapping`注解的params属性通过请求的请求参数匹配请求映射 @RequestMapping注解的params属性是一个字符串类型的数组，可以通过四种表达式设置请求参数和请求映射的匹配关系
 
 - "param"：要求请求映射所匹配的请求必须携带param请求参数
 - "!param"：要求请求映射所匹配的请求必须不能携带param请求参数
@@ -391,8 +391,8 @@ public String testRequestMapping(){
 
 ```
 
-注： 若当前请求满足@RequestMapping注解的value和method属性，但是不满足params属性，此时 页面回报错400：Parameter conditions "username, password!=123456"
-not met for actual request parameters: username={admin}, password={123456}
+注： 若当前请求满足`@RequestMapping`注解的value和method属性，但是不满足params属性，此时 页面回报错`400：Parameter conditions "username, password!=123456"
+not met for actual request parameters: username={admin}, password={123456}`
 
 ## @RequestMapping注解的headers属性（了解）
 
@@ -415,7 +415,7 @@ not met for actual request parameters: username={admin}, password={123456}
 @RequestMapping(value = "/testConsumes", method = Request.POST, consumes = "multipart/form-data")
 ```
 
-比如如下代码指定 ContentType 不能为为 multipart/form-data（即包含文件域）的请求才能接收处理
+比如如下代码指定 `ContentType` 不能为为 `multipart/form-data`（即包含文件域）的请求才能接收处理
 
 ```java
 @RequestMapping(value = "/testConsumes", method = Request.POST, consumes = "!multipart/form-data")
@@ -437,8 +437,8 @@ not met for actual request parameters: username={admin}, password={123456}
 原始方式：`/deleteUser?id=1`
 rest方式：`/user/delete/1`
 
-SpringMVC路径中的占位符常用于RESTful风格中，当请求路径中将某些数据通过路径的方式传输到服 务器中，就可以在相应的@RequestMapping注解的value属性中通过占位符{xxx}表示传输的数据，在
-通过@PathVariable注解，将占位符所表示的数据赋值给控制器方法的形参
+SpringMVC路径中的占位符常用于RESTful风格中，当请求路径中将某些数据通过路径的方式传输到服 务器中，就可以在相应的`@RequestMapping`注解的value属性中通过占位符{xxx}表示传输的数据，在
+通过`@PathVariable`注解，将占位符所表示的数据赋值给控制器方法的形参
 
 ```html
 <a th:href="@{/testRest/1/admin}">测试路径中的占位符-->/testRest</a><br>
@@ -458,7 +458,7 @@ String username){
 
 ## 通过ServletAPI获取
 
-将HttpServletRequest作为控制器方法的形参，此时HttpServletRequest类型的参数表示封装了当前请 求的请求报文的对象
+将`HttpServletRequest`作为控制器方法的形参，此时`HttpServletRequest`类型的参数表示封装了当前请 求的请求报文的对象
 
 ```java
 @RequestMapping("/testParam")
@@ -472,7 +472,7 @@ public String testParam(HttpServletRequest request){
 
 ## 通过控制器方法的形参获取请求参数
 
-在控制器方法的形参位置，设置和请求参数同名的形参，当浏览器发送请求，匹配到请求映射时，在 DispatcherServlet中就会将请求参数赋值给相应的形参
+在控制器方法的形参位置，设置和请求参数同名的形参，当浏览器发送请求，匹配到请求映射时，在 `DispatcherServlet`中就会将请求参数赋值给相应的形参
 
 ```html
 <a th:href="@{/testParam(username='admin',password=123456)}">测试获取请求参数--
@@ -496,12 +496,11 @@ public String testParam(String username,String password){
 
 `@RequestParam`注解一共有三个属性：
 
-- value：指定为形参赋值的请求参数的参数名
-- required：设置是否必须传输此请求参数，默认值为true
-    - 若设置为true时，则当前请求必须传输value所指定的请求参数，若没有传输该请求参数，且没有设置defaultValue属性，则页面报错400：Required String parameter 'xxx' is not
-      present；
+- `value`：指定为形参赋值的请求参数的参数名
+- `required`：设置是否必须传输此请求参数，默认值为true
+    - 若设置为true时，则当前请求必须传输value所指定的请求参数，若没有传输该请求参数，且没有设置defaultValue属性，则页面报错`400：Required String parameter 'xxx' is not present；`
     - 若设置为false，则当前请求不是必须传输value所指定的请求参数，若没有传输，则注解所标识的形参的值为null
-- defaultValue：不管required属性值为true或false，当value所指定的请求参数没有传输或传输的值为""时，则使用默认值为形参赋值
+- `defaultValue`：不管required属性值为true或false，当value所指定的请求参数没有传输或传输的值为""时，则使用默认值为形参赋值
 
 ```java
 // http://localhost:8080/springmvc_demo/param/mvc?username=xiaoxuanzi1654&password=16540504
@@ -521,8 +520,8 @@ public String getParam(@RequestParam(value = "user", required = true) String use
 
 ## @RequestHeader
 
-- @RequestHeader是将请求头信息和控制器方法的形参创建映射关系
-- @RequestHeader注解一共有三个属性：value、required、defaultValue，用法同@RequestParam
+- `@RequestHeader`是将请求头信息和控制器方法的形参创建映射关系
+- `@RequestHeader`注解一共有三个属性：value、required、defaultValue，用法同@RequestParam
 
 ```java
 @RequestMapping("/mvc")
@@ -545,7 +544,7 @@ public String getParam(@CookieValue(value = "JSESSIONID") String jsessionId){
 
 ## 通过POJO获取请求参数
 
-可以在控制器方法的形参位置设置一个实体类类型的形参，此时若浏览器传输的请求参数的***参数名***和实体类中的***属性名*  **一致，那么请求参数就会为此属性赋值
+可以在控制器方法的形参位置设置一个实体类类型的形参，此时若浏览器传输的请求参数的***参数名***和实体类中的***属性名***一致，那么请求参数就会为此属性赋值
 
 ```html
 
@@ -594,6 +593,7 @@ public String testPOJO(User user){
 <url-pattern>/*</url-pattern>
 </filter-mapping>
 ```
+乱码问题和tomcat的版本关系
 
 - tomcat7没有解决乱码问题
 - tomcat8解决了get的乱码问题，没有解决post的乱码问题
@@ -602,11 +602,21 @@ public String testPOJO(User user){
 
 解决请求参数获取时候的乱码问题 此过滤器一定要配置到最前面，要不然会无效，因为在设置编码之前一定不能设置请求参数。
 
-没有`forcceEncoding`的话只会编码处理请求的参数，设置为真的时候也可以处理响应`response`的编码
+没有`forceEncoding`的话只会编码处理请求`request`的参数，设置为真的时候也可以处理响应`response`的编码
 
 # 域对象共享数据
 
-request,application,session
+`request,application,session`三种域
+
+客户端向服务器发送一个请求，服务器响应之后，这个请求对象就结束了
+
+request的`setAttribute`和`getAttribute`都是在服务器端执行的，客户端并不知情。
+
+request的`getParameter`是可以获取到客户端发送到服务器端的请求参数
+
+session作用域存在于浏览器窗口关闭之前，只要浏览器窗口没有关闭，session对象就会一直存在、
+
+application全局作用范围的存在范围就是只要服务器端没有关闭，application域对象中的数据就不会消失。
 
 ## 使用ServletAPI向request域对象共享数据
 
@@ -615,7 +625,7 @@ request,application,session
 public String testServletAPI(HttpServletRequest request){
         request.setAttribute("testScope","hello,servletAPI");
         return"success";
-        }
+}
 ```
 
 ## 使用ModelAndView向request域对象共享数据
@@ -636,7 +646,7 @@ public ModelAndView testModelAndView(){
 //设置逻辑视图，实现页面跳转
         mav.setViewName("success");
         return mav;
-        }
+}
 ```
 
 ## 使用Model向request域对象共享数据
@@ -646,7 +656,7 @@ public ModelAndView testModelAndView(){
 public String testModel(Model model){
         model.addAttribute("testScope","hello,Model");
         return"success";
-        }
+}
 ```
 
 ## 使用map向request域对象共享数据
@@ -656,7 +666,7 @@ public String testModel(Model model){
 public String testMap(Map<String, Object> map){
         map.put("testScope","hello,Map");
         return"success";
-        }
+}
 ```
 
 ## 使用ModelMap向request域对象共享数据
@@ -666,7 +676,7 @@ public String testMap(Map<String, Object> map){
 public String testModelMap(ModelMap modelMap){
         modelMap.addAttribute("testScope","hello,ModelMap");
         return"success";
-        }
+}
 ```
 
 ## Model、ModelMap、Map的关系
@@ -695,7 +705,7 @@ public class BindingAwareModelMap extends ExtendedModelMap {
 public String testSession(HttpSession session){
         session.setAttribute("testSessionScope","hello,session");
         return"success";
-        }
+}
 ```
 
 ```html
@@ -712,7 +722,7 @@ public String testApplication(HttpSession session){
         ServletContext application=session.getServletContext();
         application.setAttribute("testApplicationScope","hello,application");
         return"success";
-        }
+}
 ```
 
 ## 域对象的区别
@@ -737,19 +747,18 @@ SpringMVC视图的种类很多，默认有转发视图和重定向视图 当工�
 @RequestMapping("/testHello")
 public String testHello(){
         return"hello";
-        }
+}
 ```
 
 ## 转发视图
 
-SpringMVC中默认的转发视图是InternalResourceView SpringMVC中创建转发视图的情况： 当控制器方法中所设置的视图名称以"forward:"为前缀时，创建InternalResourceView视图，此时的视
-图名称不会被SpringMVC配置文件中所配置的视图解析器解析，而是会将前缀"forward:"去掉，剩余部 分作为最终路径通过转发的方式实现跳转 例如"forward:/"，"forward:/employee"
+SpringMVC中默认的转发视图是InternalResourceView SpringMVC中创建转发视图的情况： 当控制器方法中所设置的视图名称以"`forward:`"为前缀时，创建`InternalResourceView`视图，此时的视图名称不会被SpringMVC配置文件中所配置的视图解析器解析，而是会将前缀"`forward:`"去掉，剩余部分作为最终路径通过转发的方式实现跳转 例如"`forward:/`"，"`forward:/employee`"
 
 ```java
 @RequestMapping("/testForward")
 public String testForward(){
         return"forward:/testHello";
-        }
+}
 
 ```
 
@@ -760,17 +769,16 @@ public String testForward(){
 
 SpringMVC中默认的重定向视图是RedirectView
 
-当控制器方法中所设置的视图名称以"redirect:"为前缀时，创建RedirectView视图，此时的视图名称不 会被SpringMVC配置文件中所配置的视图解析器解析，而是会将前缀"redirect:"去掉，剩余部分作为最
-终路径通过重定向的方式实现跳转 例如"redirect:/"，"redirect:/employee"
+当控制器方法中所设置的视图名称以"`redirect:`"为前缀时，创建`RedirectView`视图，此时的视图名称不 会被SpringMVC配置文件中所配置的视图解析器解析，而是会将前缀"`redirect:`"去掉，剩余部分作为最终路径通过重定向的方式实现跳转 例如"`redirect:/`"，"`redirect:/employee`"
 
 ```java
 @RequestMapping("/testRedirect")
 public String testRedirect(){
         return"redirect:/testHello";
-        }
+}
 ```
 
-注： 重定向视图在解析时，会先将redirect:前缀去掉，然后会判断剩余部分是否以/开头，若是则会自 动拼接上下文路径 地址变为testHello
+注： 重定向视图在解析时，会先将redirect:前缀去掉，然后会判断剩余部分是否以/开头，若是则会自动拼接上下文路径 地址变为testHello
 
 ## 视图控制器view-controller
 
@@ -802,7 +810,9 @@ REST：Representational State Transfer，表现层资源状态转移。
 ②资源的表述
 
 资源的表述是一段对于资源在某个特定时刻的状态的描述。可以在客户端-服务器端之间转移（交 换）。资源的表述可以有多种格式，例如HTML/XML/JSON/纯文本/图片/视频/音频等等。资源的表述格
-式可以通过协商机制来确定。请求-响应方向的表述通常使用不同的格式。 ③状态转移
+式可以通过协商机制来确定。请求-响应方向的表述通常使用不同的格式。
+
+③状态转移
 
 状态转移说的是：在客户端和服务器端之间转移（transfer）代表资源状态的表述。通过转移和操作资 源的表述，来间接实现操作资源的目的。
 
@@ -850,7 +860,7 @@ b>当前请求必须传输请求参数`_method` 满足以上条件，`HiddenHttp
 </form>
 ```
 
-目前为止，SpringMVC中提供了两个过滤器`：CharacterEncodingFilter`和`HiddenHttpMethodFilter`
+目前为止，SpringMVC中提供了两个过滤器：`CharacterEncodingFilter`和`HiddenHttpMethodFilter`
 
 在web.xml中注册时，必须先注册`CharacterEncodingFilter`，再注册`HiddenHttpMethodFilter` 原因：
 
@@ -862,7 +872,7 @@ b>当前请求必须传输请求参数`_method` 满足以上条件，`HiddenHttp
 
 ## 静态资源
 
-使用默认配置的Servlet处理静态资源 当前工程的web.xml 配置的前端控制器 `DispatcherServlet` 的` url-pattern `是 `/ Tomcat` 的 `web.xml `
+使用默认配置的Servlet处理静态资源 当前工程的web.xml 配置的前端控制器 `DispatcherServlet` 的` url-pattern `是 `/Tomcat` 的 `web.xml `
 配置的 `DefaultServlet`
 的`url-pattern `也是 `/` 此时，浏览器发送的请求会优先被` DispatcherServlet` 进行处理，但是` DispatcherServlet` 无法处理静态资源
 若配置了 `<mvc:default-servlet-handler /> `，则所有请求都会被` DefaultServlet` 处理。 若配置了`<mvc:default-servlet-handler />`
@@ -911,12 +921,12 @@ b>当前请求必须传输请求参数`_method` 满足以上条件，`HiddenHttp
 ```
 
 ```java
-   @RequestMapping("/test/ajax")
+@RequestMapping("/test/ajax")
 public void testAjax(Integer id,@RequestBody String requestbody,HttpServletResponse httpServletResponse)throws IOException{
-        System.out.println(requestbody);
-        httpServletResponse.getWriter().write("hello ajax");
-        }
-        }
+    System.out.println(requestbody);
+    httpServletResponse.getWriter().write("hello ajax");
+    
+}
 ```
 
 ## @RequestBody
@@ -937,27 +947,29 @@ public void testAjax(Integer id,@RequestBody String requestbody,HttpServletRespo
 public String testRequestBody(@RequestBody String requestBody){
         System.out.println("requestBody:"+requestBody);
         return"success";
-        }
+}
 ```
 
-输出结果： requestBody:username=admin&password=123456
+输出结果： `requestBody:username=admin&password=123456`
 
 ## @RequestBody获取json格式的请求参数
 
-在使用了axios发送ajax请求之后，浏览器发送到服务器的请求参数有两种格式： 1、name=value&name=value...，此时的请求参数可以通过request.getParameter()
-获取，对应SpringMVC中，可以直接通过控制器方法的形参获取此类请求参数
+在使用了`axios`发送`ajax`请求之后，浏览器发送到服务器的请求参数有两种格式： 
 
-2、{key:value,key:value,...}，此时无法通过request.getParameter()获取，之前我们使用操作 json的相关jar包gson或jackson处理此类请求参数，可以将其转换为指定的实体类对象或map集
-合。在SpringMVC中，直接使用@RequestBody注解标识控制器方法的形参即可将此类请求参数 转换为java对象
+1、name=value&name=value...，此时的请求参数可以通过request.getParameter() 获取，对应SpringMVC中，可以直接通过控制器方法的形参获取此类请求参数
 
-使用@RequestBody获取json格式的请求参数的条件： 1、导入jackson的依赖
+2、{key:value,key:value,...}，此时无法通过request.getParameter()获取，之前我们使用操作 json的相关jar包json或jackson处理此类请求参数，可以将其转换为指定的实体类对象或map集合。在SpringMVC中，直接使用@RequestBody注解标识控制器方法的形参即可将此类请求参数 转换为java对象
+
+使用@RequestBody获取json格式的请求参数的条件： 
+
+1、导入jackson的依赖
 
 ```xml
-dependency>
-<groupId>com.fasterxml.jackson.core</groupId>
-<artifactId>jackson-databind</artifactId>
-<version>2.12.1</version>
-        </dependency>
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.12.1</version>
+</dependency>
 
 ```
 
@@ -1049,20 +1061,20 @@ public void testRequestBody(@RequestBody User user,HttpServletResponse
 @RequestMapping("/testResponseBody")
 public String testResponseBody(){
 //此时会跳转到逻辑视图success所对应的页面
-        return"success";
-        }
+    return"success";
+}
 @RequestMapping("/testResponseBody")
 @ResponseBody
 public String testResponseBody(){
 //此时响应浏览器数据success
-        return"success";
-        }
+    return"success";
+}
 ```
 
 ## @ResponseBody响应浏览器json数据
 
 服务器处理ajax请求之后，大多数情况都需要向浏览器响应一个java对象，此时必须将java对象转换为 json字符串才可以响应到浏览器，之前我们使用操作json数据的jar包gson或jackson将java对象转换为
-json字符串。在SpringMVC中，我们可以直接使用`@ResponseBody`注解实现此功能` @ResponseBody`响应浏览器json数据的条件：
+json字符串。在SpringMVC中，我们可以直接使用`@ResponseBody`注解实现此功能 `@ResponseBody`响应浏览器json数据的条件：
 
 1. 导入`jackson`的依赖
 2. SpringMVC的配置文件中设置开启mvc的注解驱动
@@ -1110,7 +1122,7 @@ public List<User> testResponseBody(){
         User user3=new User(1003,"admin3","123456",23,"男");
         List<User> list=Arrays.asList(user1,user2,user3);
         return list;
-        }
+}
 //响应浏览器map集合
 @RequestMapping("/test/ResponseBody/json")
 @ResponseBody
@@ -1123,13 +1135,13 @@ public Map<String, Object> testResponseBody(){
         map.put("1002",user2);
         map.put("1003",user3);
         return map;
-        }
+}
 //响应浏览器实体类对象
 @RequestMapping("/test/ResponseBody/json")
 @ResponseBody
 public User testResponseBody(){
         return user;
-        }
+}
 
 ```
 
@@ -1170,7 +1182,7 @@ public ResponseEntity<byte[]>testResponseEntity(HttpSession session)throws IOExc
 //关闭输入流
         is.close();
         return responseEntity;
-        }
+}
 ```
 
 ## 文件上传
@@ -1184,8 +1196,7 @@ SpringMVC中将上传的文件封装到`MultipartFile`对象中，通过此对�
 ①添加依赖
 
 ```xml
-<!-- https://mvnrepository.com/artifact/commons-fileupload/commons-fileupload --
->
+<!-- https://mvnrepository.com/artifact/commons-fileupload/commons-fileupload -->
 <dependency>
 <groupId>commons-fileupload</groupId>
 <artifactId>commons-fileupload</artifactId>
@@ -1218,7 +1229,7 @@ public String testUp(MultipartFile photo,HttpSession session)throws
         String photoPath=servletContext.getRealPath("photo");
         File file=new File(photoPath);
         if(!file.exists()){
-        file.mkdir();
+            file.mkdir();
         }
         String finalPath=photoPath+File.separator+fileName;
 //实现上传功能
@@ -1550,7 +1561,7 @@ resolvers.add(exceptionResolver);
 @RequestMapping("/")
 public String index(){
         return"index";
-        }
+}
 
 ```
 
@@ -1594,15 +1605,15 @@ public String index(){
 
 ①`processRequest()`
 
-`FrameworkServlet`重写HttpServlet中的service()和doXxx()，这些方法中调用了`processRequest(request, response)`
+`FrameworkServlet`重写`HttpServlet`中的`service()`和`doXxx()`，这些方法中调用了`processRequest(request, response)`
 
 所在类：`org.springframework.web.servlet.FrameworkServlet`
 
-②doService()
+②`doService()`
 
 所在类：`org.springframework.web.servlet.DispatcherServlet`
 
-③doDispatch()
+③`doDispatch()`
 
 所在类：`org.springframework.web.servlet.DispatcherServlet`
 
@@ -1610,32 +1621,45 @@ public String index(){
 
 ## SpringMVC的执行流程
 
-1) 用户向服务器发送请求，请求被SpringMVC 前端控制器 DispatcherServlet捕获。
-2) DispatcherServlet对请求URL进行解析，得到请求资源标识符（URI），判断请求URI对应的映射： a) 不存在
+1) 用户向服务器发送请求，请求被SpringMVC 前端控制器 `DispatcherServlet` 捕获。
+   
+2) `DispatcherServlet`对请求URL进行解析，得到请求资源标识符（URI），判断请求URI对应的映射： 
+   
+   a) 不存在
 
-   i. 再判断是否配置了mvc:default-servlet-handler
+        i. 再判断是否配置了 `mvc:default-servlet-handler`
 
-   ii. 如果没配置，则控制台报映射查找不到，客户端展示404错误
+        ii. 如果没配置，则控制台报映射查找不到，客户端展示404错误
 
-   iii. 如果有配置，则访问目标资源（一般为静态资源，如：JS,CSS,HTML），找不到客户端也会展示404 错误
+        iii. 如果有配置，则访问目标资源（一般为静态资源，如：JS,CSS,HTML），找不到客户端也会展示404 错误
 
    b) 存在则执行下面的流程
-3) 根据该URI，调用HandlerMapping获得该Handler配置的所有相关的对象（包括Handler对象以及 Handler对象对应的拦截器），最后以HandlerExecutionChain执行链对象的形式返回。
-4) DispatcherServlet 根据获得的Handler，选择一个合适的HandlerAdapter。
-5) 如果成功获得HandlerAdapter，此时将开始执行拦截器的preHandler(…)方法【正向】
-6) 提取Request中的模型数据，填充Handler入参，开始执行Handler（Controller)方法，处理请求。 在填充Handler的入参过程中，根据你的配置，Spring将帮你做一些额外的工作： a)
-   HttpMessageConveter： 将请求消息（如Json、xml等数据）转换成一个对象，将对象转换为指定 的响应信息
+
+3) 根据该URI，调用`HandlerMapping`获得该Handler配置的所有相关的对象（包括Handler对象以及 Handler对象对应的拦截器），最后以`HandlerExecutionChain`执行链对象的形式返回。
+   
+4) `DispatcherServlet` 根据获得的Handler，选择一个合适的`HandlerAdapter`。
+   
+5) 如果成功获得`HandlerAdapter`，此时将开始执行拦截器的`preHandler(…)`方法【正向】
+   
+6) 提取Request中的模型数据，填充Handler入参，开始执行Handler（Controller)方法，处理请求。 在填充Handler的入参过程中，根据你的配置，Spring将帮你做一些额外的工作： 
+   
+   a)`HttpMessageConveter`： 将请求消息（如Json、xml等数据）转换成一个对象，将对象转换为指定的响应信息
 
    b) 数据转换：对请求消息进行数据转换。如String转换成Integer、Double等
 
    c) 数据格式化：对请求消息进行数据格式化。 如将字符串转换成格式化数字或格式化日期等
 
    d) 数据验证： 验证数据的有效性（长度、格式等），验证结果存储到BindingResult或Error中
-7) Handler执行完成后，向DispatcherServlet 返回一个ModelAndView对象。
-8) 此时将开始执行拦截器的postHandle(...)方法【逆向】。
-9) 根据返回的ModelAndView（此时会判断是否存在异常：如果存在异常，则执行 HandlerExceptionResolver进行异常处理）选择一个适合的ViewResolver进行视图解析，根据Model
+
+7) Handler执行完成后，向`DispatcherServlet` 返回一个`ModelAndView`对象。
+   
+8) 此时将开始执行拦截器的`postHandle(...)`方法【逆向】。
+   
+9)  根据返回的ModelAndView（此时会判断是否存在异常：如果存在异常，则执行 `HandlerExceptionResolver`进行异常处理）选择一个适合的`ViewResolver`进行视图解析，根据Model
    和View，来渲染视图。
-10) 渲染视图完毕执行拦截器的afterCompletion(…)方法【逆向】。
+
+10) 渲染视图完毕执行拦截器的`afterCompletion(…)`方法【逆向】。
+    
 11) 将渲染结果返回给客户端。
 
 # SSM整合
@@ -1652,7 +1676,7 @@ Springioc容器的创建可以放在监听器或者过滤器的初始化过程�
 
 springMVC和spring的ioc容器初始化的关系
 
-spring的ioc容器是父容器，springmvc中的ioc容器是子容器，父容器不能访问子容器的bean，子容器能够访问父容器的bean
+spring的ioc容器是 ***父容器*** ，springmvc中的ioc容器是 ***子容器*** ，父容器不能访问子容器的bean，子容器能够访问父容器的bean
 
 - mvc的初始化时机是在mvc的前端控制器初始化的时候初始化的
 - 而前端控制器初始化之前会经过 监听器和过滤器 这里使用的是监听器
@@ -1807,20 +1831,23 @@ Spring提供了监听器`ContextLoaderListener`，实现`ServletContextListener`
 </dependencies>
 ```
 
-|**
-包**| javax.servlet-api |
-|----|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|spring-webmvc| 间接依赖 springioc的四个核心jar包 + spring-web包 | |jackson-databind| springmvc 在异步请求处理JSON数据的时候会使用 |
-|thymeleaf-spring5| springmvc + thymeleaf 整合 | |spring-jdbc| 只使用里面的事务支持，其会为我们提供已经编写好的事务管理的切面类 | |spring-aspects|
-AOP功能的支持 | |mybatis| 持久层框架 | |pagehelper| 为mybatis 提供分页功能的插件 | |mybatis-spring| mybatis 和 spring 的整合包 :
-其提供了一个SqlSessionFactoryBean，用于创建SqlSession | |druid| 德鲁伊连接池，提供数据源 | |mysql-connector-java| MYSQL驱动 | |spring-test|
-Spring提供的测试功能，可以直接在测试代码中注入容器当中的Bean | |log4j （**druid/mybatis 选用**）| 日志 （经验证发现 , Druid / mybatis 内部使用 log4j，而且是 **
-provide**的间接依赖，可能是检测到有包就用，当你在系统里面依赖 log4j ，不提供log4j的配置文件，则会发生提示 ：log4j:WARN No appenders could be found for logger (
-com.alibaba.druid.pool.DruidDataSource).<br>log4j:WARN Please initialize the log4j system properly.）<br><br>因此：要么就依赖
-log4j.jar 且 配置 log4j.properties/log4j.xml 给 Druid 使用，要么就不提供依赖，druid也不会检测到系统有jar包，不会给出 WARN | |logback-classic（**Spring
-/thymeleaf 整合包使用**）| slf4j的日志实现<br>1. thymeleaf 使用了 sl4j 的依赖，因此需要提高 logback 实现，并且配置logback;  <br>2. spring-context 会
-间接依赖spring.jcl 包判断日志实现的时候会默认为 slfj 的具体实现（发现机制），因此可以配置个 slf4j 的具体实现使用Spring的日志。若系统内部没有 slf4j ，会搜寻 log4j2，还是没有则默认使用 JUL
-日志输出。 | |javax.servlet-api| MVC的Controller中可能会使用到Servlet的API | |commons-fileupload| SpringMVC底层支持文件上传需要jar包 |
+|**包**| javax.servlet-api |
+|----|----|
+|spring-webmvc| 间接依赖 springioc的四个核心jar包 + spring-web包 | 
+|jackson-databind| springmvc 在异步请求处理JSON数据的时候会使用 |
+|thymeleaf-spring5| springmvc + thymeleaf 整合 |
+|spring-jdbc| 只使用里面的事务支持，其会为我们提供已经编写好的事务管理的切面类 |
+|spring-aspects|AOP功能的支持 | 
+|mybatis| 持久层框架 | 
+|pagehelper| 为mybatis 提供分页功能的插件 | 
+|mybatis-spring| mybatis 和 spring 的整合包 :其提供了一个SqlSessionFactoryBean，用于创建SqlSession | 
+|druid| 德鲁伊连接池，提供数据源 | 
+|mysql-connector-java| MYSQL驱动 | 
+|spring-test|Spring提供的测试功能，可以直接在测试代码中注入容器当中的Bean | 
+|log4j （**druid/mybatis 选用**）| 日志 （经验证发现 , Druid / mybatis 内部使用 log4j，而且是 **provide**的间接依赖，可能是检测到有包就用，当你在系统里面依赖 log4j ，不提供log4j的配置文件，则会发生提示 ：log4j:WARN No appenders could be found for logger (com.alibaba.druid.pool.DruidDataSource).<br>log4j:WARN Please initialize the log4j system properly.）<br><br>因此：要么就依赖log4j.jar 且 配置 log4j.properties/log4j.xml 给 Druid 使用，要么就不提供依赖，druid也不会检测到系统有jar包，不会给出 WARN | 
+|logback-classic（**Spring/thymeleaf 整合包使用**）| slf4j的日志实现<br>1. thymeleaf 使用了 sl4j 的依赖，因此需要提高 logback 实现，并且配置logback;  <br>2. spring-context 会间接依赖spring.jcl 包判断日志实现的时候会默认为 slfj 的具体实现（发现机制），因此可以配置个 slf4j 的具体实现使用Spring的日志。若系统内部没有 slf4j ，会搜寻 log4j2，还是没有则默认使用 JUL日志输出。 | 
+|javax.servlet-api| MVC的Controller中可能会使用到Servlet的API |
+|commons-fileupload| SpringMVC底层支持文件上传需要jar包 |
 
 
 ③创建表
@@ -1945,11 +1972,11 @@ CREATE TABLE `t_emp`
 
 ## 搭建MyBatis环境
 
-1. resources/mybatis-config.xml 中编写配置，其中关于数据源的配置交给  在Spring中进行配置，向SpringIOC容器中注入 SqlSessionFactory 对象。
-2. resources/ 下创建同包的路径的Mapper目录，并编写mapper.xml 
+1. `resources/mybatis-config.xml` 中编写配置，其中关于数据源的配置交给  在Spring中进行配置，向SpringIOC容器中注入 `SqlSessionFactory` 对象。
+2. `resources/` 下创建同包的路径的Mapper目录，并编写mapper.xml 
 3. 配置分页插件
 
-①创建属性文件jdbc.properties
+①创建属性文件`jdbc.properties`
 
 ```properties
 jdbc.user=boss
@@ -2070,8 +2097,8 @@ xml version="1.0" encoding="UTF-8" ?>
 三：MyBaits需要的配置：
 1. 引入 jdbc.properties
 2. druid 数据源（需要1）
-3. SqlSessionFactoryBean 注册到IOC（需要2）
-4.. 产生的mapper代理类注册到IOC → 即配置 MapperScannerConfigurer
+3. `SqlSessionFactoryBean` 注册到IOC（需要2）
+4.. 产生的mapper代理类注册到IOC → 即配置 `MapperScannerConfigurer`
 
 
 ```xml
