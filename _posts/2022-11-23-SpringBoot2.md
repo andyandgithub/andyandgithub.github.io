@@ -35,17 +35,17 @@ Spring Boot makes it easy to create stand-alone, production-grade Spring based A
 
 ## SpringBoot优点
 - Create stand-alone Spring applications
- - 创建独立Spring应用
+  - 创建独立Spring应用
 - Embed Tomcat, Jetty or Undertow directly (no need to deploy WAR files)
- - 内嵌web服务器
+  - 内嵌web服务器
 - Provide opinionated 'starter' dependencies to simplify your build configuration
- - 自动starter依赖，简化构建配置
+  - 自动starter依赖，简化构建配置
 - Automatically configure Spring and 3rd party libraries whenever possible
- - 自动配置Spring以及第三方功能
+  - 自动配置Spring以及第三方功能
 - Provide production-ready features such as metrics, health checks, and externalized configuration
- - 提供生产级别的监控、健康检查及外部化配置
+  - 提供生产级别的监控、健康检查及外部化配置
 - Absolutely no code generation and no requirement for XML configuration
- - 无代码生成、无需编写XML
+  - 无代码生成、无需编写XML
 
 SpringBoot是整合Spring技术栈的一站式框架
 
@@ -219,7 +219,7 @@ server.port=8888
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
-    </build>
+</build>
 ```
 把项目打成jar包，直接在目标服务器执行即可
 
@@ -301,7 +301,7 @@ IDEA快捷键：
       <artifactId>spring-boot-starter-tomcat</artifactId>
       <version>2.3.4.RELEASE</version>
       <scope>compile</scope>
-    </dependency>
+</dependency>
 ```
 
 
@@ -792,23 +792,23 @@ org.springframework.boot.autoconfigure.webservices.client.WebServiceTemplateAuto
 
 ###  修改默认配置 
 ```java
-    @Bean
-		@ConditionalOnBean(MultipartResolver.class)  //容器中有这个类型组件
-		@ConditionalOnMissingBean(name = DispatcherServlet.MULTIPART_RESOLVER_BEAN_NAME) //容器中没有这个名字 multipartResolver 的组件
-		public MultipartResolver multipartResolver(MultipartResolver resolver) {
-            //给@Bean标注的方法传入了对象参数，这个参数的值就会从容器中找。
-            //SpringMVC multipartResolver。防止有些用户配置的文件上传解析器不符合规范
-			// Detect if the user has created a MultipartResolver but named it incorrectly
-			return resolver;
-		}
-        // 给容器中加入了文件上传解析器
+@Bean
+@ConditionalOnBean(MultipartResolver.class)  //容器中有这个类型组件
+@ConditionalOnMissingBean(name = DispatcherServlet.MULTIPART_RESOLVER_BEAN_NAME) //容器中没有这个名字 multipartResolver 的组件
+public MultipartResolver multipartResolver(MultipartResolver resolver) {
+    //给@Bean标注的方法传入了对象参数，这个参数的值就会从容器中找。
+    //SpringMVC multipartResolver。防止有些用户配置的文件上传解析器不符合规范
+    // Detect if the user has created a MultipartResolver but named it incorrectly
+    return resolver;
+}
+// 给容器中加入了文件上传解析器
 ```
 SpringBoot默认会在底层配好所有的组件。但是如果用户自己配置了以用户的优先
 ```java
 @Bean
-	@ConditionalOnMissingBean
-	public CharacterEncodingFilter characterEncodingFilter() {
-    }
+@ConditionalOnMissingBean
+public CharacterEncodingFilter characterEncodingFilter() {
+}
 ```
 总结：
 - SpringBoot先加载所有的自动配置类  xxxxxAutoConfiguration
@@ -935,7 +935,7 @@ k: v
 k: {k1: v1,k2: v2,k3: v3}
 #或
 k: 
-	k1: v1
+  k1: v1
   k2: v2
   k3: v3
 ```
@@ -995,11 +995,11 @@ person:
 ### 配置提示
 自定义的类和配置文件绑定一般没有提示
 ```xml
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
-        </dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-configuration-processor</artifactId>
+    <optional>true</optional>
+</dependency>
 
 <!-- 打包的时候去除掉这个提示包 -->
  <build>

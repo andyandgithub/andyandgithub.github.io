@@ -1668,7 +1668,7 @@ public String index(){
 
 SpringMVC的ioc容器是在DispatchServlet初始化的时候创建。
 
-Spring的Ioc容器床架必须早于SpringMVC
+Spring的Ioc容器框架必须早于SpringMVC
 
 监听器->过滤器->Servlet
 
