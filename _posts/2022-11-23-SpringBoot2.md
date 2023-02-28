@@ -321,7 +321,7 @@ IDEA快捷键：
 等同于
 @SpringBootConfiguration
 @EnableAutoConfiguration
-@ComponentScan("com.atguigu.boot")
+@ComponentScan("com.andy.boot")
 ```
 
 - 各种配置拥有默认值
@@ -380,7 +380,7 @@ public class MyConfig {
 // ################################@Configuration测试代码如下########################################
 @SpringBootConfiguration
 @EnableAutoConfiguration
-@ComponentScan("com.atguigu.boot")
+@ComponentScan("com.andy.boot")
 public class MainApplication {
 
     public static void main(String[] args) {
@@ -402,7 +402,7 @@ public class MainApplication {
         System.out.println("组件："+(tom01 == tom02));
 
 
-        //4、com.atguigu.boot.config.MyConfig$$EnhancerBySpringCGLIB$$51f1e1ca@1654a892
+        //4、com.andy.boot.config.MyConfig$$EnhancerBySpringCGLIB$$51f1e1ca@1654a892
         MyConfig bean = run.getBean(MyConfig.class);
         System.out.println(bean);
 
@@ -504,12 +504,12 @@ public static void main(String[] args) {
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
 
-    <bean id="haha" class="com.atguigu.boot.bean.User">
+    <bean id="haha" class="com.andy.boot.bean.User">
         <property name="name" value="zhangsan"></property>
         <property name="age" value="18"></property>
     </bean>
 
-    <bean id="hehe" class="com.atguigu.boot.bean.Pet">
+    <bean id="hehe" class="com.andy.boot.bean.Pet">
         <property name="name" value="tomcat"></property>
     </bean>
 </beans>
@@ -1044,16 +1044,20 @@ The auto-configuration adds the following features on top of Spring’s defaults
 - Automatic use of a ConfigurableWebBindingInitializer bean (covered later in this document).
   - 自动使用 ConfigurableWebBindingInitializer ，（DataBinder负责将请求数据绑定到JavaBean上）
 
-不用@EnableWebMvc注解。使用 @Configuration + WebMvcConfigurer 自定义规则
+不用`@EnableWebMvc`注解。使用 @Configuration + WebMvcConfigurer 自定义规则
 
 声明 WebMvcRegistrations 改变默认底层组件
 
-使用 @EnableWebMvc+@Configuration+DelegatingWebMvcConfiguration 全面接管SpringMVC
+使用 `@EnableWebMvc`+`@Configuration`+`DelegatingWebMvcConfiguration` 全面接管SpringMVC
+
+Spring Boot 默认提供Spring MVC 自动配置，不需要使用`@EnableWebMvc`注解
+如果需要配置MVC（拦截器、格式化、视图等） 请使用添加`@Configuration`并实现`WebMvcConfigurer`接口.不要添加`@EnableWebMvc`注解。
+`@EnableWebMvc` 只能添加到一个`@Configuration`配置类上，用于导入Spring Web MVC configuratio
 
 ### 简单功能分析
 #### 静态资源访问
 ##### 静态资源目录
-只要静态资源放在类路径下： ` /static ` (or ` /public ` or ` /resources ` or ` /META-INF/resources `
+只要静态资源放在类路径下： `/static` (or `/public` or `/resources` or `/META-INF/resources`
 
 访问 ： 当前项目根路径/ + 静态资源名 
 
@@ -1225,15 +1229,15 @@ public class ResourceProperties {
 // HandlerMapping：处理器映射。保存了每一个Handler能处理哪些请求。	
 
 @Bean
-    public WelcomePageHandlerMapping welcomePageHandlerMapping(ApplicationContext applicationContext,
-            FormattingConversionService mvcConversionService, ResourceUrlProvider mvcResourceUrlProvider) {
-        WelcomePageHandlerMapping welcomePageHandlerMapping = new WelcomePageHandlerMapping(
-                new TemplateAvailabilityProviders(applicationContext), applicationContext, getWelcomePage(),
-                this.mvcProperties.getStaticPathPattern());
-        welcomePageHandlerMapping.setInterceptors(getInterceptors(mvcConversionService, mvcResourceUrlProvider));
-        welcomePageHandlerMapping.setCorsConfigurations(getCorsConfigurations());
-        return welcomePageHandlerMapping;
-    }
+public WelcomePageHandlerMapping welcomePageHandlerMapping(ApplicationContext applicationContext,
+        FormattingConversionService mvcConversionService, ResourceUrlProvider mvcResourceUrlProvider) {
+    WelcomePageHandlerMapping welcomePageHandlerMapping = new WelcomePageHandlerMapping(
+            new TemplateAvailabilityProviders(applicationContext), applicationContext, getWelcomePage(),
+            this.mvcProperties.getStaticPathPattern());
+    welcomePageHandlerMapping.setInterceptors(getInterceptors(mvcConversionService, mvcResourceUrlProvider));
+    welcomePageHandlerMapping.setCorsConfigurations(getCorsConfigurations());
+    return welcomePageHandlerMapping;
+}
 
 WelcomePageHandlerMapping(TemplateAvailabilityProviders templateAvailabilityProviders,
         ApplicationContext applicationContext, Optional<Resource> welcomePage, String staticPathPattern) {
@@ -1357,17 +1361,17 @@ protected void doDispatch(HttpServletRequest request, HttpServletResponse respon
 - 我们需要一些自定义的映射处理，我们也可以自己给容器中放HandlerMapping。自定义 HandlerMapping
 
 ```java
-	protected HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
-		if (this.handlerMappings != null) {
-			for (HandlerMapping mapping : this.handlerMappings) {
-				HandlerExecutionChain handler = mapping.getHandler(request);
-				if (handler != null) {
-					return handler;
-				}
-			}
-		}
-		return null;
-	}
+protected HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
+    if (this.handlerMappings != null) {
+        for (HandlerMapping mapping : this.handlerMappings) {
+            HandlerExecutionChain handler = mapping.getHandler(request);
+            if (handler != null) {
+                return handler;
+            }
+        }
+    }
+    return null;
+}
 ```
 
 #### 普通参数与基本注解
@@ -1473,21 +1477,21 @@ WebRequest、ServletRequest、MultipartRequest、 HttpSession、javax.servlet.ht
 ServletRequestMethodArgumentResolver  以上的部分参数
 ```java
 @Override
-	public boolean supportsParameter(MethodParameter parameter) {
-		Class<?> paramType = parameter.getParameterType();
-		return (WebRequest.class.isAssignableFrom(paramType) ||
-				ServletRequest.class.isAssignableFrom(paramType) ||
-				MultipartRequest.class.isAssignableFrom(paramType) ||
-				HttpSession.class.isAssignableFrom(paramType) ||
-				(pushBuilder != null && pushBuilder.isAssignableFrom(paramType)) ||
-				Principal.class.isAssignableFrom(paramType) ||
-				InputStream.class.isAssignableFrom(paramType) ||
-				Reader.class.isAssignableFrom(paramType) ||
-				HttpMethod.class == paramType ||
-				Locale.class == paramType ||
-				TimeZone.class == paramType ||
-				ZoneId.class == paramType);
-	}
+public boolean supportsParameter(MethodParameter parameter) {
+    Class<?> paramType = parameter.getParameterType();
+    return (WebRequest.class.isAssignableFrom(paramType) ||
+            ServletRequest.class.isAssignableFrom(paramType) ||
+            MultipartRequest.class.isAssignableFrom(paramType) ||
+            HttpSession.class.isAssignableFrom(paramType) ||
+            (pushBuilder != null && pushBuilder.isAssignableFrom(paramType)) ||
+            Principal.class.isAssignableFrom(paramType) ||
+            InputStream.class.isAssignableFrom(paramType) ||
+            Reader.class.isAssignableFrom(paramType) ||
+            HttpMethod.class == paramType ||
+            Locale.class == paramType ||
+            TimeZone.class == paramType ||
+            ZoneId.class == paramType);
+}
 ```
 ##### 复杂参数：
 Map、Model（map、model里面的数据会被放在request的请求域  request.setAttribute）、Errors/BindingResult、RedirectAttributes（ 重定向携带数据）、ServletResponse（response）、SessionStatus、UriComponentsBuilder、ServletUriComponentsBuilder
@@ -1562,6 +1566,7 @@ Object[] args = getMethodArgumentValues(request, mavContainer, providedArgs);
 ```
 ##### 参数解析器-HandlerMethodArgumentResolver
 确定将要执行的目标方法的每一个参数的值是什么;
+
 SpringMVC目标方法能写多少种参数类型。取决于参数解析器
 
 - 当前解析器是否支持解析这种参数
@@ -1577,38 +1582,38 @@ SpringMVC目标方法能写多少种参数类型。取决于参数解析器
 protected Object[] getMethodArgumentValues(NativeWebRequest request, @Nullable ModelAndViewContainer mavContainer,
 			Object... providedArgs) throws Exception {
 
-		MethodParameter[] parameters = getMethodParameters();
-		if (ObjectUtils.isEmpty(parameters)) {
-			return EMPTY_ARGS;
-		}
+    MethodParameter[] parameters = getMethodParameters();
+    if (ObjectUtils.isEmpty(parameters)) {
+        return EMPTY_ARGS;
+    }
 
-		Object[] args = new Object[parameters.length];
-		for (int i = 0; i < parameters.length; i++) {
-			MethodParameter parameter = parameters[i];
-			parameter.initParameterNameDiscovery(this.parameterNameDiscoverer);
-			args[i] = findProvidedArgument(parameter, providedArgs);
-			if (args[i] != null) {
-				continue;
-			}
-			if (!this.resolvers.supportsParameter(parameter)) {
-				throw new IllegalStateException(formatArgumentError(parameter, "No suitable resolver"));
-			}
-			try {
-				args[i] = this.resolvers.resolveArgument(parameter, mavContainer, request, this.dataBinderFactory);
-			}
-			catch (Exception ex) {
-				// Leave stack trace for later, exception may actually be resolved and handled...
-				if (logger.isDebugEnabled()) {
-					String exMsg = ex.getMessage();
-					if (exMsg != null && !exMsg.contains(parameter.getExecutable().toGenericString())) {
-						logger.debug(formatArgumentError(parameter, exMsg));
-					}
-				}
-				throw ex;
-			}
-		}
-		return args;
-	}
+    Object[] args = new Object[parameters.length];
+    for (int i = 0; i < parameters.length; i++) {
+        MethodParameter parameter = parameters[i];
+        parameter.initParameterNameDiscovery(this.parameterNameDiscoverer);
+        args[i] = findProvidedArgument(parameter, providedArgs);
+        if (args[i] != null) {
+            continue;
+        }
+        if (!this.resolvers.supportsParameter(parameter)) {
+            throw new IllegalStateException(formatArgumentError(parameter, "No suitable resolver"));
+        }
+        try {
+            args[i] = this.resolvers.resolveArgument(parameter, mavContainer, request, this.dataBinderFactory);
+        }
+        catch (Exception ex) {
+            // Leave stack trace for later, exception may actually be resolved and handled...
+            if (logger.isDebugEnabled()) {
+                String exMsg = ex.getMessage();
+                if (exMsg != null && !exMsg.contains(parameter.getExecutable().toGenericString())) {
+                    logger.debug(formatArgumentError(parameter, exMsg));
+                }
+            }
+            throw ex;
+        }
+    }
+    return args;
+}
 ```
 ###### 挨个判断所有参数解析器那个支持解析这个参数
 ```java
@@ -1715,9 +1720,10 @@ public static boolean isSimpleValueType(Class<?> type) {
 		return attribute;
 	}
 ```
-WebDataBinder binder = binderFactory.createBinder(webRequest, attribute, name);
-WebDataBinder :web数据绑定器，将请求参数的值绑定到指定的JavaBean里面
-WebDataBinder 利用它里面的 Converters 将请求数据转成指定的数据类型。再次封装到JavaBean中
+
+`WebDataBinder binder = binderFactory.createBinder(webRequest, attribute, name);`
+`WebDataBinder` :web数据绑定器，将请求参数的值绑定到指定的JavaBean里面
+`WebDataBinder` 利用它里面的 Converters 将请求数据转成指定的数据类型。再次封装到JavaBean中
 
 GenericConversionService：在设置每一个值的时候，找它里面的所有converter那个可以将这个数据类型（request带来参数的字符串）转换到指定的类型（JavaBean -- Integer）（for循环判断符合条件的converter转换器）
 byte -- > file
@@ -1731,84 +1737,87 @@ byte -- > file
 
 ```java
     //1、WebMvcConfigurer定制化SpringMVC的功能
-    @Bean
-    public WebMvcConfigurer webMvcConfigurer(){
-        return new WebMvcConfigurer() {
-            @Override
-            public void configurePathMatch(PathMatchConfigurer configurer) {
-                UrlPathHelper urlPathHelper = new UrlPathHelper();
-                // 不移除；后面的内容。矩阵变量功能就可以生效
-                urlPathHelper.setRemoveSemicolonContent(false);
-                configurer.setUrlPathHelper(urlPathHelper);
-            }
+@Bean
+public WebMvcConfigurer webMvcConfigurer(){
+    return new WebMvcConfigurer() {
+        @Override
+        public void configurePathMatch(PathMatchConfigurer configurer) {
+            UrlPathHelper urlPathHelper = new UrlPathHelper();
+            // 不移除；后面的内容。矩阵变量功能就可以生效
+            urlPathHelper.setRemoveSemicolonContent(false);
+            configurer.setUrlPathHelper(urlPathHelper);
+        }
 
-            @Override
-            public void addFormatters(FormatterRegistry registry) {
-                registry.addConverter(new Converter<String, Pet>() {
+        @Override
+        public void addFormatters(FormatterRegistry registry) {
+            registry.addConverter(new Converter<String, Pet>() {
 
-                    @Override
-                    public Pet convert(String source) {
-                        // 啊猫,3
-                        if(!StringUtils.isEmpty(source)){
-                            Pet pet = new Pet();
-                            String[] split = source.split(",");
-                            pet.setName(split[0]);
-                            pet.setAge(Integer.parseInt(split[1]));
-                            return pet;
-                        }
-                        return null;
+                @Override
+                public Pet convert(String source) {
+                    // 啊猫,3
+                    if(!StringUtils.isEmpty(source)){
+                        Pet pet = new Pet();
+                        String[] split = source.split(",");
+                        pet.setName(split[0]);
+                        pet.setAge(Integer.parseInt(split[1]));
+                        return pet;
                     }
-                });
-            }
-        };
-    }
+                    return null;
+                }
+            });
+        }
+    };
+}
 ```
 
 ##### 目标方法执行完成
-将所有的数据都放在 ModelAndViewContainer；包含要去的页面地址View。还包含Model数据。
+将所有的数据都放在 `ModelAndViewContainer`；包含要去的页面地址View。还包含Model数据。
 ##### 处理派发结果
-processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);
 
+```java
+processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);
 renderMergedOutputModel(mergedModel, getRequestToExpose(request), response)
+```
+
 ```java
 InternalResourceView：
 @Override
-	protected void renderMergedOutputModel(
-			Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+protected void renderMergedOutputModel(
+        Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		// Expose the model object as request attributes.
-		exposeModelAsRequestAttributes(model, request);
+    // Expose the model object as request attributes.
+    exposeModelAsRequestAttributes(model, request);
 
-		// Expose helpers as request attributes, if any.
-		exposeHelpers(request);
+    // Expose helpers as request attributes, if any.
+    exposeHelpers(request);
 
-		// Determine the path for the request dispatcher.
-		String dispatcherPath = prepareForRendering(request, response);
+    // Determine the path for the request dispatcher.
+    String dispatcherPath = prepareForRendering(request, response);
 
-		// Obtain a RequestDispatcher for the target resource (typically a JSP).
-		RequestDispatcher rd = getRequestDispatcher(request, dispatcherPath);
-		if (rd == null) {
-			throw new ServletException("Could not get RequestDispatcher for [" + getUrl() +
-					"]: Check that the corresponding file exists within your web application archive!");
-		}
+    // Obtain a RequestDispatcher for the target resource (typically a JSP).
+    RequestDispatcher rd = getRequestDispatcher(request, dispatcherPath);
+    if (rd == null) {
+        throw new ServletException("Could not get RequestDispatcher for [" + getUrl() +
+                "]: Check that the corresponding file exists within your web application archive!");
+    }
 
-		// If already included or response already committed, perform include, else forward.
-		if (useInclude(request, response)) {
-			response.setContentType(getContentType());
-			if (logger.isDebugEnabled()) {
-				logger.debug("Including [" + getUrl() + "]");
-			}
-			rd.include(request, response);
-		}
+    // If already included or response already committed, perform include, else forward.
+    if (useInclude(request, response)) {
+        response.setContentType(getContentType());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Including [" + getUrl() + "]");
+        }
+        rd.include(request, response);
+    }
 
-		else {
-			// Note: The forwarded resource is supposed to determine the content type itself.
-			if (logger.isDebugEnabled()) {
-				logger.debug("Forwarding to [" + getUrl() + "]");
-			}
-			rd.forward(request, response);
-		}
-	}
+    else {
+        // Note: The forwarded resource is supposed to determine the content type itself.
+        if (logger.isDebugEnabled()) {
+            logger.debug("Forwarding to [" + getUrl() + "]");
+        }
+        rd.forward(request, response);
+    }
+}
 ```
 ```java
 暴露模型作为请求域属性
@@ -1834,17 +1843,17 @@ protected void exposeModelAsRequestAttributes(Map<String, Object> model,
 #### 响应JSON
 ##### jackson.jar+@ResponseBody
 ```xml
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
 web场景自动引入了json场景
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-json</artifactId>
-      <version>2.3.4.RELEASE</version>
-      <scope>compile</scope>
-    </dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-json</artifactId>
+    <version>2.3.4.RELEASE</version>
+    <scope>compile</scope>
+</dependency>
 
 ```
 给前端自动返回json数据；
@@ -1853,21 +1862,21 @@ web场景自动引入了json场景
 1、返回值解析器
 ```java
 try {
-			this.returnValueHandlers.handleReturnValue(
-					returnValue, getReturnValueType(returnValue), mavContainer, webRequest);
-		}
+    this.returnValueHandlers.handleReturnValue(
+            returnValue, getReturnValueType(returnValue), mavContainer, webRequest);
+}
 ```
 ```java
-	@Override
-	public void handleReturnValue(@Nullable Object returnValue, MethodParameter returnType,
-			ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
+@Override
+public void handleReturnValue(@Nullable Object returnValue, MethodParameter returnType,
+        ModelAndViewContainer mavContainer, NativeWebRequest webRequest) throws Exception {
 
-		HandlerMethodReturnValueHandler handler = selectHandler(returnValue, returnType);
-		if (handler == null) {
-			throw new IllegalArgumentException("Unknown return value type: " + returnType.getParameterType().getName());
-		}
-		handler.handleReturnValue(returnValue, returnType, mavContainer, webRequest);
-	}
+    HandlerMethodReturnValueHandler handler = selectHandler(returnValue, returnType);
+    if (handler == null) {
+        throw new IllegalArgumentException("Unknown return value type: " + returnType.getParameterType().getName());
+    }
+    handler.handleReturnValue(returnValue, returnType, mavContainer, webRequest);
+}
 ```
 ```java
 RequestResponseBodyMethodProcessor  	
@@ -1920,21 +1929,21 @@ WebAsyncTask
 
 1、MessageConverter规范
 
-HttpMessageConverter: 看是否支持将 此 Class类型的对象，转为MediaType类型的数据。
+`HttpMessageConverter`: 看是否支持将 此 Class类型的对象，转为MediaType类型的数据。
 例子：Person对象转为JSON。或者 JSON转为Person
 
-2、默认的MessageConverter
+2、默认的`MessageConverter`
 
-0 - 只支持Byte类型的
-1 - String
-2 - String
-3 - Resource
-4 - ResourceRegion
-5 - DOMSource.class \ SAXSource.class) \ StAXSource.class \StreamSource.class \Source.class
-6 - MultiValueMap
-7 - true 
-8 - true
-9 - 支持注解方式xml处理的。
+- 0 - 只支持Byte类型的
+- 1 - String
+- 2 - String
+- 3 - Resource
+- 4 - ResourceRegion
+- 5 - DOMSource.class \ SAXSource.class) \ StAXSource.class \StreamSource.class \Source.class
+- 6 - MultiValueMap
+- 7 - true 
+- 8 - true
+- 9 - 支持注解方式xml处理的。
 
 最终 MappingJackson2HttpMessageConverter  把对象转为JSON（利用底层的jackson的objectMapper转换的
 
@@ -1986,13 +1995,12 @@ spring:
 WebMvcConfigurationSupport
 jackson2XmlPresent = ClassUtils.isPresent("com.fasterxml.jackson.dataformat.xml.XmlMapper", classLoader);
 
-if (jackson2XmlPresent) {
-			Jackson2ObjectMapperBuilder builder = Jackson2ObjectMapperBuilder.xml();
-			if (this.applicationContext != null) {
-				builder.applicationContext(this.applicationContext);
-			}
-			messageConverters.add(new MappingJackson2XmlHttpMessageConverter(builder.build()));
-		}
+if (jackson2XmlPresent) {Jackson2ObjectMapperBuilder builder = Jackson2ObjectMapperBuilder.xml();
+    if (this.applicationContext != null) {
+        builder.applicationContext(this.applicationContext);
+    }
+    messageConverters.add(new MappingJackson2XmlHttpMessageConverter(builder.build()));
+}
 ```
 
 5、自定义 MessageConverter
@@ -2044,19 +2052,19 @@ public void configureContentNegotitation(ContentNegotitationConfigurer configure
 
 #### 视图解析
 - 1、视图解析原理流程
-- 1、目标方法处理的过程中，所有数据都会被放在 ModelAndViewContainer 里面。包括数据和视图地址
-- 2、方法的参数是一个自定义类型对象（从请求参数中确定的），把他重新放在 ModelAndViewContainer 
+- 1、目标方法处理的过程中，所有数据都会被放在 `ModelAndViewContainer` 里面。包括数据和视图地址
+- 2、方法的参数是一个自定义类型对象（从请求参数中确定的），把他重新放在 `ModelAndViewContainer` 
 - 3、任何目标方法执行完成以后都会返回 ModelAndView（数据和视图地址）。
-- 4、processDispatchResult  处理派发结果（页面改如何响应）
- - 1、render(mv, request, response); 进行页面渲染逻辑
+- 4、`processDispatchResult`  处理派发结果（页面改如何响应）
+ - 1、`render(mv, request, response)`; 进行页面渲染逻辑
    - 1、根据方法的String返回值得到 View 对象【定义了页面的渲染逻辑】
      - 1、所有的视图解析器尝试是否能根据当前返回值得到View对象
-     - 2、得到了  redirect:/main.html --> Thymeleaf new RedirectView()
-    - 3、ContentNegotiationViewResolver 里面包含了下面所有的视图解析器，内部还是利用下面所有视图解析器得到视图对象。
-    - 4、view.render(mv.getModelInternal(), request, response);   视图对象调用自定义的render进行页面渲染工作
+     - 2、得到了 ` redirect:/main.html` --> `Thymeleaf new RedirectView()`
+    - 3、`ContentNegotiationViewResolver `里面包含了下面所有的视图解析器，内部还是利用下面所有视图解析器得到视图对象。
+    - 4、`view.render(mv.getModelInternal(), request, response);`   视图对象调用自定义的render进行页面渲染工作
       -  RedirectView 如何渲染【重定向到一个页面】
        - 1、获取目标url地址
-       - 2、response.sendRedirect(encodedURL);
+       - 2、`response.sendRedirect(encodedURL)`;
 
 
 视图解析：
@@ -2146,9 +2154,9 @@ Default: (value) ?: (defaultvalue)
 ###### 迭代
 ```html
 <tr th:each="prod : ${prods}">
-        <td th:text="${prod.name}">Onions</td>
-        <td th:text="${prod.price}">2.41</td>
-        <td th:text="${prod.inStock}? #{true} : #{false}">yes</td>
+    <td th:text="${prod.name}">Onions</td>
+    <td th:text="${prod.price}">2.41</td>
+    <td th:text="${prod.inStock}? #{true} : #{false}">yes</td>
 </tr>
 ```
 ```html
@@ -2189,10 +2197,10 @@ th:if="${not #lists.isEmpty(prod.comments)}">view</a>
 1、引入Starter
 
 ```xml
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-thymeleaf</artifactId>
-        </dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-thymeleaf</artifactId>
+</dependency>
 ```
 
 2.自动配置好了thymeleaf
@@ -2210,9 +2218,9 @@ public class ThymeleafAutoConfiguration { }
 - ● 4、我们只需要直接开发页面
 
 ```java
-	public static final String DEFAULT_PREFIX = "classpath:/templates/";
+public static final String DEFAULT_PREFIX = "classpath:/templates/";
 
-	public static final String DEFAULT_SUFFIX = ".html";  //xxx.html
+public static final String DEFAULT_SUFFIX = ".html";  //xxx.html
 
 ```
 3.页面开发
@@ -2226,8 +2234,8 @@ public class ThymeleafAutoConfiguration { }
 <body>
 <h1 th:text="${msg}">哈哈</h1>
 <h2>
-    <a href="www.atguigu.com" th:href="${link}">去百度</a>  <br/>
-    <a href="www.atguigu.com" th:href="@{link}">去百度2</a>
+    <a href="www.andy.com" th:href="${link}">去百度</a>  <br/>
+    <a href="www.andy.com" th:href="@{link}">去百度2</a>
 </h2>
 </body>
 </html>
@@ -2246,55 +2254,55 @@ public class ThymeleafAutoConfiguration { }
 
 5、页面跳转
 ```java
-    @PostMapping("/login")
-    public String main(User user, HttpSession session, Model model){
+@PostMapping("/login")
+public String main(User user, HttpSession session, Model model){
 
-        if(StringUtils.hasLength(user.getUserName()) && "123456".equals(user.getPassword())){
-            //把登陆成功的用户保存起来
-            session.setAttribute("loginUser",user);
-            //登录成功重定向到main.html;  重定向防止表单重复提交
-            return "redirect:/main.html";
-        }else {
-            model.addAttribute("msg","账号密码错误");
-            //回到登录页面
-            return "login";
-        }
-
+    if(StringUtils.hasLength(user.getUserName()) && "123456".equals(user.getPassword())){
+        //把登陆成功的用户保存起来
+        session.setAttribute("loginUser",user);
+        //登录成功重定向到main.html;  重定向防止表单重复提交
+        return "redirect:/main.html";
+    }else {
+        model.addAttribute("msg","账号密码错误");
+        //回到登录页面
+        return "login";
     }
+
+}
 ```
 
 6.数据渲染
 
 ```java
-    @GetMapping("/dynamic_table")
-    public String dynamic_table(Model model){
-        //表格内容的遍历
-        List<User> users = Arrays.asList(new User("zhangsan", "123456"),
-                new User("lisi", "123444"),
-                new User("haha", "aaaaa"),
-                new User("hehe ", "aaddd"));
-        model.addAttribute("users",users);
+@GetMapping("/dynamic_table")
+public String dynamic_table(Model model){
+    //表格内容的遍历
+    List<User> users = Arrays.asList(new User("zhangsan", "123456"),
+            new User("lisi", "123444"),
+            new User("haha", "aaaaa"),
+            new User("hehe ", "aaddd"));
+    model.addAttribute("users",users);
 
-        return "table/dynamic_table";
-    }
+    return "table/dynamic_table";
+}
 ```
 ```html
-        <table class="display table table-bordered" id="hidden-table-info">
-        <thead>
+<table class="display table table-bordered" id="hidden-table-info">
+    <thead>
         <tr>
             <th>#</th>
             <th>用户名</th>
             <th>密码</th>
-        </tr>
-        </thead>
-        <tbody>
+        </tr>   
+    </thead>
+    <tbody>
         <tr class="gradeX" th:each="user,stats:${users}">
             <td th:text="${stats.count}">Trident</td>
             <td th:text="${user.userName}">Internet</td>
             <td >[[${user.password}]]</td>
         </tr>
-        </tbody>
-        </table>
+    </tbody>
+</table>
 ```
 ### 拦截器
 #### HandlerInterceptor 接口
@@ -3137,7 +3145,7 @@ public interface ErrorViewResolver {
 
 #### 使用原生的注解 servlet 原生api
 
-- `@ServletComponentScan(basePackages = "com.atguigu.admin")` :指定原生Servlet组件都放在那里
+- `@ServletComponentScan(basePackages = "com.andy.admin")` :指定原生Servlet组件都放在那里
 - `@WebServlet(urlPatterns = "/my")`：效果：直接响应，没有经过Spring的拦截器？
 - `@WebFilter(urlPatterns={"/css/*","/images/*"})`
 - `@WebListener`
@@ -3146,7 +3154,7 @@ public interface ErrorViewResolver {
 
 
 
-扩展：`DispatchServle`t 如何注册进来
+扩展：`DispatchServlet` 如何注册进来
 - ● 容器中自动配置了  `DispatcherServlet ` 属性绑定到 WebMvcProperties；对应的配置文件配置项是 spring.mvc。
 - ● 通过 `ServletRegistrationBean<DispatcherServlet>` 把 DispatcherServlet  配置进来。
 - ● 默认映射的是 / 路径
@@ -3709,7 +3717,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
 
     druid:
-      aop-patterns: com.atguigu.admin.*  #监控SpringBean
+      aop-patterns: com.andy.admin.*  #监控SpringBean
       filters: stat,wall     # 底层开启功能，stat（sql监控），wall（防火墙）
 
       stat-view-servlet:   # 配置监控页功能
@@ -4554,7 +4562,9 @@ public class Junit5Test {
 多个断言那么一个断言失败 后面的代码（包括断言）都不会执行
 
 JUnit 5 内置的断言可以分成如下几个类别：
-多个u大纳言你#### 简单断言
+多个u大纳言你
+
+#### 简单断言
 
 用来对单个值进行简单的验证。如：
 
@@ -5514,26 +5524,29 @@ B --> C[spring-boot-starter]
 - autoconfigure包中配置使用`META-INF/spring.factories`中`EnableAutoConfiguration`的值，使得项目启动加载指定的自动配置类
 - 编写自动配置类 `xxxAutoConfiguration` -> `xxxxProperties`
 
-- - `@Configuration`
-  - `@Conditional`
-  - `@EnableConfigurationProperties`
-  - `@Bean`
-  - ......
+- `@Configuration`
+- `@Conditional`
+- `@EnableConfigurationProperties`
+- `@Bean`
+- ......
 
 - 引入starter --- `xxxAutoConfiguration` --- 容器中放入组件 ---- `绑定xxxProperties` ---- 配置项
 
 #### 自定义starter
-● autoconfigure包中配置使用 META-INF/spring.factories 中 EnableAutoConfiguration 的值，使得项目启动加载指定的自动配置类
-● 编写自动配置类 xxxAutoConfiguration -> xxxxProperties
-  ○ @Configuration
-  ○ @Conditional
-  ○ @EnableConfigurationProperties
-  ○ @Bean
-  ○ ......
+- ● autoconfigure包中配置使用` META-INF/spring.factories` 中 `EnableAutoConfiguration` 的值，使得项目启动加载指定的自动配置类
+- ● 编写自动配置类 xxxAutoConfiguration -> xxxxProperties
+  - ○ @Configuration
+  - ○ @Conditional
+  - ○ @EnableConfigurationProperties
+  - ○ @Bean
+  - ○ ......
+
 引入starter --- xxxAutoConfiguration --- 容器中放入组件 ---- 绑定xxxProperties ---- 配置项
+
 2、自定义starter
-atguigu-hello-spring-boot-starter（启动器）
-atguigu-hello-spring-boot-starter-autoconfigure（自动配置包
+
+andy-hello-spring-boot-starter（启动器）
+andy-hello-spring-boot-starter-autoconfigure（自动配置包）
 
 
 
@@ -5769,51 +5782,52 @@ class HelloSpringBootStarterTestApplicationTests {
 - ● 创建 SpringApplication
   - ○ 保存一些信息。
   - ○ 判定当前应用的类型。ClassUtils。Servlet
-  - ○ bootstrappers：初始启动引导器（List<Bootstrapper>）：去spring.factories文件中找 org.springframework.boot.Bootstrapper
-  - ○ 找 ApplicationContextInitializer；去spring.factories找 ApplicationContextInitializer
-    ■ List<ApplicationContextInitializer<?>> initializers
-  - ○ 找 ApplicationListener  ；应用监听器。去spring.factories找 ApplicationListener
-    - ■ List<ApplicationListener<?>> listeners
-- ● 运行 SpringApplication
+  - ○ bootstrappers：初始启动引导器（`List<Bootstrapper>`）：去`spring.factories`文件中找 `org.springframework.boot.Bootstrapper`
+  - ○ 找 `ApplicationContextInitializer`；去`spring.factories`找 `ApplicationContextInitializer`
+    ■ `List<ApplicationContextInitializer<?>> initializers`
+  - ○ 找 `ApplicationListener`  ；应用监听器。去`spring.factories`找 `ApplicationListener`
+    - ■ `List<ApplicationListener<?>> listeners`
+- ● 运行 `SpringApplication`
   - ○ StopWatch
   - ○ 记录应用的启动时间
-  - ○ 创建引导上下文（Context环境）createBootstrapContext()
-    - ■ 获取到所有之前的 bootstrappers 挨个执行 intitialize() 来完成对引导启动器上下文环境设置
-  - ○ 让当前应用进入headless模式。java.awt.headless
-  - ○ 获取所有 RunListener（运行监听器）【为了方便所有Listener进行事件感知】
-    - ■ getSpringFactoriesInstances 去spring.factories找 SpringApplicationRunListener. 
-  - ○ 遍历 SpringApplicationRunListener 调用 starting 方法；
+  - ○ 创建引导上下文（Context环境）`createBootstrapContext()`
+    - ■ 获取到所有之前的 bootstrappers 挨个执行 `intitialize()` 来完成对引导启动器上下文环境设置
+  - ○ 让当前应用进入headless模式。`java.awt.headless`
+  - ○ 获取所有 `RunListener`（运行监听器）【为了方便所有Listener进行事件感知】
+    - ■ `getSpringFactoriesInstances` 去spring.factories找 `SpringApplicationRunListener`. 
+  - ○ 遍历 `SpringApplicationRunListener` 调用 starting 方法；
     - ■ 相当于通知所有感兴趣系统正在启动过程的人，项目正在 starting。
   - ○ 保存命令行参数；ApplicationArguments
-  - ○ 准备环境 prepareEnvironment（）;
-    - ■ 返回或者创建基础环境信息对象。StandardServletEnvironment
+  - ○ 准备环境 `prepareEnvironment（）`;
+    - ■ 返回或者创建基础环境信息对象`。StandardServletEnvironment`
     - ■ 配置环境信息对象。
       - ● 读取所有的配置源的配置属性值。
     - ■ 绑定环境信息
-    - ■ 监听器调用 listener.environmentPrepared()；通知所有的监听器当前环境准备完成
-  - ○ 创建IOC容器（createApplicationContext（））
+    - ■ 监听器调用 `listener.environmentPrepared()`；通知所有的监听器当前环境准备完成
+  - ○ 创建IOC容器（`createApplicationContext（）`）
     - ■ 根据项目类型（Servlet）创建容器，
-    - ■ 当前会创建 AnnotationConfigServletWebServerApplicationContext
-  - ○ 准备ApplicationContext IOC容器的基本信息   prepareContext()
+    - ■ 当前会创建` AnnotationConfigServletWebServerApplicationContext`
+  - ○ 准备ApplicationContext IOC容器的基本信息  ` prepareContext()`
     - ■ 保存环境信息
     - ■ IOC容器的后置处理流程。
     - ■ 应用初始化器；applyInitializers；
       - ● 遍历所有的 ApplicationContextInitializer 。调用 initialize.。来对ioc容器进行初始化扩展功能
       - ● 遍历所有的 listener 调用 contextPrepared。EventPublishRunListenr；通知所有的监听器contextPrepared
     - ■ 所有的监听器 调用 contextLoaded。通知所有的监听器 contextLoaded；
-  - ○ 刷新IOC容器。refreshContext
+  - ○ 刷新IOC容器。`refreshContext`
     - ■ 创建容器中的所有组件（Spring注解）
   - ○ 容器刷新完成后工作？afterRefresh
-  - ○ 所有监听 器 调用 listeners.started(context); 通知所有的监听器 started
+  - ○ 所有监听 器 调用 `listeners.started(context);` 通知所有的监听器 started
   - ○ 调用所有runners；callRunners()
-    - ■ 获取容器中的 ApplicationRunner 
-    - ■ 获取容器中的  CommandLineRunner
+    - ■ 获取容器中的 `ApplicationRunner`
+    - ■ 获取容器中的  `CommandLineRunner`
     - ■ 合并所有runner并且按照@Order进行排序
     - ■ 遍历所有的runner。调用 run 方法
   - ○ 如果以上有异常，
     - ■ 调用Listener 的 failed
   - ○ 调用所有监听器的 running 方法  listeners.running(context); 通知所有的监听器 running 
   - z○ running如果有问题。继续通知 failed 。调用所有 Listener 的 failed；通知所有的监听器 failed
+
 #### SpringBoot启动过程
 
 Spring Boot应用的启动类：
@@ -5923,7 +5937,7 @@ org.springframework.boot.liquibase.LiquibaseServiceLocatorApplicationListener
 
 ####  原理解析-SpringBoot完整启动过程
 
-继续上一节，接着讨论`return new SpringApplication(primarySources).run(args)`的`run`方法
+讨论`return new SpringApplication(primarySources).run(args)`的`run`方法
 
 ```java
 public class SpringApplication {
@@ -6431,7 +6445,7 @@ org.springframework.boot.SpringApplicationRunListener=\
 
 
 
-###  后会有期
+###  总述
 
 > 路漫漫其修远兮，吾将上下而求索。
 
