@@ -669,6 +669,8 @@ class Solution {
 
 ## 前缀和
 > 前缀和主要适用的场景是原始数组不会被修改的情况下，频繁查询某个区间的累加和
+
+
 ```java
 import javax.naming.NamingEnumeration;
 
@@ -697,12 +699,11 @@ class NumArray {
 
 ### 常用技巧
 #### 求子数组
+
 - 一般计算`left`和`right`数组，左到右、右到左的连乘、连加的时候
 就是某个位置左右两边的和或者乘积的时候。
 - 使用`Deque`双端队列保存一个滑动窗口
 - 前缀和与哈希表一起使用
-
-
 
 
 
@@ -773,8 +774,9 @@ Arrays.sort(nums,(a,b)->{
 1. 先按照x排序，利用每个间隔或者每个x进行下一步处理
 2. 在y轴用一条线自左向右扫描，乘或者取和。
 3. y轴运算可以采用区间技巧 
-## 一些算法技巧
 
+
+## 一些算法技巧
 ### 模幂运算
 运算数字太大
 ```java
@@ -871,7 +873,7 @@ public int gcd(int a,int b){
         return gcd(a>>1,b>>1)<<1;
     }else if(!aiseven&&biseven){
         return gcd(a,b>>1);
-    }
+    
     }else if(aiseven&&!biseven){
         return gcd(a>>1,b);
     }else {
