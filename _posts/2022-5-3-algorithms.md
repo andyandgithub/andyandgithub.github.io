@@ -746,9 +746,160 @@ public class Difference {
 
 ## 线段树
 可用数组实现，一般大小为原数组的四倍大小。
-
+线段树
 
 ```java
+import java.util.*;
+
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ * int val;
+ * TreeNode left;
+ * TreeNode right;
+ * TreeNode(int x) { val = x; }
+ * }
+ */
+class Solution {
+    int n, m, c;
+    SegTreeNode[] segTree;
+    // List<Integer> nums = new ArrayList<>(100000);
+
+    class SegTreeNode {
+        int l, r, len, color;
+        Integer lazy;
+
+        public SegTreeNode() {
+        }
+
+        public SegTreeNode(int l, int r, int len) {
+            this.l = l;
+            this.r = r;
+            this.len = len;
+        }
+
+        @Override
+        public String toString() {
+            return l + "-" + r + "-" + len + "-" + color+"+"+lazy;
+        }
+    }
+
+    public SegTreeNode buildTree(int i, int l, int r) {
+        if (l == r) {
+            segTree[i] = new SegTreeNode(nums.get(l), nums.get(r), 1);
+            return segTree[i];
+        }
+//        segTree[i]=new SegTreeNode();
+        int mid = l + ((r - l) >> 1);
+        SegTreeNode left = buildTree(2 * i + 1, l, mid);
+        SegTreeNode right = buildTree(2 * i + 2, mid + 1, r);
+        segTree[i] = new SegTreeNode(left.l, right.r, left.len + right.len);
+        return segTree[i];
+    }
+
+    public void update(int i, int l, int r, int color) {
+//        System.out.println(i+"-"+l+"-"+r);
+        if (segTree[i].lazy != null) {
+            if (segTree[i].lazy == color) {
+                return;
+            }else if(l <= segTree[i].l && r >= segTree[i].r){
+                segTree[i].lazy = color;
+                return;
+            }
+            pushDown(i);
+        }
+        if (l <= segTree[i].l && r >= segTree[i].r) {
+            segTree[i].color = color;
+            segTree[i].lazy = color;
+            return;
+        }
+//        if()
+//        segTree[i].lazy=null;
+//        if (color == 0) {
+//            segTree[i].color = color;
+//        }
+        int tl = 2 * i + 1, tr = 2 * i + 2;
+        if ((tl >= m || segTree[tl] == null) && (tr >= m || segTree[tr] == null)) {
+            return;
+        }
+
+//        if ((l >= segTree[tl].l && l <= segTree[tl].r) || ()||(r >= segTree[tl].l && r <= segTree[tl].r)) {
+//            update(tl, l, r, color);
+//        }
+//        if ((l >= segTree[tr].l && l <= segTree[tr].r) || (r >= segTree[tr].l && r <= segTree[tr].r)) {
+//            update(tr, l, r, color);
+//        }
+
+        int left=segTree[tl].r,right=segTree[tr].l;
+        if(r<=left){
+            update(tl,l,r,color);
+        }else if(l>left){
+            update(tr,l,r,color);
+        }else{
+            update(tl,l,left,color);
+            update(tr,right,r,color);
+        }
+
+
+    }
+
+    public void pushDown(int i) {
+        int c = segTree[i].lazy, l = 2 * i + 1, r = 2 * i + 2;
+        segTree[i].lazy = null;
+        if (l < m && segTree[l] != null) {
+            segTree[l].lazy = c;
+            segTree[l].color = c;
+        }
+        if (r < m && segTree[r] != null) {
+            segTree[r].lazy = c;
+            segTree[r].color = c;
+        }
+
+    }
+
+    public void query(int i) {
+        if (i >= m || segTree[i] == null) {
+            return;
+        }
+//        if (segTree[i].color == 1) {
+//            c += segTree[i].len;
+//            return;
+//
+//        }
+        if (segTree[i].lazy != null && segTree[i].lazy == 1) {
+            c += segTree[i].len;
+            return;
+        }
+        if (segTree[i].lazy == null) {
+            query(2 * i + 1);
+            query(2 * i + 2);
+        }
+
+
+    }
+
+  
+
+
+
+    public int getNumber(List<Integer> nums , int[][] ops) {
+        n = nums.size();
+
+        segTree = new SegTreeNode[5 * n];
+
+        buildTree(0, 0, n - 1);
+        m = segTree.length;
+        for (int[] op : ops) {
+            update(0, op[1], op[2], op[0]);
+        }
+        c = 0;
+        query(0);
+        return c;
+    }
+
+    
+}
+
 
 
 ```
