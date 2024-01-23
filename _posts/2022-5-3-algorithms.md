@@ -82,7 +82,7 @@ int right_bound(int[] nums, int target) {
 }
 ```
 ### 双指针法
-安静两个循环变成一个循环 27
+两个循环变成一个循环 27
 ```java
 public int removeElement(int[] nums, int val) {
     if(nums.length==0){
